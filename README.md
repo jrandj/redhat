@@ -118,7 +118,60 @@
 
 
 1. Log in and switch users in multiuser targets
+
+    * A user can switch to another user using su. The -i ensures that the target users login scripts are run:
+
+        ```shell
+        sudo -i -u targetUser
+        ``` 
+    * To run a command as root without switching:
+    
+        ```shell
+        sudo -c
+        ``` 
+    * The configuration for which users can run which commands using sudo is defined in the /etc/sudoers file. The visudo command is used to edit the sudoers file. The sudo command logs successful authentication and command data to /var/log/secure.
+
 1. Archive, compress, unpack, and uncompress files using tar, star, gzip, and bzip2
+
+    * To archive using tar:
+
+        ```shell
+        tar cvf myTar.tar /home
+        ``` 
+
+    * To unpack using tar:
+
+        ```shell
+        tar xvf myTar.tar
+        ``` 
+
+    * To compress using tar and gzip:
+
+        ```shell
+        tar cvfz myTar.tar /home
+        ``` 
+
+    * To compress using tar and bzip2:
+
+        ```shell
+        tar cvfj myTar.tar /home
+        ``` 
+
+    * To uncompress using tar and gzip:
+
+        ```shell
+        tar xvfz myTar.tar /home
+        ``` 
+
+    * To uncompress using tar and bzip2:
+
+        ```shell
+        tar xvfj myTar.tar /home
+        ``` 
+
+    * The star command is an enhanced versin of tar. It also supports SELinux security contexts and extended file attributes. The options are similar to tar.
+
+
 1. Create and edit text files
 1. Create, delete, copy, and move files and directories
 1. Create hard and soft links
