@@ -110,16 +110,16 @@
 
     * Secure Shell (SSH) provides a secure mechanism for data transmission between source and destination systems over IP networks.
     * SSH uses encryption and performs data integrity checks on transmitted data.
-    * The version of SSH used is defined in /etc/ssh/sshd_config.
+    * The version of SSH used is defined in */etc/ssh/sshd_config*.
     * The most common authentication methods are Password-Based Authentication and Public/Private Key-Based Authentication.
-    * The command ssh-keygen is used to generate keys and place them in the .ssh directory, and the command ssh-copy-id is used to copy the public key file to your account on the remote server.
-    * TCP Wrappers is a host-based mechanism that is used to limit access to wrappers-aware TCP services on the system by inbound clients. Two files /etc/hosts.allow and /etc/hosts.deny are used to control access. The .allow file is referenced before the .deny file. The format of the files is \<name of service process>:\<user@source>.
-    * All messages related to TCP Wrappers are logged to the /var/log/secure file.
+    * The command *ssh-keygen* is used to generate keys and place them in the .ssh directory, and the command *ssh-copy-id* is used to copy the public key file to your account on the remote server.
+    * TCP Wrappers is a host-based mechanism that is used to limit access to wrappers-aware TCP services on the system by inbound clients. Two files */etc/hosts.allow* and */etc/hosts.deny* are used to control access. The .allow file is referenced before the .deny file. The format of the files is \<name of service process>:\<user@source>.
+    * All messages related to TCP Wrappers are logged to the */var/log/secure* file.
 
 
 1. Log in and switch users in multiuser targets
 
-    * A user can switch to another user using su. The -i ensures that the target users login scripts are run:
+    * A user can switch to another user using the *su* command. The -i option ensures that the target users login scripts are run:
 
         ```shell
         sudo -i -u targetUser
@@ -129,7 +129,7 @@
         ```shell
         sudo -c
         ``` 
-    * The configuration for which users can run which commands using sudo is defined in the /etc/sudoers file. The visudo command is used to edit the sudoers file. The sudo command logs successful authentication and command data to /var/log/secure.
+    * The configuration for which users can run which commands using sudo is defined in the */etc/sudoers* file. The visudo command is used to edit the sudoers file. The sudo command logs successful authentication and command data to */var/log/secure*.
 
 1. Archive, compress, unpack, and uncompress files using tar, star, gzip, and bzip2
 
@@ -173,12 +173,143 @@
 
 
 1. Create and edit text files
+
+    * To create an empty file:
+
+        ```shell
+        touch file
+        cat > newfile
+        ``` 
+
+    * To create a vile using vim:
+    
+        ```shell
+        vi file
+        ``` 
+
 1. Create, delete, copy, and move files and directories
+
+    * To create a directory:
+
+        ```shell
+        mkdir directory
+        ``` 
+
+    * To move a file or directory:
+
+        ```shell
+        mv item1 item2
+        ```     
+
+    * To copy a file or directory:
+
+        ```shell
+        cp item1 item2
+        ```     
+
+    * To remove a file:
+
+        ```shell
+        rm file1
+        ```
+
+    * To remove an empty directory:
+
+        ```shell
+        rmdir directory
+        ```
+
+    * To remove a non-empty directory:
+
+        ```shell
+        rm -r directory
+        ```
+
 1. Create hard and soft links
+
+    * A soft link associates one file with another. If the original file is removed the soft link will point to nothing. To create a softlink to file1:
+
+        ```shell
+        ln -s file1 softlink
+        ``` 
+
+    * A hard link associates multiple files to the same inode making them indistinguishable. If the original file is removed, you will still have access to the data through the linked file. To create a softlink to file1:
+
+        ```shell
+        ln file1 hardlink
+        ``` 
+
 1. List, set, and change standard ugo/rwx permissions
-1. Locate, read, and use system documentation including man, info, and files in /usr/share/doc
+
+    * Permissions are set for the user, group and others. User is the owner of the file or the directory, group is a set of users with identical access defined in */etc/group*, and others are all other users. The types of permission are read, write and execute.
+    * Permission combinations are shown below:
+
+        | Octal Value | Binary Notation | Symbolic Notation | Explanation                           |
+        |-------------|-----------------|-------------------|---------------------------------------|
+        | 0           | 000             | ---               | No permissions.                       |
+        | 1           | 001             | --x               | Execute permission only.              |
+        | 2           | 010             | -w-               | Write permission only.                |
+        | 3           | 011             | -wx               | Write and execute permissions.        |
+        | 4           | 100             | r--               | Read permission only.                 |
+        | 5           | 101             | r-x               | Read and execute permissions.         |
+        | 6           | 110             | rw-               | Read and write permissions.           |
+        | 7           | 111             | rwx               | Read, write, and execute permissions. |
+
+    * To grant the owner, group and others all permissions using the *chmod* command:
+
+        ```shell
+        chmod 777 file1
+        ```
+    * The default permissions are calculated based on the umask. The default umask for root is 0022 and 0002 for regular users (the leading 0 has no significance). The pre-defined initial permissions are 666 for files and 777 for directories. The umask is subtracted from these initial permissions to obtain the default permissions. To change the default umask:
+
+        ```shell
+        umask 027
+        ```
+    * Every file and directory has an owner. By default, the creator assumes ownership. The owner's group is assigned to a file or directory. To change the ownership of a file or directory:
+
+        ```shell
+        useradd user100
+        chown user100 item1
+        chgrp user100 item1
+        ```
+    
+        ```shell
+        chown user100:user100 item1
+        ```
+    * Note that the -R option must be used to recusively change all files in a directory.
+
+1. Locate, read, and use system documentation including man, info, and files in */usr/share/doc*
+
+    * The *man* command can be used to view help for a command. To search for a command based on a keyword the *apropros* command or *man* with the -k option can be used. The *mandb* command is used to build the man database.
+
+    * The *whatis* command can be used to search for a command in the man database for a short descripton.
+
+    * The *info* command provides more detailed information than the *man* command. 
+
+    * The */usr/share/doc* directory contains documentation for all installed packages under sub-directories that match package names followed by their version.
 
 ### Operate running systems
+
+1. Boot, reboot, and shut down a system normally
+
+1. Boot systems into different targets manually
+
+1. Interrupt the boot process in order to gain access to a system
+
+1. Identify CPU/memory intensive processes and kill processes
+
+1. Adjust process scheduling
+
+1. Manage tuning profiles
+
+1. Locate and interpret system log files and journals
+
+1. Preserve system journals
+
+1. Start, stop, and check the status of network services
+
+1. Securely transfer files between systems
+
 
 ### Configure local storage
 
