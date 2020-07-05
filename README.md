@@ -292,7 +292,49 @@
 
 1. Boot, reboot, and shut down a system normally
 
+    * The RHEL boot process occurs when the system is powered up or reset, and lasts until all enabled services are started and a login prompt appears at the screen. The login process consists of 4 steps:
+
+        * The firmware is the Basic Input Output System (BIOS) or Unified Extensible Firmware Interface (UEFI) code that is stored in flash memory on the motherboard. The first thing it does is run the power-on-self-test (POST) to initialise the system hardware components. It also installs appropriate drivers for the video hardware and displays system messages to the screen. It scans the available storage devices to locate a boot device (GRUB2 on RHEL), and then loads it into memory and passes control to it.
+
+        * The boot loader presents a menu with a list of bootable kernels available on the system. After a pre-defined amount of time it boots the default kernel. GRUB2 searches for the kernel in the */boot* file system. It then extracts the kernel code into memory and loads it based on the configuration in */boot/grub2/grub.cfg*. Note that for UEFI systems, GRUB2 looks in */boot/efi* instead and loads based on configuration in */boot/efi/EFI/redhat/grub.efi*. Once the kernel is loaded, GRUB2 passes control to it.
+
+        * The kernel loads the initial RAM disk (initrd) image from the */boot* file system. This acts as a temporary file system. The kernal then loads necessary modules from initrd to allow access to the physical disks and the partitions and file systems within. It also loads any drivers required to support the boot process. Later, the kernal unmounts initrd and mounts the actual root file system.
+
+        * The kernel continues the boot process. *systemd* is the default system initilisation scheme. It starts all enabled userspace system and network services.
+
+    * The *shutdown* command is used to halt, power off, or reboot the system gracefully. This command broadcasts a warning message to all logged-in users, disables further user logins, waits for the specified time, and then stops the service and shuts to the system down to the specified target state. 
+    
+    * To shut down the system now:
+        ```shell
+        shutdown -P now
+        ```
+
+    * To halt the system now:
+        ```shell
+        shutdown -H now
+        ```
+
+    * To reboot the system now:
+        ```shell
+        shutdown -r now
+        ```
+
+    * To shut down the system after 5 minutes:
+        ```shell
+        shutdown -P 5
+        ```
+
 1. Boot systems into different targets manually
+
+    * *systemd* is the default system initialisation mechanism in RHEL8. It is the first process that starts at boot and it is the last process that terminates at shutdown.
+
+    * *Units* are systemd objects that are used for organising boot and maintenance tasks, such as hardware initialisation, socket creation, file system mounts, and service startups. Unit configuration is stored in their respective configuration files, which are auto-generated from other configurations, created dynamically from the system state, produced at runtime, or userdeveloped. Units are in one of several operational states, including active, inactive, in the process of being activated or deactivated, and failed. Units can be enabled or disabled.
+
+    * Units have a name and a type, which are encoded in files of the form unitname.type. Units can be viewed using the *systemctl* command.
+
+    * *systemctl* is the primary command for interaction with systemd. 
+
+    * A target is a logical collection of units. They are a special systemd unit type with the .target file extension.
 
 1. Interrupt the boot process in order to gain access to a system
 
