@@ -330,13 +330,43 @@
 
     * *Units* are systemd objects that are used for organising boot and maintenance tasks, such as hardware initialisation, socket creation, file system mounts, and service startups. Unit configuration is stored in their respective configuration files, which are auto-generated from other configurations, created dynamically from the system state, produced at runtime, or userdeveloped. Units are in one of several operational states, including active, inactive, in the process of being activated or deactivated, and failed. Units can be enabled or disabled.
 
-    * Units have a name and a type, which are encoded in files of the form unitname.type. Units can be viewed using the *systemctl* command.
+    * Units have a name and a type, which are encoded in files of the form unitname.type. Units can be viewed using the *systemctl* command. A target is a logical collection of units. They are a special systemd unit type with the .target file extension.
 
     * *systemctl* is the primary command for interaction with systemd. 
 
-    * A target is a logical collection of units. They are a special systemd unit type with the .target file extension.
+    * To boot into a custom target the *e* key can be pressed at the GRUB2 menu, and the desired target specified using systemd.unit. After editing press *Ctrl+x* to boot into the target state. To boot into the emergency target: 
+        ```shell
+        systemd.unit=emergency.target
+        ```
+
+    * To boot into the rescue target:
+        ```shell
+        systemd.unit=rescue.target
+        ```
+
+    * Run *systemctl reboot* after you are done to reboot the system.
 
 1. Interrupt the boot process in order to gain access to a system
+
+    * Press *e* at the GRUB2 menu and add "rd.break" in place of "ro crash". 
+    * Press *Ctrl+x* to reboot.
+    * Run the following command to remount root with rw:
+        ```shell
+        mount -o remount,rw /sysroot
+        ```
+    *  Run the following command to change the root directory:
+        ```shell
+        chroot /sysroot
+        ```
+    *  Run *passwd* command to change the password.
+    *  Run the following commands to create an empty, hidden file to instruct the system to perform SELinux relabeling after the next boot:
+        ```shell
+        touch /.autorelabel
+        exit
+        exit
+        ```
+
+
 
 1. Identify CPU/memory intensive processes and kill processes
 
