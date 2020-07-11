@@ -2,6 +2,15 @@
 
 ## RHCSA
 
+- [Understand and use essential tools](#Understand-and-use-essential-tools)
+- [Operate running systems](#Operate-running-systems)
+- [Configure local storage](#Configure-local-storage)
+- [Create and configure file systems](#Create-and-configure-file-systems)
+- [Deploy, configure, and maintain systems](#Deploy,-configure,-and-maintain-systems)
+- [Manage basic networking](#Manage-basic-networking)
+- [Manage users and groups](#Manage-users-and-groups)
+- [Manage security](#Manage-security)
+
 ### Understand and use essential tools
 1. Access a shell prompt and issue commands with correct syntax
     * Common commands and their options, as well as vim usage, are shown below:
@@ -366,13 +375,93 @@
         exit
         ```
 
-
-
 1. Identify CPU/memory intensive processes and kill processes
 
+    * A process is a unit for provisioning system resources. A process is created in memory in its own address space when a program, application, or command is initiated. Processes are organised in a heirarchical fashion. Each process has a parent process that spawns it, and may have one or many child processes. Each process is assigned a unique identification number, known as the Process Identifier (PID). When a process completes its lifecycle or is terminated, this event is reported back to its parent process, and all the resources provisioned to it are then freed and the PID is removed. Processes spawned at system boot are called daemons. Many of these sit in memory and wait for an event to trigger a request to use their services.
+
+    * There are 5 basic process states:
+        * Running: The process is being executed by the CPU.
+        * Sleeping: The process is waiting for input from a user or another process.
+        * Waiting: The process has received the input it was waiting for and is now ready to run when its turn arrives.
+        * Stopped: The process is halted and will not run even when its turn arrives, unless a signal is sent to change its behaviour.
+        * Zombie: The process is dead. Its entry is retained until the parent process permits it to die.
+
+    * The *ps* and *top* commands can be used to view running processes.
+    
+    * The *pidof* or *pgrep* commands can be used to view the PID associated with a process name.
+    
+    * The *ps* command can be used to view the processes associated with a particular user. An example is shown below:
+        ```shell
+        ps -U root
+        ```
+
+    * To kill a process the *kill* or *pkill* commands can be used. Ordinary users can kill processes they own, while the *root* user can kill any process. The *kill* command requires a PID and the *pkill* command requires a process name. An example is shown below:
+        ```shell
+        pkill crond
+        kill `pidof crond`
+        ```
+    * The list of signals accessible by *kill* can be seen by passing the *-l* option. The default signal is SIGTERM which signals for a process to terminate in an orderly fashion.
+
+    * To use the SIGKILL signal:
+        ```shell
+        pkill -9 crond
+        kill -9 `pgrep crond`
+        ```
+
+    * The *killall* command can be used to terminate all processes that match a specified criteria.
+    
 1. Adjust process scheduling
 
+    * The priority of a process ranges from -20 (highest) to +19 (lowest). A higher niceness lowers the execution priority of a process and a lower niceness increases it. A child process inherits the niceness of its parent process.
+
+    * To run a command with a lower (+2) priority:
+        ```shell
+        nice -2 top
+        ```
+
+    * To run a command with a higher (-2) priority:
+        ```shell
+        nice --2 top
+        ```
+
+    * To renice a running process:
+        ```shell
+        renice 5 1919
+        ```
+    
 1. Manage tuning profiles
+
+    * Tuned is a service which monitors the system and optimises the performance of the system for different use cases. There are pre-defined tuned profiels available in the */usr/lib/tuned* directory. New profiles are created in the */etc/tuned* directory. The *tuned-adm* command allows you to interact with the Tuned service.
+
+    * To install and start the tuned service:
+        ```shell
+        yum install tuned
+        systemctl enable --now tuned
+        ```
+ 
+    * To check the currently active profile:
+        ```shell
+        tuned-adm active
+        ```
+
+    * To check the recommended profile:
+        ```shell
+        tuned-adm recommend
+        ```
+
+    * To change the active profile:
+        ```shell
+        tuned-adm profile <profile-name>
+        ```
+
+    * To create a customised profile and set it as active:
+        ```shell   
+        mkdir /etc/tuned/<profile-name>
+        vi /etc/tuned/<profile-name>/<profile-name.conf>
+        # customise as required
+        tuned-adm profile <profile-name>
+        systmctl restart tuned.service
+        ```
 
 1. Locate and interpret system log files and journals
 
@@ -382,12 +471,85 @@
 
 1. Securely transfer files between systems
 
-
 ### Configure local storage
+
+1. List, create, delete partitions on MBR and GPT disks
+
+1. Create and remove physical volumes
+
+1. Assign physical volumes to volume groups
+
+1. Create and delete logical volumes
+
+1. Configure systems to mount file systems at boot by universally unique ID (UUID) or label
+
+1. Add new partitions and logical volumes, and swap to a system non-destructively
 
 ### Create and configure file systems
 
+1. Create, mount, unmount, and use vfat, ext4, and xfs file systems
+
+1. Mount and unmount network file systems using NFS
+
+1. Extend existing logical volumes
+
+1. Create and configure set-GID directories for collaboration
+
+1. Configure disk compression
+
+1. Manage layered storage
+
+1. Diagnose and correct file permission problems
+
 ### Deploy, configure, and maintain systems
+
+1. Schedule tasks using at and cron
+
+    * Job scheduling and execution is handled by the *atd* and *crond* daemons. While *atd* manages jobs scheduled to run once in the future, *crond* is responsbile for running jobs repetitively at pre-specified times. At startup, *crond* reads schedules in files located in the */var/spool/cron* and */etc/cron.d* directories, and loads them in memory for later execution.
+
+    * There are 4 files that control permissions for setting scheduled jobs. These are *at.allow*, *at.deny*, *cron.allow* and *cron.deny*. These files are located in the */etc* directory. The syntax of the files is identical, with each file taking 1 username per line. If no files exist, then no users are permitted. By default, the *deny* files exist and are empty, and the *allow* files do not exist. This opens up full access to using both tools for all users.
+
+    * All activities involving *atd* and *crond* are logged to the */var/log/cron* file.
+
+    * The *at* command is used to schedule one-time execution of a program by the *atd* daemon. All submitted jobs are stored in the */var/spool/at* directory.
+
+    * To schedule a job using *at* the below syntax is used:
+        ```shell
+        at 11:30pm 6/30/15
+        ```
+    * The commands to execute are defined in the terminal, press *Ctrl+d* when finished. The added job can be viewed with *at* and can be removed with the *-d* option.
+
+    * A shell script can also be provided:
+        ```shell
+        at -f ~/script1.sh 11:30pm 6/30/15
+        ```
+
+    * The */etc/crontab* file has the following columns:
+        * 1: Minutes of hour (0-59), with multiple comma seperated values, or * to represent every minute.
+        * 2: Hours of day (0-23), with multiple comma seperated values, or * to represent every hour.
+        * 3: Days of month (1-31), with multiple comma seperated values, or * to represent every day.
+        * 4: Month of year (1-12, jan-dec), with multiple comma seperated values, or * to represent every month.
+        * 5: Day of week (0-6, sun-sat), with multiple comma seperated values, or * to represent every day.
+        * 6: Full path name of the command or script to be executed, along with any arguments.
+        
+    * Step values can be used with */2 meaning every 2nd minute.
+    
+    * The *crontab* command can be used to edit the file. Common options are *e* (edit), *l* (view), *r* (remove):
+        ```shell
+        crontab -e
+        ```
+
+1. Start and stop services and configure services to start automatically at boot
+
+1. Configure systems to boot into a specific target automatically
+
+1. Configure time service clients
+
+1. Install and update software packages from Red Hat Network, a remote repository, or from the local file system
+
+1. Work with package module streams
+
+1. Modify the system bootloader
 
 ### Manage basic networking
 
