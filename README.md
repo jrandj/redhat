@@ -507,6 +507,8 @@
 
 1. List, create, delete partitions on MBR and GPT disks
 
+    * Data is stored on disk dives that are logically divided into partitions. A partition can exist on a portion of a disk, an entire disk, or across multiple disks. Each partition can contain a file system, raw data space, swap space, or dump space.
+
 1. Create and remove physical volumes
 
 1. Assign physical volumes to volume groups
