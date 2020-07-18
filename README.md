@@ -509,11 +509,132 @@
 
     * Data is stored on disk dives that are logically divided into partitions. A partition can exist on a portion of a disk, an entire disk, or across multiple disks. Each partition can contain a file system, raw data space, swap space, or dump space.
 
+    * A disk in RHEL can be divided into several partitions. This partition information is stored on the disk in a small region, which is read by the operating system at boot time. This is known as the Master Boot Record (MBR) on BIOS-based systems, and GUID Partition Table (GPT) on UEFI-based systems. At system boot, the BIOS/UEFI scans all storage devices, detects the presence of MBR/GPT, identifies the boot disks, loads the boot loader program in memory from the default boot disk, executes the boot code to read the partition table and identify the */boot* partition, and continues with the boot process by loiading the kernel in the memory and passing control over to it.
+
+    * MBR allows the creation of only up to 4 primary partitions on a single disk, with the option of using one of the 4 partitions as an extended partition to hold an arbitrary number of logical partitions. MBR also lacks addressing space beyond 2TB due to its 32-bit nature and the disk sector size of 512-byte that it uses. MBR is also non-redundant, so a system becomes unbootable if it becomes corrupted somehow.
+
+    * GPT is a newer 64-bit partitioning standard developed and integrated to UEFI firmware. GPT allows for 128 partitions, use of disks much larger than 2TB, and redundant locations for the storage of partition information. GPT also allows a BIOS-based system to boot from a GPT disk, using the boot loader program stored in a protective MBR at the first disk sector.
+
+    * To list the mount points, size and available space:
+        ```shell   
+        df -h
+        ```
+
+    * In RHEL block devices are an abstraction for certain hardware, such hard disks. The *blkid* command lists all block devices. The *lsblk* command lists more details about block devices.
+
+    * To list all disks and partitions:
+        ```shell   
+        fdisk -l # MBR
+        gdisk -l # GPT
+        ```
+
+    * For MBR based partitions the *fdisk* utilty can be used to create and delete partitions. To make a change to a disk:
+        ```shell   
+        fdisk <disk>
+        ```
+
+    * For GPT based partitions the *gdisk* utilty can be used to create and delete partitions. To make a change to a disk:
+        ```shell   
+        gdisk <disk>
+        ```
+    
 1. Create and remove physical volumes
+
+    * Logical Volume Manager (LVM) is used to provide an abstraction layer between the physical storage and the file system. This enables the file system to be resized, to span across multiple physical disks, use random disk space, etc. One or more partitions or disks (physical volumes) can form a logical container (volume group), which is then divided into logical partitions (called logical volumes). These are further divided into physical extents (PEs) and logical extents (LEs).
+
+    * A physical volume (PV) is created when a block storage device is brought under LVM control after going through the initialisation process. This process constructs LVM data structures on the device, including a label on the second sector and metadata information. The label includes a UUID, device size, and pointers to the locations of data and metadata areas.
+
+    * A volume group (VG) is created when at least one physical volume is added to it. The space from all physical volumes in a volume group is aggregated to form one large pool of storage, which is then used to build one or more logical volumes. LVM writes metadata information for the volume group on each physical volume that is added to it.
+
+    * To view physical volumes:
+        ```shell   
+        pvs
+        ```
+
+    * To view physical volumes with additional details:
+        ```shell   
+        pvdisplay
+        ```
+
+    * To initialise a disk or partition for use by LVM:
+        ```shell   
+        pvcreate <disk>
+        ```
+
+    * To remove a physical volume from a disk:
+        ```shell   
+        pvremove <disk>
+        ```
 
 1. Assign physical volumes to volume groups
 
+    * To view volume groups:
+        ```shell   
+        vgs
+        ```
+
+    * To view volume groups with additional details:
+        ```shell   
+        vgdisplay
+        ```
+
+    * To create a volume group:
+        ```shell   
+        vgcreate <name> <disk>
+        ```
+
+    * To extend an existing volume group:
+        ```shell   
+        vgextend <name> <disk>
+        ```
+
+    * To remove a disk from a volume group:
+        ```shell   
+        vgreduce <name> <disk>
+        ```
+
+    * To remove the last disk from a volume group:
+        ```shell   
+        vgremove <name> <disk>
+        ```
+
 1. Create and delete logical volumes
+
+    * To view logical volumes:
+        ```shell   
+        lvs
+        ```
+
+    * To view logical volumes with additional details:
+        ```shell   
+        lvdisplay
+        ```
+
+    * To create a logical volume in vg1 named lv1 and with 4GB of space:
+        ```shell   
+        lvcreate -L 4G -n lv1 vg1 
+        ```
+
+    * To extend the logical volume by 1GB:
+        ```shell   
+        lvextend -L+1G <lvpath>
+        ```
+
+    * To extend the logical volume by 1GB:
+        ```shell   
+        lvextend -L+1G <lvpath>
+        ```
+
+    * To reduce the size for a logical volume by 1GB:
+        ```shell   
+        lvreduce -L-1G <lvpath>
+        ```
+
+    * To remove a logical volume:
+        ```shell   
+        umount <mountpoint>
+        lvremove <lvpath>
+        ```
 
 1. Configure systems to mount file systems at boot by universally unique ID (UUID) or label
 
@@ -587,6 +708,38 @@
 
 ### Manage basic networking
 
+1. Configure IPv4 and IPv6 addresses
+
+1. Configure hostname resolution
+
+1. Configure network services to start automatically at boot
+
+1. Restrict network access using firewall-cmd/firewall
+
 ### Manage users and groups
 
+1. Create, delete, and modify local user accounts
+
+1. Change passwords and adjust password aging for local user accounts
+
+1. Create, delete, and modify local groups and group memberships
+
+1. Configure superuser access
+
 ### Manage security
+
+1. Configure firewall settings using firewall-cmd/firewalld
+
+1. Create and use file access control lists
+
+1. Configure key-based authentication for SSH
+
+1. Set enforcing and permissive modes for SELinux
+
+1. List and identify SELinux file and process context
+
+1. Restore default file contexts
+
+1. Use boolean settings to modify system SELinux settings
+
+1. Diagnose and address routine SELinux policy violations
