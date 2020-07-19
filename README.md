@@ -537,6 +537,11 @@
         ```shell   
         gdisk <disk>
         ```
+
+    * To inform the OS of partition table changes:
+        ```shell   
+        partprobe
+        ```
     
 1. Create and remove physical volumes
 
@@ -637,12 +642,68 @@
         ```
 
 1. Configure systems to mount file systems at boot by universally unique ID (UUID) or label
-
+    
+    * The */etc/fstab* file is a system configuration file that lists all available disks, disk partitions and their options. Each file system is described on a separate line. The */etc/fstab* file is used by the *mount* command, which reads the file to determine which options should be used when mounting the specific device. A file system can be added to this file so that it is mounted on boot.
+    
+    * The *e2label* command can be used to change the label on ext file systems. This can then be used instead of the UUID.
+    
 1. Add new partitions and logical volumes, and swap to a system non-destructively
+
+    * Virtual memory is equal to RAM plus swap space. A swap partition is a standard disk partition that is designated as swap space by the *mkswap* command. A file can also be used as swap space but that is not recommended.
+
+    * To create a swap:
+        ```shell   
+        mkswap <device>
+        ```
+
+    * To enable a swap:
+        ```shell   
+        swapon <device>
+        ```
+
+    * To check the status of swaps:
+        ```shell   
+        swapon -s
+        ```
+
+    * To disable a swap:
+        ```shell   
+        swapoff <device>
+        ```
+
+    * The */etc/fstab* file will need a new entry for the swap so that it is created persistently.
 
 ### Create and configure file systems
 
 1. Create, mount, unmount, and use vfat, ext4, and xfs file systems
+
+    * A file system is a logical container that is used to store files and directories. Each file system must be connected to the root of the directory hierarchy in order to be accessible. This is typically done automatically on system boot, but can be done manually as well. Each file system can be mounted or unmounted using the UUID associated with it or by using a label that can be assigned to it. Mounting is the process of attaching an additional filesystem, which resides on a CDROM, hard disk drive (HDD) or other storage device, to the currently accessible filesystem of a computer. 
+
+    * Each file system is created in a separate partition or logical volume. A typical RHEL system has numerous file systems. During OS installation, the */* and */boot* file systems are created by default. Typical additional file systems created during installation include */home*, */opt*, */tmp*, */usr* and */var*.
+
+    * File systems supported in RHEL are categorised as disk-based, network-based, and memory-based. Disk-based and network-based file systems are stored persistently, while data in memory-based systems is lost at system reboot. The different file systems are shown below:
+
+    | File System          | Type    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+    |----------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+    | ext2                 | Disk    | The second generation of the extended file system. The first generation is no longer supported. ext2 is deprecated in RHEL and will be removed in a future RHEL release.                                                                                                                                                                                                                                                                                                                                        |
+    | ext3                 | Disk    | The third generation of the extended file system. It supports metadata journaling for faster recovery, superior reliability, file systems up to 16TB, files up to 2TB, and up to 32,000 sub-directories. ext3 writes each metadata update in its entirety to the journal after it has been completed. The system looks in the file system journal following a reboot after a system crash has occured, and recovers the file system rapidly using the updated structural information stored in its journal. |
+    | ext4                 | Disk    | The fourth generation of the extended file system. It supports file systems up to 1EB, files up to 16TB, an unlimited number of sub-directories, metadata and quota journaling, and extended user attributes.                                                                                                                                                                                                                                                                                                   |
+    | xfs                  | Disk    | XFS is a highly scalable and high-performance 64-bit file system.  It supports metadata journaling for faster crash recovery, online defragmentation, expansion quota journaling, and extended user attributes. It supports file systems and files of sizes up to 8EB. It is the default file system in RHEL8.                                                                                                                                                                                                  |
+    | btrfs                | Disk    | B-tree file system that supports a system size of 50TB. It supports more files, larger files, and larger volumes than ext4 and supports snapshotting and compression capabilities.                                                                                                                                                                                                                                                                                                                              |
+    | vfat                 | Disk    | This is used for post-Windows 95 file system format on hard disks, USB drives, and floppy disks.                                                                                                                                                                                                                                                                                                                                                                                                                |
+    | iso9660              | Disk    | This is used for CD/DVD-based optical file systems.                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+    | BIOS Boot            | Disk    | A very small partition required for booting a device with a GUID partition table (GPT) on a BIOS system.                                                                                                                                                                                                                                                                                                                                                                                                        |
+    | EFI System Partition | Disk    | A small partition required for booting a device with a GUID partition table (GPT) on a UEFI system.                                                                                                                                                                                                                                                                                                                                                                                                             |
+    | NFS                  | Network | A directory or file system shared over the network for access by other Linux systems.                                                                                                                                                                                                                                                                                                                                                                                                                           |
+    | AutoFS               | Network | An NFS file system set to mount and unmount automatically on a remote system.                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+    | CIFS                 | Network | Common Internet File System (a.k.a Samba). A directory or file system shared over the network for access by Windows and other Linux systems.                                                                                                                                                                                                                                                                                                                                                                    |
+
+    * To create an ext4 file system:
+        ```shell   
+        mkfs.ext4 <path>
+        ```
+
+    * The path is the device name or a regular file that shall contain the file system.
 
 1. Mount and unmount network file systems using NFS
 
