@@ -643,7 +643,7 @@
 
 1. Configure systems to mount file systems at boot by universally unique ID (UUID) or label
     
-    * The */etc/fstab* file is a system configuration file that lists all available disks, disk partitions and their options. Each file system is described on a separate line. The */etc/fstab* file is used by the *mount* command, which reads the file to determine which options should be used when mounting the specific device. A file system can be added to this file so that it is mounted on boot.
+    * The */etc/fstab* file is a system configuration file that lists all available disks, disk partitions and their options. Each file system is described on a separate line. The */etc/fstab* file is used by the *mount* command, which reads the file to determine which options should be used when mounting the specific device. A file system can be added to this file so that it is mounted on boot automatically.
     
     * The *e2label* command can be used to change the label on ext file systems. This can then be used instead of the UUID.
     
@@ -698,9 +698,78 @@
     | AutoFS               | Network | An NFS file system set to mount and unmount automatically on a remote system.                                                                                                                                                                                                                                                                                                                                                                                                                                   |
     | CIFS                 | Network | Common Internet File System (a.k.a Samba). A directory or file system shared over the network for access by Windows and other Linux systems.                                                                                                                                                                                                                                                                                                                                                                    |
 
+    * The *mount* command is used to attach a file system to a desired point in the directory heirarchy to make it accessible to users and applications. This point is referred to as the *mount point*, which is essentially an empty directory created soley for this point. The *mount* command requires the absolute pathname (or its UUID or label) to the block device containing the file system, and a mount point name in order to attach it to the directory tree. The *mount* command adds an entry to the */proc/mounts* file and instructs the kernel to add the entry to the */proc/mounts* file as well after a file system has been successfully mounted.
+
+    * The opposite of the *mount* command is *unmount*, whihc is used to detach a file system from the directory hierarchy and make it inaccessible to users and applications.
+
+    * To create a vfat file system:
+        ```shell   
+        mkfs.vfat <path>
+        ```
+
+    * To mount a vfat file system:
+        ```shell   
+        mount <path> /mnt
+        ```
+
+     * To unmount a vfat file system:
+        ```shell   
+        umount <path> /mnt
+        ```
+
+     * To check a vfat file system:
+        ```shell   
+        fsck.vfat <path>
+        ```
+
     * To create an ext4 file system:
         ```shell   
         mkfs.ext4 <path>
+        ```
+
+    * To mount an ext4 file system:
+        ```shell   
+        mount <path> /mnt
+        ```
+
+     * To unmount an ext4 file system:
+        ```shell   
+        umount <path> /mnt
+        ```
+
+     * To check an ext4 file system:
+        ```shell   
+        fsck <path>
+        ```
+
+     * To get additional details about an ext4 file system:
+        ```shell   
+        dumpe2fs <path>
+        ```
+
+    * To create a xfs file system:
+        ```shell   
+        mkfs.xfs <path>
+        ```
+
+    * To mount a xfs file system:
+        ```shell   
+        mount <path> /mnt
+        ```
+
+     * To unmount a xfs file system:
+        ```shell   
+        umount <path> /mnt
+        ```
+
+     * To check a xfs file system:
+        ```shell   
+        xfs_repair <path>
+        ```
+
+     * To get additional details about an xfs file system:
+        ```shell   
+        xfs_info <path>
         ```
 
     * The path is the device name or a regular file that shall contain the file system.
