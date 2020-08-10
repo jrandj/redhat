@@ -826,7 +826,89 @@
 
 1. Start and stop services and configure services to start automatically at boot
 
+    * To check the status of a service:
+        ```shell
+        systemctl status <service>
+        ```
+
+    * To start a service:
+        ```shell
+        systemctl start <service>
+        ```
+
+    * To stop a service:
+        ```shell
+        systemctl stop <service>
+        ```
+
+    * To make a service reload its configuration:
+        ```shell
+        systemctl reload <service>
+        ```
+
+    * To make a service reload its configuration or restart if it can't reload:
+        ```shell
+        systemctl reload-or-restart <service>
+        ```
+
+    * To make a service start on boot:
+        ```shell
+        systemctl enable <service>
+        ```
+
+    * To stop a service starting on boot:
+        ```shell
+        systemctl disable <service>
+        ```
+
+    * To check if a service is enabled:
+        ```shell
+        systemctl is-enabled <service>
+        ```
+
+    * To check if a service has failed:
+        ```shell
+        systemctl is-failed <service>
+        ```
+
+    * To view the configuration file for a service:
+        ```shell
+        systemctl cat /usr/lib/sysdtemd/system/<service>
+        ```
+
+   * To view the dependencies for a service:
+        ```shell
+        systemctl list-dependencies <service>
+        ```
+
+   * To stop a service from being run by anyone but the system and from being started on boot:
+        ```shell
+        systemctl mask <service>
+        ```
+
+   * To remove a mask:
+        ```shell
+        systemctl unmask <service>
+        ```
+
 1. Configure systems to boot into a specific target automatically
+
+   * To get the default target:
+        ```shell
+        systemctl get-default
+        ```
+
+   * To list available targets:
+        ```shell
+        systemctl list-units --type target --all
+        ```
+
+   * To change the default target:
+        ```shell
+        systemctl set-default <target>
+        ```
+
+    * The change will take affect after a reboot.
 
 1. Configure time service clients
 
