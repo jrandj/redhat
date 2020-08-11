@@ -912,6 +912,49 @@
 
 1. Configure time service clients
 
+    * To print the date:
+        ```shell
+        date +%d%m%y-%H%M%S
+        ```
+
+    * To set the system clock as per the hardware clock:
+        ```shell
+        hwclock -s
+        ```
+
+    * To set the hardware clock as per the system clock:
+        ```shell
+        hwclock -w
+        ```
+
+    * The *timedatectl* command can also be used to view the date and time.
+
+    * To change the date or time:
+        ```shell
+        timedatectl set-time 2020-03-18
+        timedatectl set-time 22:43:00
+        ```
+
+    * To view a list of timezones:
+        ```shell
+        timedatectl list-timezones
+        ```
+
+    * To change the timezone:
+        ```shell
+        timedatectl set-timezone <timezone>
+        ```
+
+    * To enable NTP:
+        ```shell
+        timedatectl set-ntp yes
+        ```
+
+    * To start the *chronyd* service:
+        ```shell
+        systemctl start chronyd
+        ```
+
 1. Install and update software packages from Red Hat Network, a remote repository, or from the local file system
 
 1. Work with package module streams
