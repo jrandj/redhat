@@ -957,6 +957,113 @@
 
 1. Install and update software packages from Red Hat Network, a remote repository, or from the local file system
 
+    * The .rpm extension is a format for files that are manipulated by the Redhat Package Manager (RPM) package management system. RHEL8 provides tools for the installation and administration of RPM packages. A package is a group of files organised in a directory structure and metadata that makes up a software application.
+
+    * An RPM package name follows the below format:
+        ```shell
+        openssl-1.0.1e-34.el7.x86_64.rpm
+        # package name = openssl
+        # package version = 1.0.1e
+        # package release = 34
+        # RHEL version = el7
+        # processor architecture = x86_64
+        # extension = .rpm
+        ```
+
+    * The *subscription-manager* command can be used to link a Red Hat subscription to a system.
+
+    * The *dnf* command is the front-end to *rpm* and is the preferred tool for package management. The *yum* command has been superseded by *dnf* in RHEL8. It requires that the system has access to a software repository. The primary benefit of *dnf* is that it automatically resolves dependencies by downloading and installaing any additional required packages.
+
+    * To list enabled and disabled repositories:
+        ```shell
+        dnf repolist all
+        dnf repoinfo
+        ```
+    
+    * To search for a package:
+        ```shell
+        dnf search <package>
+        dnf list <package>
+        ```
+    
+    * To view more information about a particular package:
+        ```shell
+        dnf info <package>
+        ```
+
+    * To install a package:
+        ```shell
+        dnf install <package>
+        ```
+
+    * To remove a package:
+        ```shell
+        dnf remove <package>
+        ```
+
+    * To find a package from a file:
+        ```shell
+        dnf provides <path>
+        ```
+
+    * To install a package locally:
+        ```shell
+        dnf localinstall <path>
+        ```
+
+    * To view available groups:
+        ```shell
+        dnf groups list
+        ```
+
+    * To install a group (e.g. System Tools)
+        ```shell
+        dnf group "System Tools"
+        ```
+
+    * To remove a group (e.g. System Tools)
+        ```shell
+        dnf group remove "System Tools"
+        ```
+
+    * To see the history of installations using *dnf*:
+        ```shell
+        dnf history list
+        ```
+
+    * To undo a particular installation (e.g. ID=22):
+        ```shell
+        dnf history undo 22
+        ```
+
+    * To redo a particular installation (e.g. ID=22):
+        ```shell
+        dnf history redo 22
+        ```
+
+    * To add a repository to the yum config manager:
+        ```shell
+        yum-config-manager --add-repo <url>
+        ```
+
+    * To enable a repository to the yum config manager:
+        ```shell
+        yum-config-manager --enablerepo <repository>
+        ```
+
+    * To disable a repository to the yum config manager:
+        ```shell
+        yum-config-manager --disablerepo <repository>
+        ```
+
+    * To create a repository:
+        ```shell
+        dnf install createrepo
+        mkdir <path>
+        createrepo --<name> <path>
+        yum-config-manager --add-repo file://<path>
+        ```
+
 1. Work with package module streams
 
 1. Modify the system bootloader
