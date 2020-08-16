@@ -308,7 +308,7 @@
 
 1. Boot systems into different targets manually
 
-    * *systemd* is the default system initialisation mechanism in RHEL8. It is the first process that starts at boot and it is the last process that terminates at shutdown.
+    * *systemd* is the default system initialisation mechanism in RHEL 8. It is the first process that starts at boot and it is the last process that terminates at shutdown.
 
     * *Units* are systemd objects that are used for organising boot and maintenance tasks, such as hardware initialisation, socket creation, file system mounts, and service startups. Unit configuration is stored in their respective configuration files, which are auto-generated from other configurations, created dynamically from the system state, produced at runtime, or userdeveloped. Units are in one of several operational states, including active, inactive, in the process of being activated or deactivated, and failed. Units can be enabled or disabled.
 
@@ -688,7 +688,7 @@
     | ext2                 | Disk    | The second generation of the extended file system. The first generation is no longer supported. ext2 is deprecated in RHEL and will be removed in a future RHEL release.                                                                                                                                                                                                                                                                                                                                        |
     | ext3                 | Disk    | The third generation of the extended file system. It supports metadata journaling for faster recovery, superior reliability, file systems up to 16TB, files up to 2TB, and up to 32,000 sub-directories. ext3 writes each metadata update in its entirety to the journal after it has been completed. The system looks in the file system journal following a reboot after a system crash has occured, and recovers the file system rapidly using the updated structural information stored in its journal. |
     | ext4                 | Disk    | The fourth generation of the extended file system. It supports file systems up to 1EB, files up to 16TB, an unlimited number of sub-directories, metadata and quota journaling, and extended user attributes.                                                                                                                                                                                                                                                                                                   |
-    | xfs                  | Disk    | XFS is a highly scalable and high-performance 64-bit file system.  It supports metadata journaling for faster crash recovery, online defragmentation, expansion quota journaling, and extended user attributes. It supports file systems and files of sizes up to 8EB. It is the default file system in RHEL8.                                                                                                                                                                                                  |
+    | xfs                  | Disk    | XFS is a highly scalable and high-performance 64-bit file system.  It supports metadata journaling for faster crash recovery, online defragmentation, expansion quota journaling, and extended user attributes. It supports file systems and files of sizes up to 8EB. It is the default file system in RHEL 8.                                                                                                                                                                                                  |
     | btrfs                | Disk    | B-tree file system that supports a system size of 50TB. It supports more files, larger files, and larger volumes than ext4 and supports snapshotting and compression capabilities.                                                                                                                                                                                                                                                                                                                              |
     | vfat                 | Disk    | This is used for post-Windows 95 file system format on hard disks, USB drives, and floppy disks.                                                                                                                                                                                                                                                                                                                                                                                                                |
     | iso9660              | Disk    | This is used for CD/DVD-based optical file systems.                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
@@ -957,7 +957,7 @@
 
 1. Install and update software packages from Red Hat Network, a remote repository, or from the local file system
 
-    * The .rpm extension is a format for files that are manipulated by the Redhat Package Manager (RPM) package management system. RHEL8 provides tools for the installation and administration of RPM packages. A package is a group of files organised in a directory structure and metadata that makes up a software application.
+    * The .rpm extension is a format for files that are manipulated by the Redhat Package Manager (RPM) package management system. RHEL 8 provides tools for the installation and administration of RPM packages. A package is a group of files organised in a directory structure and metadata that makes up a software application.
 
     * An RPM package name follows the below format:
         ```shell
@@ -972,7 +972,7 @@
 
     * The *subscription-manager* command can be used to link a Red Hat subscription to a system.
 
-    * The *dnf* command is the front-end to *rpm* and is the preferred tool for package management. The *yum* command has been superseded by *dnf* in RHEL8. It requires that the system has access to a software repository. The primary benefit of *dnf* is that it automatically resolves dependencies by downloading and installaing any additional required packages.
+    * The *dnf* command is the front-end to *rpm* and is the preferred tool for package management. The *yum* command has been superseded by *dnf* in RHEL 8. It requires that the system has access to a software repository. The primary benefit of *dnf* is that it automatically resolves dependencies by downloading and installaing any additional required packages.
 
     * To list enabled and disabled repositories:
         ```shell
@@ -1041,19 +1041,19 @@
         dnf history redo 22
         ```
 
-    * To add a repository to the yum config manager:
+    * To add a repository using the dnf config manager:
         ```shell
-        yum-config-manager --add-repo <url>
+        dnf config-manager --add-repo <url>
         ```
 
-    * To enable a repository to the yum config manager:
+    * To enable a repository using the dnf config manager:
         ```shell
-        yum-config-manager --enablerepo <repository>
+        dnf config-manager --enablerepo <repository>
         ```
 
-    * To disable a repository to the yum config manager:
+    * To disable a repository using the dnf config manager:
         ```shell
-        yum-config-manager --disablerepo <repository>
+        dnf config-manager --disablerepo <repository>
         ```
 
     * To create a repository:
@@ -1066,7 +1066,60 @@
 
 1. Work with package module streams
 
+    * RHEL 8 introduced the concept of Application Streams. Components made available as Application Streams can be packaged as modules or RPM packages and are delivered through the AppStream repository in RHEL 8. Module streams represent versions of the Application Stream components. Only one module stream can be active at a particular time, but it allows multiple different versions to be available in the same dnf repository.
+    
+    * To view modules:
+        ```shell
+        dnf module list
+        ```
+
+    * To get information about a module: 
+        ```shell
+        dnf module info --profile <module-name>
+        ```
+
+    * To install a module: 
+        ```shell
+        dnf module install <module-name>
+        ```
+
+    * To remove a module: 
+        ```shell
+        dnf module remove <module-name>
+        ```
+
+    * To reset a module after removing it: 
+        ```shell
+        dnf module reset <module-name>
+        ```
+
+    * To be specific about the module installation:
+        ```shell
+        dnf module install <module-name>:<version>/<profile>
+        ```
+
+    * To check the version of a module:
+        ```shell
+        <module-name> -v
+        ```
+
 1. Modify the system bootloader
+
+    * The GRUB2 configuration can be edited directly on the boot screen. The configuration can also be edited using the command line.
+
+    * To view the grub2 commands: 
+        ```shell
+        grub2
+        ```
+
+    * To make a change to the configuration: 
+        ```shell
+        vi /etc/default/grub
+        # Change a value
+        grub2-mkconfig -o /boot/grub2/grub.cfg
+        # View changes
+        vi /boot/grub2/grub.cfg
+        ```
 
 ### Manage basic networking
 
