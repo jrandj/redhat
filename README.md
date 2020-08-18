@@ -1125,6 +1125,56 @@
 
 1. Configure IPv4 and IPv6 addresses
 
+    * The format of an IPv4 address is a set of 4 8 bit integers that gives a 32 bit IP address.  The format of an IPv6 is a set of 8 16 bit hexadecimal numbers that gives a 128 bit IP address.
+
+    * The *nmcli* command is used to configure networking using the NetworkManager service. This command is used to create, display, edit, delete, activate and deactive network connections. Each network device corresponds to a Network Manager device.
+
+    * Using nmcli with the connection option lists the available connection profiles in NetworkManager.
+    
+    * To view system IP addresses:
+        ```shell
+        ip addr
+        ```
+
+    * To show the current connections:
+        ```shell
+        nmcli connection show
+        ```
+
+    * Using nmcli with the device option lists the available network devices in the system.
+
+    * To view the current device status and details:
+        ```shell
+        nmcli device status
+        nmcli device show
+        ```
+
+    * To add an ethernet IPv4 connection:
+        ```shell
+        nmcli connection add con-name <name> ifname <name> type ethernet ip4 <address> gw4 <address>
+        ```
+
+    * To manually modify a connection:
+        ```shell
+        nmcli connection modify <name> ipv4.addresses <address>
+        nmcli connection modify <name> ipv4.method manual
+        ```
+
+    * To delete a connection:
+        ```shell
+        nmcli connection delete <name>
+        ```
+
+    * To activate a connection:
+        ```shell
+        nmcli connection up <name>
+        ```
+
+    * To deactivate a connection:
+        ```shell
+        nmcli connection down <name>
+        ```
+
 1. Configure hostname resolution
 
 1. Configure network services to start automatically at boot
