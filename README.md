@@ -12,6 +12,11 @@
 - [Manage security](#Manage-security)
 
 ### Understand and use essential tools
+1. Programmable completion for bash is provided in the bash-completion module. To install this module:
+    ```shell
+    sudo dnf install bash-completion
+    ```
+
 1. Access a shell prompt and issue commands with correct syntax
     * Common commands and their options, as well as vim usage, are shown below:
         | Command        | Options                                                                                                                                                          | Description                                     |
@@ -1130,6 +1135,8 @@
     * The *nmcli* command is used to configure networking using the NetworkManager service. This command is used to create, display, edit, delete, activate and deactive network connections. Each network device corresponds to a Network Manager device.
 
     * Using nmcli with the connection option lists the available connection profiles in NetworkManager.
+
+    * The *ip* command can also be used for network configuration. The main difference between ip and nmcli is that changes made with the ip command are not persistent.
     
     * To view system IP addresses:
         ```shell
@@ -1143,7 +1150,7 @@
 
     * Using nmcli with the device option lists the available network devices in the system.
 
-    * To view the current device status and details:
+    * To view the current network device status and details:
         ```shell
         nmcli device status
         nmcli device show
@@ -1174,6 +1181,21 @@
         ```shell
         nmcli connection down <name>
         ```
+
+    * To check the DNS servers that are being used:
+        ```shell
+        cat /etc/resolv.conf
+        ```
+
+    * To change the DNS server being used:
+        ```shell
+        nmcli con mod <name> ipv4.dns <dns>
+        systemctl restart network
+        ```
+    
+    * To lookup the IP address based on a host name the *host* or *nslookup* commands can be used.
+
+    * The */etc/hosts* file is like a local DNS. The */etc/nsswitch.conf* file controls the order that resources are checked for resolution. 
 
 1. Configure hostname resolution
 
