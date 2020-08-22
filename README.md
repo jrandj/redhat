@@ -1192,20 +1192,156 @@
         nmcli con mod <name> ipv4.dns <dns>
         systemctl restart network
         ```
-    
+   
+1. Configure hostname resolution
+
     * To lookup the IP address based on a host name the *host* or *nslookup* commands can be used.
 
     * The */etc/hosts* file is like a local DNS. The */etc/nsswitch.conf* file controls the order that resources are checked for resolution. 
 
-1. Configure hostname resolution
+    * To lookup the hostname:
+        ```shell
+        hostname -s # short
+        hostname -f # fully qualified domain name
+        ```
+
+    * The hostname file is located in */etc/hostname*. To refresh any changes run the *hostnamectl* command.
+
+    * The domain name servers 
+        ```shell
+        hostname -s # short
+        hostname -f # fully qualified
+        ```
 
 1. Configure network services to start automatically at boot
 
+    * To install a service and make it start automatically at boot:
+        ```shell
+        dnf install httpd
+        systemctl enable httpd
+        ```
+    
+    * To set a connection to be enabled on boot:
+        ```shell
+        nmcli connection modify eth0 connection.autoconnect yes
+        ```
+
 1. Restrict network access using firewall-cmd/firewall
+
+    * The default firewall system in RHEL 8 is *firewalld*. Firewalld is a zone-based firewall. Each zone can be associated with one or more network interfaces, and each zone can be configured to accept or deny services and ports. The *firewall-cmd* command is the command line client for firewalld.
+
+    * To check firewall zones:
+        ```shell
+        firewall-cmd --get-zones
+        ```
+
+    * To list configuration for a zone:
+        ```shell
+        firewall-cmd --zone work --list-all
+        ```
+
+    * To create a new zone:
+        ```shell
+        firewall-cmd --new-zone servers --permanent
+        ```
+
+    * To reload firewall-cmd configuration:
+        ```shell
+        firewall-cmd --reload
+        ```
+
+    * To add a service to a zone:
+        ```shell
+        firewall-cmd --zone servers --add-service=ssh --permanent
+        ```
+
+    * To add an interface to a zone:
+        ```shell
+        firewall-cmd --change-interface=enp0s8 --zone=servers --permanent
+        ```
+
+    * To get active zones:
+        ```shell
+        firewall-cmd --get-active-zones
+        ```
+
+    * To set a default zone:
+        ```shell
+        firewall-cmd --set-default-zone=servers
+        ```
+
+    * To check the services allowed for a zone:
+        ```shell
+        firewall-cmd --get-services
+        ```
+
+    * To add a port to a zone:
+        ```shell
+        firewall-cmd --add-port 8080/tcp --permanent --zone servers
+        ```
+
+    * To remove a service from a zone:
+        ```shell
+        firewall-cmd --remove-service https --permanent --zone servers
+        ```
+
+    * To remove a port from a zone:
+        ```shell
+        firewall-cmd --remove-port 8080/tcp --permanent --zone servers
+        ```
 
 ### Manage users and groups
 
 1. Create, delete, and modify local user accounts
+
+    * RHEL 8 supports three user account types: root, normal and service. The root user has full access to all services and administrative functions. A normal user can run applications and programs that they are authorised to execute. Service accounts are responsible for taking care of the installed services.
+
+    * The */etc/passwd* file contains vital user login data.
+
+    * The */etc/shadow* file is readable only by the root user and contains user authentication information. Each row in the file corresponds to one entry in the passwd file. The password expiry settings are defined in the */etc/login.defs* file.
+
+    * The */etc/group* file contains the group information. Each row in the file stores one group entry.
+
+    * The */etc/gshadow* file stores encrypted group passwords. Each row in the file corresponds to one entry in the group file.
+
+    * Due to manual modification, inconsistencies may arise between the above four authentication files. The *pwck* command is used to check for inconsistancies.
+
+    * The *vipw* and *vigr* commands are used to modify the *passwd* and *group* files respectively. These commands disable write access to these files while the privileged user is making the modifications.
+
+    * To create a user:
+        ```shell
+        useradd user1
+        ```
+    
+    * To check that the user has been created:
+        ```shell
+        cat /etc/group | grep user1
+        ```
+
+    * To specify the UID and GID at user creation:
+        ```shell
+        useradd -u 1010 -g 1005 user1
+        ```
+
+    * To create a user and add them to a group:
+        ```shell
+        useradd -G IT user 2
+        ```
+
+    * To delete a user:
+        ```shell
+        userdel user 1
+        ```
+
+    * To modify a user:
+        ```shell 
+        usermod -l user5 user1 # note that home directory will remain as user1
+        ```
+
+    * To change the password for a user:
+        ```shell 
+        passwd user1
+        ```
 
 1. Change passwords and adjust password aging for local user accounts
 
