@@ -1338,16 +1338,94 @@
         usermod -l user5 user1 # note that home directory will remain as user1
         ```
 
+1. Change passwords and adjust password aging for local user accounts
+
     * To change the password for a user:
         ```shell 
         passwd user1
         ```
 
-1. Change passwords and adjust password aging for local user accounts
+    * To step through password aging information the *chage* command can be used without any options.
+
+    * To view user password expiry information:
+        ```shell 
+        chage -l user1
+        ```
+
+    * To set the password expiry for a user 30 days from now:
+        ```shell 
+        chage -M 30 user1
+        ```
+
+    * To set the password expiry date:
+        ```shell 
+        chage -E 2021-01-01 user1
+        ```
+
+    * To set the password to never expire:
+        ```shell 
+        chage -E -1 user1
+        ```
 
 1. Create, delete, and modify local groups and group memberships
 
+    * To create a group:
+        ```shell 
+        groupadd IT
+        ```
+
+    * To create a group with a specific GID:
+        ```shell 
+        groupadd -g 3032
+        ```
+
+    * To delete a group:
+        ```shell 
+        groupdel IT
+        ```
+
+    * To modify the name of a group:
+        ```shell 
+        groupmod -n IT-Support IT
+        ```
+
+    * To modify the GID of a group:
+        ```shell 
+        groupmod -g 3033 IT-Support
+        ```
+
+    * To add a user to a group:
+        ```shell 
+        groupmod -aG IT-Support user1
+        ```
+
+    * To view the members of a group:
+        ```shell 
+        groupmems -l -g IT-Support
+        ```
+
+    * To remove a user from a group:
+        ```shell 
+        gpasswd -d user1 IT-Support
+        ```
+
 1. Configure superuser access
+
+    * To view the sudoers file:
+        ```shell 
+        visudo /etc/sudoers
+        ```
+
+    * Members of the wheel group can use sudo on all commands. To add a user to the wheel group:
+        ```shell 
+        sudo usermod -aG wheel user1
+        ```
+
+    * To allow an individual user sudo access to specific commands:
+        ```shell
+        visudo /etc/sudoers
+        user2 ALL=(root) /bin/ls, /bin/df -h, /bin/date
+        ```
 
 ### Manage security
 
