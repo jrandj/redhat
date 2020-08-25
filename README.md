@@ -1431,7 +1431,45 @@
 
 1. Configure firewall settings using firewall-cmd/firewalld
 
+    * Network settings such as masquerading and IP forwarding can also be configured in the firewall-config GUI application. To install this application:
+        ```shell
+        dnf install firewall-config
+        ```
+
+    * To set port forwarding in the kernel setting:
+        ```shell
+        vi /etc/sysctl.conf
+        # add line
+        net.ipv4.ip_forward=1
+        # save file
+        sysctl -p
+        ```
+
 1. Create and use file access control lists
+
+    * To give a user read and write access to a file using an access control list:
+        ```shell
+        setfacl -m u:user1:rw- testFile
+        getfacl testFile
+        ```
+
+    * To remove an access control list for a user:
+        ```shell
+        setfacl -x u:user1 testFile
+        getfacl testFile
+        ```
+
+    * To give a group read and execute access to a directory recursively using an access control list:
+        ```shell
+        setfacl -R -m g:IT-Support:r-x testDirectory
+        getfacl testFile
+        ```
+
+    * To remove an access control list for a group:
+        ```shell
+        setfacl -x g:IT-Support testDirectory
+        getfacl testFile
+        ```
 
 1. Configure key-based authentication for SSH
 
