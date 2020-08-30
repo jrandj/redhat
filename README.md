@@ -951,6 +951,8 @@
 
 1. Diagnose and correct file permission problems
 
+    * File permissions can be modified using *chmod* and *setfacl*.
+    
 ### Deploy, configure, and maintain systems
 
 1. Schedule tasks using at and cron
@@ -1651,10 +1653,72 @@
 
 1. Set enforcing and permissive modes for SELinux
 
+    * Security Enhanced Linux (SELinux) is an implementation of Mandatory Access Control (MAC) architecture developed by the U.S National Security Agency (NSA). MAC provides an added layer of protection beyond the standard LInux Discretionary Access Control (DAC), which includes the traditional file and directory permissions, ACL settings, setuid/setgid bit settings, su/sudo privileges etc.
+
+    * MAC controls are fine-grained; they protect other services in the event one of the services is negotiated. MAC uses a set of defined authorisation rules called policy to examine security attributes assocaited with subjects and objects when a subject tries to access an object, and decides whether or not to permit this access attempt. SELinux decisions are stored in a special cache referred to as Access Vector Cache (AVC).
+
+    * When an application or process makes a request to access an object, SELinux checks with the AVC, where permissions are cached for subjects and objects. If a decision is unable to be made, it sends the request to the security server. The security server checks for the security context of the app or process and the object. Security context is applied from the SELinux policy database. 
+
+    * To check the SELinux status:
+        ```shell
+        getenforce
+        sestatus
+        ```
+
+    * To put SELinux into permissive mode modify the */etc/selinux/config* file as per the below and reboot::
+        ```shell
+        SELINUX=permissive
+        ```
+
+    * Messages logged from SELinux are available in */var/log/messages*.
+
 1. List and identify SELinux file and process context
+
+    * To view the SELinux contexts for files:
+        ```shell
+        ls -Z
+        ```
+
+    * To view the contexts for a user:
+        ```shell
+        id -Z
+        ```
+    * The contexts shown follow the user:role:type:level syntax. The SELinux user is mapped to a Linux user using the SELinux policy. The role is an intermediary between domains and SELinux users. The type defines a domain for processes, and a type for files. The level is used for Multi-Category Security (MCS) and Multi-Level Security (MLS).
+
+    * To view the processes for a user:
+        ```shell
+        ps -Z # ps -Zaux to see additional information
+        ```
 
 1. Restore default file contexts
 
+    * To view the SELinux contexts for files:
+        ```shell
+        chcon unconfined:u:object_r:tmp_t:s0
+        ```
+
+    * To restore the SELinux contexts for a file:
+        ```shell
+        restorecon file.txt
+        ```
+
+    * To restore the SELinux contexts recursively for a directory:
+        ```shell
+        restorecon -R directory
+        ```
+
 1. Use boolean settings to modify system SELinux settings
+
+    * SELinux has a large number of contexts and policies already defined. Booleans within SELinux allow common rules to be turned on and off.
+
+    * To check a SELinux boolean setting:  
+        ```shell
+        getsebool -a | grep virtualbox
+        ```
+
+    * To set a SELinux boolean setting permanently:  
+        ```shell
+       setsebool -P use_virtualbox on
+        ```
 
 1. Diagnose and address routine SELinux policy violations
