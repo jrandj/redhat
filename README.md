@@ -1722,3 +1722,14 @@
         ```
 
 1. Diagnose and address routine SELinux policy violations
+
+    * The SELinux Administration tool is a graphical tool that enables a number of configuration and management operations to be performed. To install and run the tool:
+       ```shell
+       yum install setools-gui
+       yum install policycoreutils-gui
+       system-config-selinux
+       ```
+
+    * SELinux alerts are written to */var/log/audit/audit.log* if the *auditd* daemon is running, or to the */var/log/messages* file via the *rsyslog* daemon in the absence of *auditd*.
+
+    * A GUI called the SELinux Troubleshooter can be accessed using the *sealert* command. This allows SELinux denial messages to be analysed and provides recommendations on how to fix issues.
