@@ -6,10 +6,11 @@
 - [Operate running systems](#Operate-running-systems)
 - [Configure local storage](#Configure-local-storage)
 - [Create and configure file systems](#Create-and-configure-file-systems)
-- [Deploy, configure, and maintain systems](#Deploy,-configure,-and-maintain-systems)
+- [Deploy, configure, and maintain systems](#Deploy-configure-and-maintain-systems)
 - [Manage basic networking](#Manage-basic-networking)
 - [Manage users and groups](#Manage-users-and-groups)
 - [Manage security](#Manage-security)
+- [Exercises](#Exercises)
 
 ### Understand and use essential tools
 1. Programmable completion for bash is provided in the bash-completion module. To install this module:
@@ -289,6 +290,11 @@
 
     * The *man* command can be used to view help for a command. To search for a command based on a keyword the *apropros* command or *man* with the -k option can be used. The *mandb* command is used to build the man database.
 
+    * To search for a command based on a keyword in occuring in its man page:
+        ```shell
+        man -K <keyword>
+        ```
+
     * The *whatis* command can be used to search for a command in the man database for a short descripton.
 
     * The *info* command provides more detailed information than the *man* command. 
@@ -355,19 +361,19 @@
 
 1. Interrupt the boot process in order to gain access to a system
 
-    * Press *e* at the GRUB2 menu and add "rd.break" in place of "ro crash". 
+    * Press *e* at the GRUB2 menu and add "rd.break" in place of "ro crash". This boot option tells the boot sequence to stop while the system is still using initramfs so that we can access the emergency shell.
     
     * Press *Ctrl+x* to reboot.
     
-    * Run the following command to remount root with rw:
+    * Run the following command to remount the */sysroot* directory with rw privileges:
         ```shell
         mount -o remount,rw /sysroot
         ```
-    *  Run the following command to change the root directory:
+    *  Run the following command to change the root directory to */sysroot*:
         ```shell
         chroot /sysroot
         ```
-    *  Run *passwd* command to change the password.
+    *  Run *passwd* command to change the root password.
     
     *  Run the following commands to create an empty, hidden file to instruct the system to perform SELinux relabeling after the next boot:
         ```shell
@@ -1665,7 +1671,7 @@
         sestatus
         ```
 
-    * To put SELinux into permissive mode modify the */etc/selinux/config* file as per the below and reboot::
+    * To put SELinux into permissive mode modify the */etc/selinux/config* file as per the below and reboot:
         ```shell
         SELINUX=permissive
         ```
@@ -1733,3 +1739,54 @@
     * SELinux alerts are written to */var/log/audit/audit.log* if the *auditd* daemon is running, or to the */var/log/messages* file via the *rsyslog* daemon in the absence of *auditd*.
 
     * A GUI called the SELinux Troubleshooter can be accessed using the *sealert* command. This allows SELinux denial messages to be analysed and provides recommendations on how to fix issues.
+
+### Exercises
+
+1. Recover the system and fix repositories:
+    ```shell
+    # press e at grub menu
+    rd.break # add to line starting with "linux16"
+    # Replace line containing "BAD" with "x86_64"
+    mount -o remount, rw /sysroot
+    chroot /sysroot
+    passwd
+    touch ./autorelabel
+    # reboot
+    grub2-mkconfig -o /boot/grub2/grub.cfg # fix grub config
+    yum repolist all
+    # change files in /etc/yum.repos.d to enable repository
+    yum update -y
+    # reboot
+    ```
+
+1. Add 3 new users alice, bob and charles. Create a marketing group and add these users to the group. Create a directory */marketing* and change the owner to alice and group to marketing. Set permissions so that members of the marketing group can share documents in the directory but nobody else can see them. Give charles read-only permission. Create an empty file in the directory. 
+    ```shell
+    useradd alice
+    useradd bob
+    useradd charles
+    groupadd marketing
+    mkdir /marketing
+    usermod -aG marketing alice
+    usermod -aG marketing bob
+    usermod -aG marketing charles
+    chgrp marketing marketing # may require restart to take effect
+    chmod 730 marketing
+    setfacl -m u:charles:r marketing
+    setfacl -m g:marketing:-wx marketing
+    touch file
+    ```
+
+1. Set the system timezone and configure the system to use NTP:
+    ```shell
+    yum install chrony
+    systemctl enable chronyd.service
+    systemctl start chronyd.service
+    timedatectl set-timezone Australia/Sydney
+    timedatectl set-ntp true
+    ```
+
+1. Install the GNOME desktop:
+    ```shell
+    yum grouplist
+    yum groupinstall "GNOME Desktop" -y
+    ```
