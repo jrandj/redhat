@@ -851,6 +851,16 @@
 
 1. Create and configure set-GID directories for collaboration
 
+     * SUID (meaning set user id) is used to specify that a user can run an executable file with effective permissions of the file owner.  This is primarily used to elevate the privileges of the current user. When a user executes the file, the operating system will execute as the file owner. Instead of the normal *x* which represents execute permissions, an *s* will be visible. To set the SUID:
+        ```shell
+        chmod u+s <filename>
+        ```
+     
+     * SGID (meaning set group id) is used to specify that a user can run an executable file with effective permissions of the owning group.  When a user executes the file, the operating system will execute as the owning group. Instead of the normal x Instead of the normal x which represents execute permissions, an s will be visible. To set the SGID:
+        ```shell
+        chmod g+s <filename>
+        ```
+    
      * To create a group and shared directory:
         ```shell
         groupadd accounts
@@ -860,8 +870,17 @@
         chmod 070 /home/shared/accounts
         ```
 
-     * After running the above commands members of the accounts group will be able to edit this file.
+     * When using SGID on a directory all files that are created in the directory will be owned by the group of the directory as opposed to the group of the owner.
 
+     * If the sticky bit is set on a directory, the files in that directory can only be removed by the owner. A typical use case is for the */tmp* directory. It can be written to by any user, but other users cannot delete the files of others. To set the sticky bit:
+        ```shell
+        chmod +t <directory>
+        ```
+
+    * The SUID, SGID and sticky bit can also be set with number notation. The standard number (rwx) is prepended with 4 for SUID, 2 for SGID, and 1 for the sticky bit.
+
+    * To remove special permissions the *-* flag is used instead of the *+* flag.
+     
 1. Configure disk compression
 
     * The Virtual Data Optimiser (VDO) provides data reduction in the form of deduplication, compression, adn thin provisioning.
@@ -1750,8 +1769,9 @@
     mount -o remount, rw /sysroot
     chroot /sysroot
     passwd
-    touch ./autorelabel
+    touch /.autorelabel
     # reboot
+    # reboot - will occur automaticaly after relabel (you can now login)
     grub2-mkconfig -o /boot/grub2/grub.cfg # fix grub config
     yum repolist all
     # change files in /etc/yum.repos.d to enable repository
@@ -1770,7 +1790,7 @@
     usermod -aG marketing bob
     usermod -aG marketing charles
     chgrp marketing marketing # may require restart to take effect
-    chmod 730 marketing
+    chmod 770 marketing
     setfacl -m u:charles:r marketing
     setfacl -m g:marketing:-wx marketing
     touch file
@@ -1785,8 +1805,32 @@
     timedatectl set-ntp true
     ```
 
-1. Install the GNOME desktop:
+1. Install and enable the GNOME desktop:
     ```shell
     yum grouplist
     yum groupinstall "GNOME Desktop" -y
+    systemtctl set-default graphical.target
+    reboot
+    ```
+
+1. Configure the system to be an NFS client:
+    ```shell
+    yum install nfs-utils
+    ```
+
+1. Configure password aging for charles so his password expires in 60 days:
+    ```shell
+    chage -M 60 charles
+    chage -l charles # to confirm result
+    ```
+
+1. Lock bobs account:
+    ```shell
+    passwd -l bob
+    passwd --status bob # to confirm result
+    ```
+
+1. Find all setuid files on the system and save the list to /testresults/setuid.list:
+    ```shell
+    find / -perm /4000 > setuid.list
     ```
