@@ -1394,12 +1394,6 @@
 
     * The hostname file is located in */etc/hostname*. To refresh any changes run the *hostnamectl* command.
 
-    * The domain name servers 
-        ```shell
-        hostname -s # short
-        hostname -f # fully qualified
-        ```
-
 1. Configure network services to start automatically at boot
 
     * To install a service and make it start automatically at boot:
@@ -1833,4 +1827,50 @@
 1. Find all setuid files on the system and save the list to /testresults/setuid.list:
     ```shell
     find / -perm /4000 > setuid.list
+    ```
+
+1. Find all setuid files on the system and save the list to /testresults/setuid.list:
+    ```shell
+    find / -perm /4000 > setuid.list
+    ```
+
+1. Set the system FQDN to *centos.local* and alias to *centos*:
+    ```shell
+    hostnamectl set-hostname centos --pretty
+    hostnamectl set-hostname centos.local
+    hostname -s # to confirm result
+    hostname # to confirm result
+    ```
+
+1. As charles, create a once-off job that creates a file called */testresults/bob* containing the text "Hello World. This is Charles." in 2 days time:
+    ```shell
+    vi hello.sh
+    # contents of hello.sh
+    #####
+    #!/bin/bash
+    # echo "Hello World. This is Charles." > bob
+    #####
+    chmod 755 hello.sh
+    usermod charles -U -e -- "" # for some reason the account was locked
+    at now + 2 days -f /testresults/bob/hello.sh
+    cd /var/spool/at # can check directory as root to confirm
+    atq # check queued job as charles
+    # atrm 1 # can remove the job using this command
+    ```
+
+1. As alice, create a periodic job that appends the current date to the file */testresults/alice* every 5 minutes every Sunday and Wednesday between the hours of 3am and 4am. Remove the ability of bob to create cron jobs:
+    ```shell
+    echo "bob" >> /etc/at.deny
+    sudo -i -u alice
+    vi addDate.sh
+    # contents of hello.sh
+    #####
+    #!/bin/bash
+    # date >> alice
+    #####
+    /testresults/alice/addDate.sh
+    crontab -e
+    # */5 03,04 * * sun,wed /testresults/alice/addDate.sh
+    crontab -l # view crontab
+    # crontab -r can remove the job using this command
     ```
