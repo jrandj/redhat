@@ -1874,3 +1874,28 @@
     crontab -l # view crontab
     # crontab -r can remove the job using this command
     ```
+
+1. Set the system SELinux mode to permissive.
+    ```shell
+    setstatus # confirm current mode is not permissive
+    vi /etc/selinux/config # Update to permissive
+    reboot
+    setstatus # confirm current mode is permissive
+    ```
+
+1. Set the system SELinux mode to permissive.
+    ```shell
+    setstatus # confirm current mode is not permissive
+    vi /etc/selinux/config # Update to permissive
+    reboot
+    setstatus # confirm current mode is permissive
+    ```
+
+1. Create a firewall rule to drop all traffic from 10.10.10.*.
+    ```shell
+    firewall-cmd --zone=drop --add-source 10.10.10.0/24
+    firewall-cmd --list-all --zone=drop # confirm rule is added
+    firewall-cmd --permanent --add-source 10.10.10.0/24
+    reboot
+    firewall-cmd --list-all --zone=drop # confirm rule remains
+    ```
