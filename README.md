@@ -1755,147 +1755,177 @@
 
 ### Exercises
 
-1. Recover the system and fix repositories:
-    ```shell
-    # press e at grub menu
-    rd.break # add to line starting with "linux16"
-    # Replace line containing "BAD" with "x86_64"
-    mount -o remount, rw /sysroot
-    chroot /sysroot
-    passwd
-    touch /.autorelabel
-    # reboot
-    # reboot - will occur automaticaly after relabel (you can now login)
-    grub2-mkconfig -o /boot/grub2/grub.cfg # fix grub config
-    yum repolist all
-    # change files in /etc/yum.repos.d to enable repository
-    yum update -y
-    # reboot
-    ```
+1. Recovery and Practise Tasks
 
-1. Add 3 new users alice, bob and charles. Create a marketing group and add these users to the group. Create a directory */marketing* and change the owner to alice and group to marketing. Set permissions so that members of the marketing group can share documents in the directory but nobody else can see them. Give charles read-only permission. Create an empty file in the directory. 
-    ```shell
-    useradd alice
-    useradd bob
-    useradd charles
-    groupadd marketing
-    mkdir /marketing
-    usermod -aG marketing alice
-    usermod -aG marketing bob
-    usermod -aG marketing charles
-    chgrp marketing marketing # may require restart to take effect
-    chmod 770 marketing
-    setfacl -m u:charles:r marketing
-    setfacl -m g:marketing:-wx marketing
-    touch file
-    ```
+    * Recover the system and fix repositories:
+        ```shell
+        # press e at grub menu
+        rd.break # add to line starting with "linux16"
+        # Replace line containing "BAD" with "x86_64"
+        mount -o remount, rw /sysroot
+        chroot /sysroot
+        passwd
+        touch /.autorelabel
+        # reboot
+        # reboot - will occur automaticaly after relabel (you can now login)
+        grub2-mkconfig -o /boot/grub2/grub.cfg # fix grub config
+        yum repolist all
+        # change files in /etc/yum.repos.d to enable repository
+        yum update -y
+        # reboot
+        ```
 
-1. Set the system timezone and configure the system to use NTP:
-    ```shell
-    yum install chrony
-    systemctl enable chronyd.service
-    systemctl start chronyd.service
-    timedatectl set-timezone Australia/Sydney
-    timedatectl set-ntp true
-    ```
+    * Add 3 new users alice, bob and charles. Create a marketing group and add these users to the group. Create a directory */marketing* and change the owner to alice and group to marketing. Set permissions so that members of the marketing group can share documents in the directory but nobody else can see them. Give charles read-only permission. Create an empty file in the directory. 
+        ```shell
+        useradd alice
+        useradd bob
+        useradd charles
+        groupadd marketing
+        mkdir /marketing
+        usermod -aG marketing alice
+        usermod -aG marketing bob
+        usermod -aG marketing charles
+        chgrp marketing marketing # may require restart to take effect
+        chmod 770 marketing
+        setfacl -m u:charles:r marketing
+        setfacl -m g:marketing:-wx marketing
+        touch file
+        ```
 
-1. Install and enable the GNOME desktop:
-    ```shell
-    yum grouplist
-    yum groupinstall "GNOME Desktop" -y
-    systemtctl set-default graphical.target
-    reboot
-    ```
+    * Set the system timezone and configure the system to use NTP:
+        ```shell
+        yum install chrony
+        systemctl enable chronyd.service
+        systemctl start chronyd.service
+        timedatectl set-timezone Australia/Sydney
+        timedatectl set-ntp true
+        ```
 
-1. Configure the system to be an NFS client:
-    ```shell
-    yum install nfs-utils
-    ```
+    * Install and enable the GNOME desktop:
+        ```shell
+        yum grouplist
+        yum groupinstall "GNOME Desktop" -y
+        systemtctl set-default graphical.target
+        reboot
+        ```
 
-1. Configure password aging for charles so his password expires in 60 days:
-    ```shell
-    chage -M 60 charles
-    chage -l charles # to confirm result
-    ```
+    * Configure the system to be an NFS client:
+        ```shell
+        yum install nfs-utils
+        ```
 
-1. Lock bobs account:
-    ```shell
-    passwd -l bob
-    passwd --status bob # to confirm result
-    ```
+    * Configure password aging for charles so his password expires in 60 days:
+        ```shell
+        chage -M 60 charles
+        chage -l charles # to confirm result
+        ```
 
-1. Find all setuid files on the system and save the list to /testresults/setuid.list:
-    ```shell
-    find / -perm /4000 > setuid.list
-    ```
+    * Lock bobs account:
+        ```shell
+        passwd -l bob
+        passwd --status bob # to confirm result
+        ```
 
-1. Find all setuid files on the system and save the list to /testresults/setuid.list:
-    ```shell
-    find / -perm /4000 > setuid.list
-    ```
+    * Find all setuid files on the system and save the list to /testresults/setuid.list:
+        ```shell
+        find / -perm /4000 > setuid.list
+        ```
 
-1. Set the system FQDN to *centos.local* and alias to *centos*:
-    ```shell
-    hostnamectl set-hostname centos --pretty
-    hostnamectl set-hostname centos.local
-    hostname -s # to confirm result
-    hostname # to confirm result
-    ```
+    * Find all setuid files on the system and save the list to /testresults/setuid.list:
+        ```shell
+        find / -perm /4000 > setuid.list
+        ```
 
-1. As charles, create a once-off job that creates a file called */testresults/bob* containing the text "Hello World. This is Charles." in 2 days time:
-    ```shell
-    vi hello.sh
-    # contents of hello.sh
-    #####
-    #!/bin/bash
-    # echo "Hello World. This is Charles." > bob
-    #####
-    chmod 755 hello.sh
-    usermod charles -U -e -- "" # for some reason the account was locked
-    at now + 2 days -f /testresults/bob/hello.sh
-    cd /var/spool/at # can check directory as root to confirm
-    atq # check queued job as charles
-    # atrm 1 # can remove the job using this command
-    ```
+    * Set the system FQDN to *centos.local* and alias to *centos*:
+        ```shell
+        hostnamectl set-hostname centos --pretty
+        hostnamectl set-hostname centos.local
+        hostname -s # to confirm result
+        hostname # to confirm result
+        ```
 
-1. As alice, create a periodic job that appends the current date to the file */testresults/alice* every 5 minutes every Sunday and Wednesday between the hours of 3am and 4am. Remove the ability of bob to create cron jobs:
-    ```shell
-    echo "bob" >> /etc/at.deny
-    sudo -i -u alice
-    vi addDate.sh
-    # contents of hello.sh
-    #####
-    #!/bin/bash
-    # date >> alice
-    #####
-    /testresults/alice/addDate.sh
-    crontab -e
-    # */5 03,04 * * sun,wed /testresults/alice/addDate.sh
-    crontab -l # view crontab
-    # crontab -r can remove the job using this command
-    ```
+    * As charles, create a once-off job that creates a file called */testresults/bob* containing the text "Hello World. This is Charles." in 2 days time:
+        ```shell
+        vi hello.sh
+        # contents of hello.sh
+        #####
+        #!/bin/bash
+        # echo "Hello World. This is Charles." > bob
+        #####
+        chmod 755 hello.sh
+        usermod charles -U -e -- "" # for some reason the account was locked
+        at now + 2 days -f /testresults/bob/hello.sh
+        cd /var/spool/at # can check directory as root to confirm
+        atq # check queued job as charles
+        # atrm 1 # can remove the job using this command
+        ```
 
-1. Set the system SELinux mode to permissive.
-    ```shell
-    setstatus # confirm current mode is not permissive
-    vi /etc/selinux/config # Update to permissive
-    reboot
-    setstatus # confirm current mode is permissive
-    ```
+    * As alice, create a periodic job that appends the current date to the file */testresults/alice* every 5 minutes every Sunday and Wednesday between the hours of 3am and 4am. Remove the ability of bob to create cron jobs:
+        ```shell
+        echo "bob" >> /etc/at.deny
+        sudo -i -u alice
+        vi addDate.sh
+        # contents of hello.sh
+        #####
+        #!/bin/bash
+        # date >> alice
+        #####
+        /testresults/alice/addDate.sh
+        crontab -e
+        # */5 03,04 * * sun,wed /testresults/alice/addDate.sh
+        crontab -l # view crontab
+        # crontab -r can remove the job using this command
+        ```
 
-1. Set the system SELinux mode to permissive.
-    ```shell
-    setstatus # confirm current mode is not permissive
-    vi /etc/selinux/config # Update to permissive
-    reboot
-    setstatus # confirm current mode is permissive
-    ```
+    * Set the system SELinux mode to permissive.
+        ```shell
+        setstatus # confirm current mode is not permissive
+        vi /etc/selinux/config # Update to permissive
+        reboot
+        setstatus # confirm current mode is permissive
+        ```
 
-1. Create a firewall rule to drop all traffic from 10.10.10.*.
-    ```shell
-    firewall-cmd --zone=drop --add-source 10.10.10.0/24
-    firewall-cmd --list-all --zone=drop # confirm rule is added
-    firewall-cmd --permanent --add-source 10.10.10.0/24
-    reboot
-    firewall-cmd --list-all --zone=drop # confirm rule remains
-    ```
+    * Set the system SELinux mode to permissive.
+        ```shell
+        setstatus # confirm current mode is not permissive
+        vi /etc/selinux/config # Update to permissive
+        reboot
+        setstatus # confirm current mode is permissive
+        ```
+
+    * Create a firewall rule to drop all traffic from 10.10.10.*.
+        ```shell
+        firewall-cmd --zone=drop --add-source 10.10.10.0/24
+        firewall-cmd --list-all --zone=drop # confirm rule is added
+        firewall-cmd --permanent --add-source 10.10.10.0/24
+        reboot
+        firewall-cmd --list-all --zone=drop # confirm rule remains
+        ```
+
+1. Linux Academy - Using SSH, Redirection, and Permissions in Linux
+
+    * Enable SSH to connect without a password from the dev user on server1 to the dev user on server2. 
+        ```shell
+        ssh dev@3.85.167.210
+        ssh-keygen # created in /home/dev/.ssh
+        ssh-copy-id 34.204.14.34
+        ```    
+
+    * Copy all tar files from `/home/dev/` on server1 to `/home/dev/` on server2, and extract them making sure the output is redirected to `/home/dev/tar-output.log`.
+        ```shell
+        scp *.tar* dev@34.204.14.34:/home/dev
+        tar xfz deploy_script.tar.gz > tar-output.log
+        tar xfz deploy_content.tar.gz >> tar-output.log
+        ```
+    
+    * Set the umask so that new files are only readable and writeable by the owner.
+        ```shell
+        umask 0066 # default is 0666, subtract 0066 to get 0600
+        ```
+
+    * Verify the `/home/dev/deploy.sh` script is executable and run it.
+        ```shell
+        chmod 711 deploy.sh
+        ./deploy.sh
+
+        ```
