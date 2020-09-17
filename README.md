@@ -883,7 +883,7 @@
      
 1. Configure disk compression
 
-    * The Virtual Data Optimiser (VDO) provides data reduction in the form of deduplication, compression, adn thin provisioning.
+    * The Virtual Data Optimiser (VDO) provides data reduction in the form of deduplication, compression, and thin provisioning.
 
     * To install vdo:
         ```shell
@@ -1775,7 +1775,7 @@
         # reboot
         ```
 
-    * Add 3 new users alice, bob and charles. Create a marketing group and add these users to the group. Create a directory */marketing* and change the owner to alice and group to marketing. Set permissions so that members of the marketing group can share documents in the directory but nobody else can see them. Give charles read-only permission. Create an empty file in the directory. 
+    * Add 3 new users alice, bob and charles. Create a marketing group and add these users to the group. Create a directory */marketing* and change the owner to alice and group to marketing. Set permissions so that members of the marketing group can share documents in the directory but nobody else can see them. Give charles read-only permission. Create an empty file in the directory: 
         ```shell
         useradd alice
         useradd bob
@@ -1877,7 +1877,7 @@
         # crontab -r can remove the job using this command
         ```
 
-    * Set the system SELinux mode to permissive.
+    * Set the system SELinux mode to permissive:
         ```shell
         setstatus # confirm current mode is not permissive
         vi /etc/selinux/config # Update to permissive
@@ -1885,7 +1885,7 @@
         setstatus # confirm current mode is permissive
         ```
 
-    * Set the system SELinux mode to permissive.
+    * Set the system SELinux mode to permissive:
         ```shell
         setstatus # confirm current mode is not permissive
         vi /etc/selinux/config # Update to permissive
@@ -1893,7 +1893,7 @@
         setstatus # confirm current mode is permissive
         ```
 
-    * Create a firewall rule to drop all traffic from 10.10.10.*.
+    * Create a firewall rule to drop all traffic from 10.10.10.*:
         ```shell
         firewall-cmd --zone=drop --add-source 10.10.10.0/24
         firewall-cmd --list-all --zone=drop # confirm rule is added
@@ -1904,28 +1904,75 @@
 
 1. Linux Academy - Using SSH, Redirection, and Permissions in Linux
 
-    * Enable SSH to connect without a password from the dev user on server1 to the dev user on server2. 
+    * Enable SSH to connect without a password from the dev user on server1 to the dev user on server2:
         ```shell
         ssh dev@3.85.167.210
         ssh-keygen # created in /home/dev/.ssh
         ssh-copy-id 34.204.14.34
         ```    
 
-    * Copy all tar files from `/home/dev/` on server1 to `/home/dev/` on server2, and extract them making sure the output is redirected to `/home/dev/tar-output.log`.
+    * Copy all tar files from `/home/dev/` on server1 to `/home/dev/` on server2, and extract them making sure the output is redirected to `/home/dev/tar-output.log`:
         ```shell
         scp *.tar* dev@34.204.14.34:/home/dev
         tar xfz deploy_script.tar.gz > tar-output.log
         tar xfz deploy_content.tar.gz >> tar-output.log
         ```
     
-    * Set the umask so that new files are only readable and writeable by the owner.
+    * Set the umask so that new files are only readable and writeable by the owner:
         ```shell
         umask 0066 # default is 0666, subtract 0066 to get 0600
         ```
 
-    * Verify the `/home/dev/deploy.sh` script is executable and run it.
+    * Verify the `/home/dev/deploy.sh` script is executable and run it:
         ```shell
         chmod 711 deploy.sh
         ./deploy.sh
-
         ```
+
+1. Linux Academy - Storage Management
+
+    * Create a 2GB GPT Partition:
+        ```shell
+        lsblk # observe nvme1n1 disk
+        sudo gdisk /dev/nvme1n1
+        # enter n for new partition
+        # accept default partition number
+        # accept default starting sector
+        # for the ending sector, enter +2G to create a 2GB partition
+        # accept default partition type
+        # enter w to write the partition information
+        # enter y to proceed
+        lsblk # observe nvme1n1 now has partition
+        partprobe # inform OS of partition change
+        ```    
+
+    * Create a 2GB MBR Partition:
+        ```shell
+        lsblk # observe nvme2n1 disk
+        sudo fdisk /dev/nvme2n1
+        # enter n for new partition
+        # accept default partition type
+        # accept default partition number
+        # accept default first sector
+        # for the ending sector, enter +2G to create a 2GB partition
+        # enter w to write the partition information
+        ```    
+
+    * Format the GPT Partition with XFS and mount the device persistently:
+        ```shell
+        sudo mkfs.xfs /dev/nvme1n1p1
+        sudo blkid # observe nvme1n1p1 UUID
+        vi /etc/fstab
+        # add a line with the new UUID and specify /mnt/gptxfs
+        mkdir /mnt/gptxfs
+        sudo mount -a
+        mount # confirm that it's mounted
+        ```
+
+    * Format the MBR Partition with ext4 and mount the device persistently:
+        ```shell
+        sudo mkfs.ext4 /dev/nvme2n1p1
+        mkdir /mnt/mbrext4
+        mount /dev/nvme2n1p1 /mnt/mbrext4
+        mount # confirm that it's mounted
+        ```    
