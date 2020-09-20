@@ -1944,7 +1944,7 @@
         # enter y to proceed
         lsblk # observe nvme1n1 now has partition
         partprobe # inform OS of partition change
-        ```    
+        ```
 
     * Create a 2GB MBR Partition:
         ```shell
@@ -1956,7 +1956,7 @@
         # accept default first sector
         # for the ending sector, enter +2G to create a 2GB partition
         # enter w to write the partition information
-        ```    
+        ```
 
     * Format the GPT Partition with XFS and mount the device persistently:
         ```shell
@@ -1975,4 +1975,87 @@
         mkdir /mnt/mbrext4
         mount /dev/nvme2n1p1 /mnt/mbrext4
         mount # confirm that it's mounted
-        ```    
+        ```
+
+1. Linux Academy - Working with LVM Storage
+
+    * Create Physical Devices:
+        ```shell
+        lsblk # observe disks xvdf and xvdg
+        pvcreate /dev/xvdf /dev/xvdg
+        ```
+
+    * Create Physical Devices:
+        ```shell
+        vgcreate RHCSA /dev/xvdf /dev/xvdg
+        vgdisplay # view details
+        ```
+
+    * Create a Logical Volume:
+        ```shell
+        lvcreate -n pinehead -L 3G RHCSA
+        lvdisplay # or lvs, to view details
+        ```
+
+    * Format the LV as XFS and mount it persistantly at `/mnt/lvol`:
+        ```shell
+        fdisk -l # get path for lv
+        mkfs.xfs /dev/mapper/RHCSA-pinehead
+        mkdir /mnt/lvol
+        blkid # copy UUID for /dev/mapper/RHCSA-pinehead
+        echo "UUID=76747796-dc33-4a99-8f33-58a4db9a2b59" >> /etc/fstab
+        # add the path /mnt/vol and copy the other columns
+        mount -a
+        mount # confirm that it's mounted
+        ```
+
+    * Grow the mount point by 200MB:
+        ```shell
+        lvextend -L +200M /dev/RHCSA/pinehead
+        ```
+
+1. Linux Academy - Network File Systems
+
+    * Set up a SAMBA share:
+        ```shell
+        # on the server
+        yum install samba -y
+        vi /etc/samba/smb.conf
+        # add the below block
+        #####
+        #[share]
+        #    browsable = yes
+        #    path = /smb
+        #    writeable = yes
+        #####
+        useradd shareuser
+        smbpasswd -a shareuser # enter password
+        mkdir /smb
+        systemctl start smb
+        chmod 777 /smb
+        
+        # on the client
+        mkdir /mnt/smb
+        yum install cifs-utils -y
+        # on the server hostname -I shows private IP
+        mount -t cifs //10.0.1.100/share /mnt/smb -o username=shareuser,password= # private ip used
+        ```
+
+
+    * Set up the NFS share:
+        ```shell
+        # on the server
+        yum install nfs-utils -y
+        mkdir /nfs
+        echo "/nfs *(rw)" >> /etc/exports
+        chmod 777 /nfs
+        exportfs -a
+        systemctl start {rpcbind,nfs-server,rpc-statd,nfs-idmapd}
+
+        # on the client
+        yum install nfs-utils -y
+        mkdir /mnt/nfs
+        showmount -e 10.0.1.101 # private ip used
+        systemctl start rpcbind
+        mount -t nfs 10.0.1.101:/nfs /mnt/nfs
+        ```
