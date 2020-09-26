@@ -2059,3 +2059,26 @@
         systemctl start rpcbind
         mount -t nfs 10.0.1.101:/nfs /mnt/nfs
         ```
+
+1. Linux Academy - Maintaining Linux Systems
+
+    * Schedule a job to update the server midnight tonight:
+        ```shell
+        echo "dnf update -y" > update.sh
+        chmod +x update.sh
+        at midnight -f update.sh
+        atq # to verify that job is scheduled
+        ```
+
+    * Modify the NTP pools:
+        ```shell
+        vi /etc/chrony.conf
+        # modify the lines at the top of the file
+        ```
+
+    * Modify GRUB to boot a different kernel:
+        ```shell
+        grubby --info=ALL # list installed kernels
+        grubby --set-default-index=1
+        grubby --default-index # verify it worked
+        ```
