@@ -2082,3 +2082,54 @@
         grubby --set-default-index=1
         grubby --default-index # verify it worked
         ```
+
+1. Linux Academy - Managing Users in Linux
+
+    * Create the superhero group:
+        ```shell
+        groupadd superhero
+        ```
+
+    * Add user accounts for Tony Stark, Diana Prince, and Carol Danvers and add them to the superhero group:
+        ```shell
+        useradd tstark -G superhero
+        useradd cdanvers -G superhero
+        useradd dprince -G superhero
+        ```
+
+    * Replace the primary group of Tony Stark with the wheel group:
+        ```shell
+        usermod tstark -aG wheel
+        grep wheel /etc/group # to verify
+        ```
+
+    * Lock the account of Diana Prince:
+        ```shell
+        usermod -L dprince 
+        chage dprince -E 0
+        ```
+
+
+1. Linux Academy - SELinux Learning Activity
+
+    * Fix the SELinux permission on `/opt/website`:
+        ```shell
+        cd /var/www # the default root directory for a web server
+        ls -Z # observe permission on html folder
+        semanage fcontext -a -t httpd_sys_content_t '/opt/website(/.*)'
+        restorecon /opt/website
+        ```
+
+    * Deploy the website and test:
+        ```shell
+        mv /root/index.html /opt/website
+        curl localhost/index.html # receive connection refused response
+        systemctl start httpd # need to start the service
+        setenforce 0 # set to permissive to allow for now
+        ```
+
+    * Resolve the error when attempting to access `/opt/website`:
+        ```shell
+        ll -Z # notice website has admin_home_t
+        restorecon /opt/website/index.html
+        ```
