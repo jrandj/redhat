@@ -2041,7 +2041,6 @@
         mount -t cifs //10.0.1.100/share /mnt/smb -o username=shareuser,password= # private ip used
         ```
 
-
     * Set up the NFS share:
         ```shell
         # on the server
@@ -2109,7 +2108,6 @@
         chage dprince -E 0
         ```
 
-
 1. Linux Academy - SELinux Learning Activity
 
     * Fix the SELinux permission on `/opt/website`:
@@ -2132,4 +2130,103 @@
         ```shell
         ll -Z # notice website has admin_home_t
         restorecon /opt/website/index.html
+        ```
+
+1. Linux Academy - Setting up VDO
+
+    * Install VDO and ensure the service is running:
+        ```shell
+		dnf install vdo -y
+		systemctl start vdo && systemctl enable vdo
+        ```
+
+    * Setup a 100G VM storage volume:
+        ```shell
+		vdo create --name=ContainerStorage --device=/dev/nvme1n1 --vdoLogicalSize=100G --sparseIndex=disabled
+		# spareIndex set to meet requirement of dense index deduplication
+		mkfs.xfs -K /dev/mapper/ContainerStorage
+		mkdir /mnt/containers
+		mount /dev/mapper/ContainerStorage /mnt/containers
+		vi /etc/fstab # add line /dev/mapper/ContainerStorage /mnt/containers xfs defaults,_netdev,x-systemd.device-timeout=0,x-systemd.requires=vdo.service 0 0
+        ```
+
+    * Setup a 60G website storage volume:
+        ```shell
+		vdo create --name=WebsiteStorage --device=/dev/nvme2n1 --vdoLogicalSize=60G --deduplication=disabled
+		# deduplication set to meet requirement of no deduplication
+		mkfs.xfs -K /dev/mapper/WebsiteStorage
+		mkdir /mnt/website
+		mount /dev/mapper/WebsiteFiles /mnt/website
+		vi /etc/fstab # add line for /dev/mapper/WebsiteStorage /mnt/website xfs defaults,_netdev,x-systemd.device-timeout=0,x-systemd.requires=vdo.service 0 0
+        ```
+
+1. Linux Academy - Final Practise Exam
+
+    * Start the guest VM:
+        ```shell
+		# use an VNC viewer connect to IP:5901
+		virsh list --all
+		virsh start --centos7.0
+		# we already have the VM installed, we just needed to start it (so we don't need virt-install)
+		dnf install virt-viewer -y
+		virt-viewer centos7.0
+		# now we are connected to the virtual machine
+		# send key Ctrl+Alt+Del when prompted for password, as we don't know it
+		# press e on GRUB screen
+		# add rd.break on the linux16 line
+		# now at the emergency console
+		mount -o remount, rw /sysroot
+		chroot /sysroot
+		passwd
+		touch /.autorelabel
+		reboot -f # needs -f to work for some reason
+		# it will restart when it completes relabelling
+        ```
+
+    * Create three users (Derek, Tom, and Kenny) that belong to the instructors group. Prevent Tom's user from accessing a shell, and make his account expire 10 day from now:
+        ```shell
+        ```
+
+    * Download and configure apache to serve index.html from `/var/web` and access it from the host machine:
+        ```shell
+        ```
+
+    * Configure umask to ensure all files created by any user cannot be accessed by the "other" users:
+        ```shell
+        ```
+
+    * Find all files in `/etc` (not including subdirectories) that are older than 720 days, and output a list to `/root/oldfiles`:
+        ```shell
+        ```
+
+    * Find all log messages in `/var/log/messages` that contain "ACPI", and export them to a file called `/root/logs`. Then archive all of `/var/log` and save it to `/tmp/log_archive.tgz`:
+        ```shell
+        ```
+
+    * Modify the GRUB timeout and make it 1 second instead of 5:
+        ```shell
+        ```
+
+    * Create a daily cron job at 4:27PM for the Derek user that runs `cat /etc/redhat-release` and redirects the output to `/home/derek/release`:
+        ```shell
+        ```
+
+    * Configure `time.nist.gov` as the only NTP Server:
+        ```shell
+        ```
+
+    * Create an 800M swap partition on the `vdb` disk and use the UUID to ensure that it is persistant:
+        ```shell
+        ```
+
+    * Create a new logical volume (LV-A) with a size of 30 extends that belongs to the volume group VG-A (with a PE size of 32M). After creating the volume, configure the server to mount it persistently on `/mnt`:
+        ```shell
+        ```
+
+    * On the host, not the guest VM, utilise ldap.linuxacademy.com for SSO, and configure AutoFS to mount user's home directories on login. Make sure to use Kerberos:
+        ```shell
+        ```
+
+    * Change the hostname of the guest to "RHCSA":
+        ```shell
         ```
