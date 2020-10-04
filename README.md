@@ -1164,7 +1164,7 @@
 
     * The *subscription-manager* command can be used to link a Red Hat subscription to a system.
 
-    * The *dnf* command is the front-end to *rpm* and is the preferred tool for package management. The *yum* command has been superseded by *dnf* in RHEL 8. It requires that the system has access to a software repository. The primary benefit of *dnf* is that it automatically resolves dependencies by downloading and installaing any additional required packages.
+    * The *dnf* command is the front-end to *rpm* and is the preferred tool for package management. The *yum* command has been superseded by *dnf* in RHEL 8. It requires that the system has access to a software repository. The primary benefit of *dnf* is that it automatically resolves dependencies by downloading and installing any additional required packages.
 
     * To list enabled and disabled repositories:
         ```shell
@@ -1506,17 +1506,22 @@
 
     * To create a user and add them to a group:
         ```shell
-        useradd -G IT user 2
+        useradd -G IT user2
         ```
 
     * To delete a user:
         ```shell
-        userdel user 1
+        userdel user1
         ```
 
     * To modify a user:
         ```shell 
         usermod -l user5 user1 # note that home directory will remain as user1
+        ```
+
+    * To add a user but not give access to the shell:
+        ```shell 
+        useradd -s /sbin/nologin user
         ```
 
 1. Change passwords and adjust password aging for local user accounts
@@ -2185,10 +2190,55 @@
 
     * Create three users (Derek, Tom, and Kenny) that belong to the instructors group. Prevent Tom's user from accessing a shell, and make his account expire 10 day from now:
         ```shell
+		groupadd instructors
+		useradd derek -G instructors
+		useradd tom -s /sbin/nologin -G instructors
+		useradd kenny -G instructors
+		chage tom -E 2020-10-14
+		chage -l tom # to check
+		cat /etc/group | grep instructors # to check
         ```
 
     * Download and configure apache to serve index.html from `/var/web` and access it from the host machine:
         ```shell
+		# there is some setup first to establish connectivity/repo
+		nmcli device # eth0 shown as disconnected
+		nmcli connection up eth0
+		vi /etc/yum.repos.d/centos7.repo
+        # contents of centos.repo
+        #####
+        #[centos7]
+        #name = centos
+        #baseurl = http://mirror.centos.org/centos/7/os/x86_64/
+		#enabled = 1
+		#gpgcheck = 1
+        #gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+        #####
+		yum repolist # confirm
+		yum install httpd -y
+		systemctl start httpd.service
+		mkdir /var/web
+		vi /etc/httpd/conf/httpd.conf
+		# change DocumentRoot to "/var/web"
+		# change Directory tag to "/var/web"
+		# change Directory tag to "/var/web/html"
+		echo "Hello world" > /var/web/index.html
+		systemctl start httpd.service
+		ip a s # note the first inet address for eth0 # from the guest VM
+		curl http://192.168.122.213/ # from the host 
+		# note that no route to host returned
+		firewall-cmd --list-services # notice no http service
+		firewall-cmd --add-service=http --permanent
+		firewall-cmd --reload
+		firewall-cmd --list-services # confirm http service
+		curl http://192.168.122.255/ # from the host 
+		# note that 403 error is returned
+		# ll -Z comparision between /var/web and /var/www shows that the SELinux type of index.html should be httpd_sys_context_t and not var_t
+		yum provides \*/semanage # suggests policycoreutils-python
+		yum install policycoreutils-python -y
+		semanage fcontext -a -t httpd_sys_content_t "/var/web(/.*)?"
+		restorecon -R -v /var/web
+		curl http://192.168.122.255/ # from the host - success!
         ```
 
     * Configure umask to ensure all files created by any user cannot be accessed by the "other" users:
