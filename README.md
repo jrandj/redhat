@@ -3,6 +3,7 @@
 ## RHCSA
 
 - [Understand and use essential tools](#Understand-and-use-essential-tools)
+- [Create simple shell scripts](#Create-simple-shell-scripts)
 - [Operate running systems](#Operate-running-systems)
 - [Configure local storage](#Configure-local-storage)
 - [Create and configure file systems](#Create-and-configure-file-systems)
@@ -10,9 +11,11 @@
 - [Manage basic networking](#Manage-basic-networking)
 - [Manage users and groups](#Manage-users-and-groups)
 - [Manage security](#Manage-security)
+- [Manage containers](#Manage-containers)
 - [Exercises](#Exercises)
 
 ### Understand and use essential tools
+
 1. Programmable completion for bash is provided in the bash-completion module. To install this module:
     ```shell
     sudo dnf install bash-completion
@@ -300,6 +303,18 @@
     * The *info* command provides more detailed information than the *man* command. 
 
     * The `/usr/share/doc` directory contains documentation for all installed packages under sub-directories that match package names followed by their version.
+
+### Create simple shell scripts
+
+1. Conditionally execute code(use of: if, test, [], etc.)
+
+1. Use Looping constructs (for, etc.) to process file, command line input
+
+1. Process script inputs ($1, $2, etc.)
+
+1. Processing output of shell commands within a script
+
+1. Processing shell command exit codes
 
 ### Operate running systems
 
@@ -1758,6 +1773,22 @@
 
     * A GUI called the SELinux Troubleshooter can be accessed using the *sealert* command. This allows SELinux denial messages to be analysed and provides recommendations on how to fix issues.
 
+### Manage containers
+
+1. Find and retrieve container images from a remote registry
+
+1. Inspect container images
+
+1. Perform container management using commands such as podman and skopeo
+
+1. Perform basic container management such as running, starting, stopping, and listing running containers
+
+1. Run a service inside a container
+
+1. Configure a container to start automatically as a systemd service
+
+1. Attach persistent storage to a container
+
 ### Exercises
 
 1. Recovery and Practise Tasks
@@ -2302,14 +2333,27 @@
 		swap # confirm swap is available
         ```
 
-    * Create a new logical volume (LV-A) with a size of 30 extends that belongs to the volume group VG-A (with a PE size of 32M). After creating the volume, configure the server to mount it persistently on `/mnt`:
+    * Create a new logical volume (LV-A) with a size of 30 extents that belongs to the volume group VG-A (with a PE size of 32M). After creating the volume, configure the server to mount it persistently on `/mnt`:
         ```shell
+		# observe through fdisk -l and df -h that /dev/vdc is available with no file system
+		yum provides pvcreate # lvm2 identified
+		yum install lvm2 -y
+		pvcreate /dev/vdc
+		vgcreate VG-A /dev/vdc -s 32M
+		lvcreate -n LV-A -l 30 VG-A
+		mkfs.xfs /dev/VG-A/LV-A
+		# note in directory /dev/mapper the name is VG--A-LV--A
+		# add an entry to /etc/fstab at /dev/mapper/VG--A-LV--A and /mnt (note that you can mount without the UUID here)
+		mount -a
+		df -h # verify that LV-A is mounted
         ```
 
     * On the host, not the guest VM, utilise ldap.linuxacademy.com for SSO, and configure AutoFS to mount user's home directories on login. Make sure to use Kerberos:
         ```shell
+		# this objective is no longer required in RHCSA 8
         ```
 
     * Change the hostname of the guest to "RHCSA":
         ```shell
+		hostnamectl set-hostname rhcsa
         ```
