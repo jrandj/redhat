@@ -1777,17 +1777,127 @@
 
 1. Find and retrieve container images from a remote registry
 
+	* A container is used for running multiple isolated applications on the same hardware. Unlike a virtual machine, containers share the host systems operating system. This is more lightweight but a little less flexible.
+
+	* Podman is a container engine developed by Redhat. Podman is an alternative to the well-known container engine Docker. It is used to directly manage pods and container images. The Podman Command Line Interface (CLI) uses the same commands as the Docker CLI. Docker is not officially supported in RHEL 8.
+	
+	* To search for an image in a remote repository and download it:
+        ```shell
+        dnf install podman -y
+        podman search httpd # note that docker.io/library/httpd has 3000+ stars
+        podman pull docker.io/library/httpd
+        ```
+
 1. Inspect container images
+
+	* To view images after they have been downloaded:
+	    ```shell
+        podman images
+        ```
+
+	* To inspect an image using Podman:
+        ```shell
+        podman inspect -l # -l gets the latest container
+        ```
+
+	* To inspect an image in a remote registry using Skopeo:
+        ```shell
+        dnf install skopeo -y
+		skopeo inspect docker://registry.fedoraproject.org/fedora:latest
+        ```
 
 1. Perform container management using commands such as podman and skopeo
 
+	* The man page for Podman and bash-completion can be used to provide more details on the usage of Podman.
+
+	* To view the logs for a container:
+        ```shell
+        podman logs -l
+        ```
+
+	* To view the pids for a container:
+        ```shell
+        podman top -l
+        ```
+
 1. Perform basic container management such as running, starting, stopping, and listing running containers
+
+	* To start, stop and remove a container:
+        ```shell
+		podman run -dt -p 8080:80/tcp docker.io/library/httpd # redirect requests on 8080 to 80
+	    podman ps -a # view container details, use -a to see all
+	    # check using 127.0.0.1:8080 on a browser
+	    podman stop af1fc4ca0253 # container ID from podman ps -a
+	    podman rm af1fc4ca0253
+        ```
 
 1. Run a service inside a container
 
+	* A Dockerfile can be used to create a custom container:
+        ```shell
+        sudo setsebool -P container_manage_cgroup on
+		vi Dockerfile
+		# contents of Dockerfile
+        #####
+        #FROM registry.access.redhat.com/ubi8/ubi-init
+		#RUN yum -y install httpd; yum clean all; systemctl enable httpd;
+		#RUN echo "Successful Web Server Test" > /var/www/html/index.html
+		#RUN mkdir /etc/systemd/system/httpd.service.d/; echo -e '[Service]\nRestart=always' > /etc/systemd/system/httpd.service.d/httpd.conf
+		#EXPOSE 80
+        #####
+		podman build -t mysysd .
+		podman run -d --name=mysysd_run -p 80:80 mysysd
+		podman ps # confirm that container is running
+        ```
+
+	* Note that the SELinux boolean referred to above can be found using:
+	    ```shell
+		getsebool -a | grep "container"
+        ```
+
+	* Note that the registry above is the Podman Universal Base Image (UBI) for RHEL 8.
+
 1. Configure a container to start automatically as a systemd service
 
+	* Podman was not originally designed to bring up an entire Linux system or manage services for such things as start-up order, dependency, checking, and failed service recovery. That is the job of an initialisation system like systemd.
+
+	* By setting up a systemd unit file on your host computer, you can have the host automatically start, stop, check the status, and otherwise manage a container as a systemd service. Many Linux services are already packaged for RHEL to run as systemd services.
+
+	* To configure a container to run as a systemd service:
+        ```shell
+		sudo setsebool -P container_manage_cgroup on
+        podman run -d --name httpd-server -p 8080:80 # -d for detached, -p for port forwarding
+		podman ps # confirm the container is running
+		vi /etc/systemd/system/httpd-container.service
+        # contents of httpd-container.service
+        #####
+        #[Unit]
+        #Description=httpd Container Service
+		#Wants=syslog.service
+		#
+		#[Service]
+		#Restart=always
+		#ExecStart=/usr/bin/podman start -a httpd-server
+		#ExecStop=/usr/bin/podman stop -t 2 httpd-server
+		#
+		#[Install]
+		#WantedBy=multi-user.target
+        #####
+		systemctl start httpd-container.service
+		systemctl status httpd-container.service # confirm running
+		systemctl enable httpd-container.service # will not run as part multi-user.target
+        ```
+
+	* Note that other systemd services can be viewed in `/etc/systemd/system` and used as examples.
+
 1. Attach persistent storage to a container
+
+	* To attach persistant storage to a container:
+        ```shell
+		ls /dev/sda1 # using this disk
+		mkdir -p /home/containers/disk1
+		podman run --privileged -it -v /home/containers/disk1:/mnt docker.io/library/httpd /bin/bash #  --privileged to allow with SELinux, -it for interactive terminal, -v to mount, and provide a terminal
+        ```
 
 ### Exercises
 
