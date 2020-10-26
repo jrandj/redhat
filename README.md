@@ -105,7 +105,7 @@
 
     * Instead of > to create or overwrite, >> can be used to append to a file.
 
-1. Use grep and regular expressions to analyze text
+1. Use grep and regular expressions to analyse text
     * The grep command is used to find text. For example:
         ```shell
         grep user100 /etc/passwd
@@ -136,7 +136,7 @@
     
     * The command *ssh-keygen* is used to generate keys and place them in the .ssh directory, and the command *ssh-copy-id* is used to copy the public key file to your account on the remote server.
     
-    * TCP Wrappers is a host-based mechanism that is used to limit access to wrappers-aware TCP services on the system by inbound clients. Two files `/etc/hosts.allow` and `/etc/hosts.deny` are used to control access. The .allow file is referenced before the .deny file. The format of the files is \<name of service process>:\<user@source>.
+    * TCP Wrappers is a host-based mechanism that is used to limit access to wrappers-aware TCP services on the system by inbound clients. 2 files `/etc/hosts.allow` and `/etc/hosts.deny` are used to control access. The .allow file is referenced before the .deny file. The format of the files is \<name of service process>:\<user@source>.
     
     * All messages related to TCP Wrappers are logged to the `/var/log/secure` file.
     
@@ -147,7 +147,7 @@
 
 1. Log in and switch users in multiuser targets
 
-    * A user can switch to another user using the *su* command. The -i option ensures that the target users login scripts are run:
+    * A user can switch to another user using the *su* command. The *-i* option ensures that the target users login scripts are run:
         ```shell
         sudo -i -u targetUser
         ``` 
@@ -159,7 +159,7 @@
 
     * The configuration for which users can run which commands using sudo is defined in the `/etc/sudoers` file. The visudo command is used to edit the sudoers file. The sudo command logs successful authentication and command data to `/var/log/secure`.
 
-1. Archive, compress, unpack, and uncompress files using tar, star, gzip, and bzip2
+1. Archive, compress, unpack, and decompress files using tar, star, gzip, and bzip2
 
     * To archive using tar:
         ```shell
@@ -181,17 +181,17 @@
         tar cvfj myTar.tar /home
         ``` 
 
-    * To uncompress using tar and gzip:
+    * To decompress using tar and gzip:
         ```shell
         tar xvfz myTar.tar /home
         ``` 
 
-    * To uncompress using tar and bzip2:
+    * To decompress using tar and bzip2:
         ```shell
         tar xvfj myTar.tar /home
         ``` 
 
-    * The star command is an enhanced versin of tar. It also supports SELinux security contexts and extended file attributes. The options are similar to tar.
+    * The star command is an enhanced version of tar. It also supports SELinux security contexts and extended file attributes. The options are similar to tar.
 
 
 1. Create and edit text files
@@ -202,7 +202,7 @@
         cat > newfile
         ``` 
 
-    * To create a vile using vim:
+    * To create a file using vim:
         ```shell
         vi file
         ``` 
@@ -241,19 +241,19 @@
 
 1. Create hard and soft links
 
-    * A soft link associates one file with another. If the original file is removed the soft link will point to nothing. To create a softlink to file1:
+    * A soft link associates one file with another. If the original file is removed the soft link will point to nothing. To create a soft link to file1:
         ```shell
         ln -s file1 softlink
         ``` 
 
-    * A hard link associates multiple files to the same inode making them indistinguishable. If the original file is removed, you will still have access to the data through the linked file. To create a softlink to file1:
+    * A hard link associates multiple files to the same inode making them indistinguishable. If the original file is removed, you will still have access to the data through the linked file. To create a soft link to file1:
         ```shell
         ln file1 hardlink
         ``` 
 
 1. List, set, and change standard ugo/rwx permissions
 
-    * Permissions are set for the user, group and others. User is the owner of the file or the directory, group is a set of users with identical access defined in `/etc/group`, and others are all other users. The types of permission are read, write and execute.
+    * Permissions are set for the user, group, and others. User is the owner of the file or the directory, group is a set of users with identical access defined in `/etc/group`, and others are all other users. The types of permission are read, write and execute.
     
     * Permission combinations are shown below:
         | Octal Value | Binary Notation | Symbolic Notation | Explanation                           |
@@ -267,7 +267,7 @@
         | 6           | 110             | rw-               | Read and write permissions.           |
         | 7           | 111             | rwx               | Read, write, and execute permissions. |
 
-    * To grant the owner, group and others all permissions using the *chmod* command:
+    * To grant the owner, group, and others all permissions using the *chmod* command:
         ```shell
         chmod 777 file1
         ```
@@ -287,18 +287,18 @@
         ```shell
         chown user100:user100 item1
         ```
-    * Note that the -R option must be used to recusively change all files in a directory.
+    * Note that the -R option must be used to recursively change all files in a directory.
 
 1. Locate, read, and use system documentation including man, info, and files in `/usr/share/doc`
 
     * The *man* command can be used to view help for a command. To search for a command based on a keyword the *apropros* command or *man* with the -k option can be used. The *mandb* command is used to build the man database.
 
-    * To search for a command based on a keyword in occuring in its man page:
+    * To search for a command based on a keyword in occurring in its man page:
         ```shell
         man -K <keyword>
         ```
 
-    * The *whatis* command can be used to search for a command in the man database for a short descripton.
+    * The *whatis* command can be used to search for a command in the man database for a short description.
 
     * The *info* command provides more detailed information than the *man* command. 
 
@@ -306,7 +306,7 @@
 
 ### Create simple shell scripts
 
-1. Conditionally execute code(use of: if, test, [], etc.)
+1. Conditionally execute code (use of: if, test, [], etc.)
 
 1. Use Looping constructs (for, etc.) to process file, command line input
 
@@ -320,15 +320,15 @@
 
 1. Boot, reboot, and shut down a system normally
 
-    * The RHEL boot process occurs when the system is powered up or reset, and lasts until all enabled services are started and a login prompt appears at the screen. The login process consists of 4 steps:
+    * The RHEL boot process occurs when the system is powered up or reset and lasts until all enabled services are started and a login prompt appears at the screen. The login process consists of 4 steps:
 
         * The firmware is the Basic Input Output System (BIOS) or Unified Extensible Firmware Interface (UEFI) code that is stored in flash memory on the motherboard. The first thing it does is run the power-on-self-test (POST) to initialise the system hardware components. It also installs appropriate drivers for the video hardware and displays system messages to the screen. It scans the available storage devices to locate a boot device (GRUB2 on RHEL), and then loads it into memory and passes control to it.
 
         * The boot loader presents a menu with a list of bootable kernels available on the system. After a pre-defined amount of time it boots the default kernel. GRUB2 searches for the kernel in the `/boot` file system. It then extracts the kernel code into memory and loads it based on the configuration in `/boot/grub2/grub.cfg`. Note that for UEFI systems, GRUB2 looks in `/boot/efi` instead and loads based on configuration in `/boot/efi/EFI/redhat/grub.efi`. Once the kernel is loaded, GRUB2 passes control to it.
 
-        * The kernel loads the initial RAM disk (initrd) image from the `/boot` file system. This acts as a temporary file system. The kernal then loads necessary modules from initrd to allow access to the physical disks and the partitions and file systems within. It also loads any drivers required to support the boot process. Later, the kernal unmounts initrd and mounts the actual root file system.
+        * The kernel loads the initial RAM disk (initrd) image from the `/boot` file system. This acts as a temporary file system. The kernel then loads necessary modules from initrd to allow access to the physical disks and the partitions and file systems within. It also loads any drivers required to support the boot process. Later, the kernel unmounts initrd and mounts the actual root file system.
 
-        * The kernel continues the boot process. *systemd* is the default system initilisation scheme. It starts all enabled userspace system and network services.
+        * The kernel continues the boot process. *systemd* is the default system initialisation scheme. It starts all enabled user space system and network services.
 
     * The *shutdown* command is used to halt, power off, or reboot the system gracefully. This command broadcasts a warning message to all logged-in users, disables further user logins, waits for the specified time, and then stops the service and shuts to the system down to the specified target state. 
     
@@ -356,7 +356,7 @@
 
     * *systemd* is the default system initialisation mechanism in RHEL 8. It is the first process that starts at boot and it is the last process that terminates at shutdown.
 
-    * *Units* are systemd objects that are used for organising boot and maintenance tasks, such as hardware initialisation, socket creation, file system mounts, and service startups. Unit configuration is stored in their respective configuration files, which are auto-generated from other configurations, created dynamically from the system state, produced at runtime, or userdeveloped. Units are in one of several operational states, including active, inactive, in the process of being activated or deactivated, and failed. Units can be enabled or disabled.
+    * *Units* are systemd objects that are used for organising boot and maintenance tasks, such as hardware initialisation, socket creation, file system mounts, and service start-ups. Unit configuration is stored in their respective configuration files, which are auto generated from other configurations, created dynamically from the system state, produced at runtime, or user developed. Units are in one of several operational states, including active, inactive, in the process of being activated or deactivated, and failed. Units can be enabled or disabled.
 
     * Units have a name and a type, which are encoded in files of the form unitname.type. Units can be viewed using the *systemctl* command. A target is a logical collection of units. They are a special systemd unit type with the .target file extension.
 
@@ -390,7 +390,7 @@
         ```
     *  Run *passwd* command to change the root password.
     
-    *  Run the following commands to create an empty, hidden file to instruct the system to perform SELinux relabeling after the next boot:
+    *  Run the following commands to create an empty, hidden file to instruct the system to perform SELinux relabelling after the next boot:
         ```shell
         touch /.autorelabel
         exit
@@ -399,7 +399,7 @@
 
 1. Identify CPU/memory intensive processes and kill processes
 
-    * A process is a unit for provisioning system resources. A process is created in memory in its own address space when a program, application, or command is initiated. Processes are organised in a heirarchical fashion. Each process has a parent process that spawns it, and may have one or many child processes. Each process is assigned a unique identification number, known as the Process Identifier (PID). When a process completes its lifecycle or is terminated, this event is reported back to its parent process, and all the resources provisioned to it are then freed and the PID is removed. Processes spawned at system boot are called daemons. Many of these sit in memory and wait for an event to trigger a request to use their services.
+    * A process is a unit for provisioning system resources. A process is created in memory in its own address space when a program, application, or command is initiated. Processes are organised in a hierarchical fashion. Each process has a parent process that spawns it and may have one or many child processes. Each process is assigned a unique identification number, known as the Process Identifier (PID). When a process completes its lifecycle or is terminated, this event is reported back to its parent process, and all the resources provisioned to it are then freed and the PID is removed. Processes spawned at system boot are called daemons. Many of these sit in memory and wait for an event to trigger a request to use their services.
 
     * There are 5 basic process states:
         * Running: The process is being executed by the CPU.
@@ -458,7 +458,7 @@
     
 1. Manage tuning profiles
 
-    * Tuned is a service which monitors the system and optimises the performance of the system for different use cases. There are pre-defined tuned profiels available in the `/usr/lib/tuned` directory. New profiles are created in the `/etc/tuned` directory. The *tuned-adm* command allows you to interact with the Tuned service.
+    * Tuned is a service which monitors the system and optimises the performance of the system for different use cases. There are pre-defined tuned profiles available in the `/usr/lib/tuned` directory. New profiles are created in the `/etc/tuned` directory. The *tuned-adm* command allows you to interact with the Tuned service.
 
     * To install and start the tuned service:
         ```shell
@@ -492,7 +492,7 @@
 
 1. Locate and interpret system log files and journals
 
-    * In RHEL logs capture messages generated by the kernel, daemons, commands, user activities, applications and other events. The daemon that is responsible for system logging is called *rsyslogd*. The configuration file for *rsyslogd* is in the `/etc/rsyslog.conf` file. As defined in this configuration file, the default repository for most logs is the `/var/log` directory.
+    * In RHEL logs capture messages generated by the kernel, daemons, commands, user activities, applications, and other events. The daemon that is responsible for system logging is called *rsyslogd*. The configuration file for *rsyslogd* is in the `/etc/rsyslog.conf` file. As defined in this configuration file, the default repository for most logs is the `/var/log` directory.
 
     * The below commands can be used to start and stop the daemon:
         ```shell   
@@ -501,13 +501,13 @@
         ```
     * A script called *logrotate* in `/etc/cron.daily` invokes the *logrotate* command to rotate log files as per the configuration file.
 
-    * The boot log file is available at `/var/log/boot.log` and contains logs generated during system startup. The system log file is available in `/var/log/messages` and is the default location for storing most system activities.
+    * The boot log file is available at `/var/log/boot.log` and contains logs generated during system start-up. The system log file is available in `/var/log/messages` and is the default location for storing most system activities.
 
 1. Preserve system journals
 
-    * In addition to system logging, the *journald* daemon (which is an element of *systemd*) also collects and manages log messages from the kernel and daemon processes. It also captures system logs and RAM disk messages, and any alerts generated during the early boot stage. It stores these messages in binary format in files called *journals* in the `/var/run/journal` directory. These files are structured and indexed for faster and easier searches, and can be viewed and managed using the *journalctl* command.
+    * In addition to system logging, the *journald* daemon (which is an element of *systemd*) also collects and manages log messages from the kernel and daemon processes. It also captures system logs and RAM disk messages, and any alerts generated during the early boot stage. It stores these messages in binary format in files called *journals* in the `/var/run/journal` directory. These files are structured and indexed for faster and easier searches and can be viewed and managed using the *journalctl* command.
 
-    * By default, journals are stored temporarily in the `/run/log/journal` directory. This is a memory-based virtual file system and does not persist across reboots. To have journal files stored persistantly in `/var/log/journal` the following commands can be run:
+    * By default, journals are stored temporarily in the `/run/log/journal` directory. This is a memory-based virtual file system and does not persist across reboots. To have journal files stored persistently in `/var/log/journal` the following commands can be run:
         ```shell   
         mkdir -p /var/log/journal
         systemctl restart systemd-journald
@@ -560,9 +560,9 @@
 
 1. List, create, delete partitions on MBR and GPT disks
 
-    * Data is stored on disk dives that are logically divided into partitions. A partition can exist on a portion of a disk, an entire disk, or across multiple disks. Each partition can contain a file system, raw data space, swap space, or dump space.
+    * Data is stored on disk drives that are logically divided into partitions. A partition can exist on a portion of a disk, an entire disk, or across multiple disks. Each partition can contain a file system, raw data space, swap space, or dump space.
 
-    * A disk in RHEL can be divided into several partitions. This partition information is stored on the disk in a small region, which is read by the operating system at boot time. This is known as the Master Boot Record (MBR) on BIOS-based systems, and GUID Partition Table (GPT) on UEFI-based systems. At system boot, the BIOS/UEFI scans all storage devices, detects the presence of MBR/GPT, identifies the boot disks, loads the boot loader program in memory from the default boot disk, executes the boot code to read the partition table and identify the `/boot` partition, and continues with the boot process by loiading the kernel in the memory and passing control over to it.
+    * A disk in RHEL can be divided into several partitions. This partition information is stored on the disk in a small region, which is read by the operating system at boot time. This is known as the Master Boot Record (MBR) on BIOS-based systems, and GUID Partition Table (GPT) on UEFI-based systems. At system boot, the BIOS/UEFI scans all storage devices, detects the presence of MBR/GPT, identifies the boot disks, loads the boot loader program in memory from the default boot disk, executes the boot code to read the partition table and identify the `/boot` partition, and continues with the boot process by loading the kernel in the memory and passing control over to it.
 
     * MBR allows the creation of only up to 4 primary partitions on a single disk, with the option of using one of the 4 partitions as an extended partition to hold an arbitrary number of logical partitions. MBR also lacks addressing space beyond 2TB due to its 32-bit nature and the disk sector size of 512-byte that it uses. MBR is also non-redundant, so a system becomes unbootable if it becomes corrupted somehow.
 
@@ -581,12 +581,12 @@
         gdisk -l # GPT
         ```
 
-    * For MBR based partitions the *fdisk* utilty can be used to create and delete partitions. To make a change to a disk:
+    * For MBR based partitions the *fdisk* utility can be used to create and delete partitions. To make a change to a disk:
         ```shell   
         fdisk <disk>
         ```
 
-    * For GPT based partitions the *gdisk* utilty can be used to create and delete partitions. To make a change to a disk:
+    * For GPT based partitions the *gdisk* utility can be used to create and delete partitions. To make a change to a disk:
         ```shell   
         gdisk <disk>
         ```
@@ -730,7 +730,7 @@
 
 1. Create, mount, unmount, and use vfat, ext4, and xfs file systems
 
-    * A file system is a logical container that is used to store files and directories. Each file system must be connected to the root of the directory hierarchy in order to be accessible. This is typically done automatically on system boot, but can be done manually as well. Each file system can be mounted or unmounted using the UUID associated with it or by using a label that can be assigned to it. Mounting is the process of attaching an additional filesystem, which resides on a CDROM, hard disk drive (HDD) or other storage device, to the currently accessible filesystem of a computer. 
+    * A file system is a logical container that is used to store files and directories. Each file system must be connected to the root of the directory hierarchy to be accessible. This is typically done automatically on system boot but can be done manually as well. Each file system can be mounted or unmounted using the UUID associated with it or by using a label that can be assigned to it. Mounting is the process of attaching an additional filesystem, which resides on a CDROM, hard disk drive (HDD) or other storage device, to the currently accessible filesystem of a computer. 
 
     * Each file system is created in a separate partition or logical volume. A typical RHEL system has numerous file systems. During OS installation, the `/` and `/boot` file systems are created by default. Typical additional file systems created during installation include `/home`, `/opt`, `/tmp`, `/usr` and `/var`.
 
@@ -751,9 +751,9 @@
     | AutoFS               | Network | An NFS file system set to mount and unmount automatically on a remote system.                                                                                                                                                                                                                                                                                                                                                                                                                                   |
     | CIFS                 | Network | Common Internet File System (a.k.a Samba). A directory or file system shared over the network for access by Windows and other Linux systems.                                                                                                                                                                                                                                                                                                                                                                    |
 
-    * The *mount* command is used to attach a file system to a desired point in the directory heirarchy to make it accessible to users and applications. This point is referred to as the *mount point*, which is essentially an empty directory created soley for this point. The *mount* command requires the absolute pathname (or its UUID or label) to the block device containing the file system, and a mount point name in order to attach it to the directory tree. The *mount* command adds an entry to the `/proc/mounts` file and instructs the kernel to add the entry to the `/proc/mounts` file as well after a file system has been successfully mounted.
+    * The *mount* command is used to attach a file system to a desired point in the directory hierarchy to make it accessible to users and applications. This point is referred to as the *mount point*, which is essentially an empty directory created solely for this point. The *mount* command requires the absolute pathname (or its UUID or label) to the block device containing the file system, and a mount point name to attach it to the directory tree. The *mount* command adds an entry to the `/proc/mounts` file and instructs the kernel to add the entry to the `/proc/mounts` file as well after a file system has been successfully mounted.
 
-    * The opposite of the *mount* command is *unmount*, whihc is used to detach a file system from the directory hierarchy and make it inaccessible to users and applications.
+    * The opposite of the *mount* command is *unmount*, which is used to detach a file system from the directory hierarchy and make it inaccessible to users and applications.
 
     * To create a vfat file system:
         ```shell   
@@ -953,7 +953,7 @@
         ```shell
         mount /stratis/strat1/fs1 /mnt
         df -h
-        # add to /etc/fstab to make it persistant
+        # add to /etc/fstab to make it persistent
         ```
 
     * To add a disk to the stratis pool and confirm:
@@ -997,9 +997,9 @@
 
 1. Schedule tasks using at and cron
 
-    * Job scheduling and execution is handled by the *atd* and *crond* daemons. While *atd* manages jobs scheduled to run once in the future, *crond* is responsbile for running jobs repetitively at pre-specified times. At startup, *crond* reads schedules in files located in the `/var/spool/cron` and `/etc/cron.d` directories, and loads them in memory for later execution.
+    * Job scheduling and execution is handled by the *atd* and *crond* daemons. While *atd* manages jobs scheduled to run once in the future, *crond* is responsible for running jobs repetitively at pre-specified times. At start-up, *crond* reads schedules in files located in the `/var/spool/cron` and `/etc/cron.d` directories, and loads them in memory for later execution.
 
-    * There are 4 files that control permissions for setting scheduled jobs. These are *at.allow*, *at.deny*, *cron.allow* and *cron.deny*. These files are located in the `/etc` directory. The syntax of the files is identical, with each file taking 1 username per line. If no files exist, then no users are permitted. By default, the *deny* files exist and are empty, and the *allow* files do not exist. This opens up full access to using both tools for all users.
+    * There are 4 files that control permissions for setting scheduled jobs. These are *at.allow*, *at.deny*, *cron.allow* and *cron.deny*. These files are in the `/etc` directory. The syntax of the files is identical, with each file taking 1 username per line. If no files exist, then no users are permitted. By default, the *deny* files exist and are empty, and the *allow* files do not exist. This opens up full access to using both tools for all users.
 
     * All activities involving *atd* and *crond* are logged to the `/var/log/cron` file.
 
@@ -1017,11 +1017,11 @@
         ```
 
     * The `/etc/crontab` file has the following columns:
-        * 1: Minutes of hour (0-59), with multiple comma seperated values, or * to represent every minute.
-        * 2: Hours of day (0-23), with multiple comma seperated values, or * to represent every hour.
-        * 3: Days of month (1-31), with multiple comma seperated values, or * to represent every day.
-        * 4: Month of year (1-12, jan-dec), with multiple comma seperated values, or * to represent every month.
-        * 5: Day of week (0-6, sun-sat), with multiple comma seperated values, or * to represent every day.
+        * 1: Minutes of hour (0-59), with multiple comma separated values, or * to represent every minute.
+        * 2: Hours of day (0-23), with multiple comma separated values, or * to represent every hour.
+        * 3: Days of month (1-31), with multiple comma separated values, or * to represent every day.
+        * 4: Month of year (1-12, jan-dec), with multiple comma separated values, or * to represent every month.
+        * 5: Day of week (0-6, sun-sat), with multiple comma separated values, or * to represent every day.
         * 6: Full path name of the command or script to be executed, along with any arguments.
         
     * Step values can be used with */2 meaning every 2nd minute.
@@ -1142,12 +1142,12 @@
         timedatectl set-time 22:43:00
         ```
 
-    * To view a list of timezones:
+    * To view a list of time zones:
         ```shell
         timedatectl list-timezones
         ```
 
-    * To change the timezone:
+    * To change the time zone:
         ```shell
         timedatectl set-timezone <timezone>
         ```
@@ -1332,9 +1332,9 @@
 
 1. Configure IPv4 and IPv6 addresses
 
-    * The format of an IPv4 address is a set of 4 8 bit integers that gives a 32 bit IP address.  The format of an IPv6 is a set of 8 16 bit hexadecimal numbers that gives a 128 bit IP address.
+    * The format of an IPv4 address is a set of 4 8-bit integers that gives a 32-bit IP address.  The format of an IPv6 is a set of 8 16-bit hexadecimal numbers that gives a 128-bit IP address.
 
-    * The *nmcli* command is used to configure networking using the NetworkManager service. This command is used to create, display, edit, delete, activate and deactive network connections. Each network device corresponds to a Network Manager device.
+    * The *nmcli* command is used to configure networking using the NetworkManager service. This command is used to create, display, edit, delete, activate, and deactivate network connections. Each network device corresponds to a Network Manager device.
 
     * Using nmcli with the connection option lists the available connection profiles in NetworkManager.
 
@@ -1407,7 +1407,7 @@
         hostname -f # fully qualified domain name
         ```
 
-    * The hostname file is located in `/etc/hostname`. To refresh any changes run the *hostnamectl* command.
+    * The hostname file is in `/etc/hostname`. To refresh any changes run the *hostnamectl* command.
 
 1. Configure network services to start automatically at boot
 
@@ -1500,7 +1500,7 @@
 
     * The `/etc/gshadow` file stores encrypted group passwords. Each row in the file corresponds to one entry in the group file.
 
-    * Due to manual modification, inconsistencies may arise between the above four authentication files. The *pwck* command is used to check for inconsistancies.
+    * Due to manual modification, inconsistencies may arise between the above four authentication files. The *pwck* command is used to check for inconsistencies.
 
     * The *vipw* and *vigr* commands are used to modify the *passwd* and *group* files respectively. These commands disable write access to these files while the privileged user is making the modifications.
 
@@ -1692,9 +1692,9 @@
 
 1. Set enforcing and permissive modes for SELinux
 
-    * Security Enhanced Linux (SELinux) is an implementation of Mandatory Access Control (MAC) architecture developed by the U.S National Security Agency (NSA). MAC provides an added layer of protection beyond the standard LInux Discretionary Access Control (DAC), which includes the traditional file and directory permissions, ACL settings, setuid/setgid bit settings, su/sudo privileges etc.
+    * Security Enhanced Linux (SELinux) is an implementation of Mandatory Access Control (MAC) architecture developed by the U.S National Security Agency (NSA). MAC provides an added layer of protection beyond the standard Linux Discretionary Access Control (DAC), which includes the traditional file and directory permissions, ACL settings, setuid/setgid bit settings, su/sudo privileges etc.
 
-    * MAC controls are fine-grained; they protect other services in the event one of the services is negotiated. MAC uses a set of defined authorisation rules called policy to examine security attributes assocaited with subjects and objects when a subject tries to access an object, and decides whether or not to permit this access attempt. SELinux decisions are stored in a special cache referred to as Access Vector Cache (AVC).
+    * MAC controls are fine-grained; they protect other services in the event one of the services is negotiated. MAC uses a set of defined authorisation rules called policy to examine security attributes associated with subjects and objects when a subject tries to access an object and decides whether or not to permit this access attempt. SELinux decisions are stored in a special cache referred to as Access Vector Cache (AVC).
 
     * When an application or process makes a request to access an object, SELinux checks with the AVC, where permissions are cached for subjects and objects. If a decision is unable to be made, it sends the request to the security server. The security server checks for the security context of the app or process and the object. Security context is applied from the SELinux policy database. 
 
@@ -1746,23 +1746,23 @@
         restorecon -R directory
         ```
 
-1. Use boolean settings to modify system SELinux settings
+1. Use Boolean settings to modify system SELinux settings
 
-    * SELinux has a large number of contexts and policies already defined. Booleans within SELinux allow common rules to be turned on and off.
+    * SELinux has many contexts and policies already defined. Booleans within SELinux allow common rules to be turned on and off.
 
-    * To check a SELinux boolean setting:  
+    * To check a SELinux Boolean setting:  
         ```shell
         getsebool -a | grep virtualbox
         ```
 
-    * To set a SELinux boolean setting permanently:  
+    * To set a SELinux Boolean setting permanently:  
         ```shell
        setsebool -P use_virtualbox on
         ```
 
 1. Diagnose and address routine SELinux policy violations
 
-    * The SELinux Administration tool is a graphical tool that enables a number of configuration and management operations to be performed. To install and run the tool:
+    * The SELinux Administration tool is a graphical tool that enables many configuration and management operations to be performed. To install and run the tool:
        ```shell
        yum install setools-gui
        yum install policycoreutils-gui
@@ -1850,7 +1850,7 @@
 		podman ps # confirm that container is running
         ```
 
-	* Note that the SELinux boolean referred to above can be found using:
+	* Note that the SELinux Boolean referred to above can be found using:
 	    ```shell
 		getsebool -a | grep "container"
         ```
@@ -1892,7 +1892,7 @@
 
 1. Attach persistent storage to a container
 
-	* To attach persistant storage to a container:
+	* To attach persistent storage to a container:
         ```shell
 		ls /dev/sda1 # using this disk
 		mkdir -p /home/containers/disk1
@@ -1938,7 +1938,7 @@
         touch file
         ```
 
-    * Set the system timezone and configure the system to use NTP:
+    * Set the system time zone and configure the system to use NTP:
         ```shell
         yum install chrony
         systemctl enable chronyd.service
@@ -1990,7 +1990,7 @@
         hostname # to confirm result
         ```
 
-    * As charles, create a once-off job that creates a file called `/testresults/bob` containing the text "Hello World. This is Charles." in 2 days time:
+    * As charles, create a once-off job that creates a file called `/testresults/bob` containing the text "Hello World. This is Charles." in 2 days later:
         ```shell
         vi hello.sh
         # contents of hello.sh
@@ -2013,7 +2013,7 @@
         vi addDate.sh
         # contents of hello.sh
         #####
-        #!/bin/bash
+        # #!/bin/bash
         # date >> alice
         #####
         /testresults/alice/addDate.sh
@@ -2135,7 +2135,7 @@
         lvdisplay # or lvs, to view details
         ```
 
-    * Format the LV as XFS and mount it persistantly at `/mnt/lvol`:
+    * Format the LV as XFS and mount it persistently at `/mnt/lvol`:
         ```shell
         fdisk -l # get path for lv
         mkfs.xfs /dev/mapper/RHCSA-pinehead
@@ -2302,7 +2302,7 @@
 
     * Start the guest VM:
         ```shell
-		# use an VNC viewer connect to IP:5901
+		# use a VNC viewer connect to IP:5901
 		virsh list --all
 		virsh start --centos7.0
 		# we already have the VM installed, we just needed to start it (so we don't need virt-install)
@@ -2391,7 +2391,7 @@
 		tar -czf /tmp/log_archive.tgz /var/log/ # note f flag must be last!
         ```
 
-    * Modify the GRUB timeout and make it 1 second instead of 5:
+    * Modify the GRUB timeout and make it 1 second instead of 5 seconds:
         ```shell
 		find / -iname grub.cfgreboot
 		# /etc/grub.d, /etc/default/grub and grub2-mkconfig referred to in /boot/grub2/grub.cfg
@@ -2424,7 +2424,7 @@
 		# replace lines at the top with server time.nist.gov
         ```
 
-    * Create an 800M swap partition on the `vdb` disk and use the UUID to ensure that it is persistant:
+    * Create an 800M swap partition on the `vdb` disk and use the UUID to ensure that it is persistent:
         ```shell
 		fdisk -l # note that we have one MBR partitions
 		fdisk /dev/vdb
