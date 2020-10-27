@@ -191,7 +191,7 @@
         tar xvfj myTar.tar /home
         ``` 
 
-    * The star command is an enhanced version of tar. It also supports SELinux security contexts and extended file attributes. The options are similar to tar.
+    * The star command is an enhanced version of tar. It also supports SELinux security contexts and extended file attributes. The options are like tar.
 
 
 1. Create and edit text files
@@ -789,7 +789,7 @@
         lvremove <lvpath>
         ```
 
-1. Configure systems to mount file systems at boot by universally unique ID (UUID) or label
+1. Configure systems to mount file systems at boot by Universally Unique ID (UUID) or label
     
     * The `/etc/fstab` file is a system configuration file that lists all available disks, disk partitions and their options. Each file system is described on a separate line. The `/etc/fstab` file is used by the *mount* command, which reads the file to determine which options should be used when mounting the specific device. A file system can be added to this file so that it is mounted on boot automatically.
     
@@ -825,7 +825,7 @@
 
 1. Create, mount, unmount, and use vfat, ext4, and xfs file systems
 
-    * A file system is a logical container that is used to store files and directories. Each file system must be connected to the root of the directory hierarchy to be accessible. This is typically done automatically on system boot but can be done manually as well. Each file system can be mounted or unmounted using the UUID associated with it or by using a label that can be assigned to it. Mounting is the process of attaching an additional filesystem, which resides on a CDROM, hard disk drive (HDD) or other storage device, to the currently accessible filesystem of a computer. 
+    * A file system is a logical container that is used to store files and directories. Each file system must be connected to the root of the directory hierarchy to be accessible. This is typically done automatically on system boot but can be done manually as well. Each file system can be mounted or unmounted using the UUID associated with it or by using a label that can be assigned to it. Mounting is the process of attaching an additional filesystem, which resides on a CDROM, Hard Disk Drive (HDD) or other storage device, to the currently accessible filesystem of a computer. 
 
     * Each file system is created in a separate partition or logical volume. A typical RHEL system has numerous file systems. During OS installation, the `/` and `/boot` file systems are created by default. Typical additional file systems created during installation include `/home`, `/opt`, `/tmp`, `/usr` and `/var`.
 
@@ -834,7 +834,7 @@
     | File System          | Type    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
     |----------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
     | ext2                 | Disk    | The second generation of the extended file system. The first generation is no longer supported. ext2 is deprecated in RHEL and will be removed in a future RHEL release.                                                                                                                                                                                                                                                                                                                                        |
-    | ext3                 | Disk    | The third generation of the extended file system. It supports metadata journaling for faster recovery, superior reliability, file systems up to 16TB, files up to 2TB, and up to 32,000 sub-directories. ext3 writes each metadata update in its entirety to the journal after it has been completed. The system looks in the file system journal following a reboot after a system crash has occured, and recovers the file system rapidly using the updated structural information stored in its journal. |
+    | ext3                 | Disk    | The third generation of the extended file system. It supports metadata journaling for faster recovery, superior reliability, file systems up to 16TB, files up to 2TB, and up to 32,000 sub-directories. ext3 writes each metadata update in its entirety to the journal after it has been completed. The system looks in the file system journal following a reboot after a system crash has occurred, and recovers the file system rapidly using the updated structural information stored in its journal. |
     | ext4                 | Disk    | The fourth generation of the extended file system. It supports file systems up to 1EB, files up to 16TB, an unlimited number of sub-directories, metadata and quota journaling, and extended user attributes.                                                                                                                                                                                                                                                                                                   |
     | xfs                  | Disk    | XFS is a highly scalable and high-performance 64-bit file system.  It supports metadata journaling for faster crash recovery, online defragmentation, expansion quota journaling, and extended user attributes. It supports file systems and files of sizes up to 8EB. It is the default file system in RHEL 8.                                                                                                                                                                                                  |
     | btrfs                | Disk    | B-tree file system that supports a system size of 50TB. It supports more files, larger files, and larger volumes than ext4 and supports snapshotting and compression capabilities.                                                                                                                                                                                                                                                                                                                              |
@@ -844,7 +844,7 @@
     | EFI System Partition | Disk    | A small partition required for booting a device with a GUID partition table (GPT) on a UEFI system.                                                                                                                                                                                                                                                                                                                                                                                                             |
     | NFS                  | Network | A directory or file system shared over the network for access by other Linux systems.                                                                                                                                                                                                                                                                                                                                                                                                                           |
     | AutoFS               | Network | An NFS file system set to mount and unmount automatically on a remote system.                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-    | CIFS                 | Network | Common Internet File System (a.k.a Samba). A directory or file system shared over the network for access by Windows and other Linux systems.                                                                                                                                                                                                                                                                                                                                                                    |
+    | CIFS                 | Network | Common Internet File System (aka Samba). A directory or file system shared over the network for access by Windows and other Linux systems.                                                                                                                                                                                                                                                                                                                                                                    |
 
     * The *mount* command is used to attach a file system to a desired point in the directory hierarchy to make it accessible to users and applications. This point is referred to as the *mount point*, which is essentially an empty directory created solely for this point. The *mount* command requires the absolute pathname (or its UUID or label) to the block device containing the file system, and a mount point name to attach it to the directory tree. The *mount* command adds an entry to the `/proc/mounts` file and instructs the kernel to add the entry to the `/proc/mounts` file as well after a file system has been successfully mounted.
 
@@ -1104,6 +1104,7 @@
         ```shell
         at 11:30pm 6/30/15
         ```
+
     * The commands to execute are defined in the terminal, press *Ctrl+d* when finished. The added job can be viewed with *at* and can be removed with the *-d* option.
 
     * A shell script can also be provided:
@@ -1318,12 +1319,12 @@
         dnf groups list
         ```
 
-    * To install a group (e.g. System Tools)
+    * To install a group (e.g. System Tools):
         ```shell
         dnf group "System Tools"
         ```
 
-    * To remove a group (e.g. System Tools)
+    * To remove a group (e.g. System Tools):
         ```shell
         dnf group remove "System Tools"
         ```
@@ -1597,7 +1598,7 @@
 
     * Due to manual modification, inconsistencies may arise between the above four authentication files. The *pwck* command is used to check for inconsistencies.
 
-    * The *vipw* and *vigr* commands are used to modify the *passwd* and *group* files respectively. These commands disable write access to these files while the privileged user is making the modifications.
+    * The *vipw* and *vigr* commands are used to modify the *passwd* and *group* files, respectively. These commands disable write access to these files while the privileged user is making the modifications.
 
     * To create a user:
         ```shell
@@ -1618,6 +1619,8 @@
         ```shell
         useradd -G IT user2
         ```
+
+	* Note that *-G* is a secondary group, and *-g* is the primary group. The primary group is the group that the operating system assigns to files to which a user belongs. A secondary group is one or more other groups to which a user also belongs. 
 
     * To delete a user:
         ```shell
@@ -1789,7 +1792,7 @@
 
     * Security Enhanced Linux (SELinux) is an implementation of Mandatory Access Control (MAC) architecture developed by the U.S National Security Agency (NSA). MAC provides an added layer of protection beyond the standard Linux Discretionary Access Control (DAC), which includes the traditional file and directory permissions, ACL settings, setuid/setgid bit settings, su/sudo privileges etc.
 
-    * MAC controls are fine-grained; they protect other services in the event one of the services is negotiated. MAC uses a set of defined authorisation rules called policy to examine security attributes associated with subjects and objects when a subject tries to access an object and decides whether or not to permit this access attempt. SELinux decisions are stored in a special cache referred to as Access Vector Cache (AVC).
+    * MAC controls are fine-grained; they protect other services in the event one of the services is negotiated. MAC uses a set of defined authorisation rules called policy to examine security attributes associated with subjects and objects when a subject tries to access an object and decides whether to permit this access attempt. SELinux decisions are stored in a special cache referred to as Access Vector Cache (AVC).
 
     * When an application or process makes a request to access an object, SELinux checks with the AVC, where permissions are cached for subjects and objects. If a decision is unable to be made, it sends the request to the security server. The security server checks for the security context of the app or process and the object. Security context is applied from the SELinux policy database. 
 
@@ -2331,7 +2334,7 @@
 
     * Replace the primary group of Tony Stark with the wheel group:
         ```shell
-        usermod tstark -aG wheel
+        usermod tstark -ag wheel
         grep wheel /etc/group # to verify
         ```
 
