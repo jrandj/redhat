@@ -966,7 +966,7 @@
         chmod u+s <filename>
         ```
      
-     * SGID (meaning set group id) is used to specify that a user can run an executable file with effective permissions of the owning group.  When a user executes the file, the operating system will execute as the owning group. Instead of the normal x Instead of the normal x which represents execute permissions, an s will be visible. To set the SGID:
+     * SGID (meaning set group id) is used to specify that a user can run an executable file with effective permissions of the owning group.  When a user executes the file, the operating system will execute as the owning group. Instead of the normal x which represents execute permissions, an s will be visible. To set the SGID:
         ```shell
         chmod g+s <filename>
         ```
@@ -1520,6 +1520,8 @@
 
 1. Restrict network access using firewall-cmd/firewall
 
+	* Netfilter is a framework provided by the Linux kernel that provides functions for packet filtering. In RHEL 7 and earlier iptables was the default way of configuring Netfilter. Disadvantages of ipables were that a seperate version (ip6tables) was required for ipv6, and that the user interface is not very user friendly.
+
     * The default firewall system in RHEL 8 is *firewalld*. Firewalld is a zone-based firewall. Each zone can be associated with one or more network interfaces, and each zone can be configured to accept or deny services and ports. The *firewall-cmd* command is the command line client for firewalld.
 
     * To check firewall zones:
@@ -1590,7 +1592,7 @@
 
     * The `/etc/passwd` file contains vital user login data.
 
-    * The `/etc/shadow` file is readable only by the root user and contains user authentication information. Each row in the file corresponds to one entry in the passwd file. The password expiry settings are defined in the `/etc/login.defs` file.
+    * The `/etc/shadow` file is readable only by the root user and contains user authentication information. Each row in the file corresponds to one entry in the passwd file. The password expiry settings are defined in the `/etc/login.defs` file. The `/etc/defaults/useradd` file contains defaults for the *useradd* command.
 
     * The `/etc/group` file contains the group information. Each row in the file stores one group entry.
 
@@ -2564,4 +2566,163 @@
     * Change the hostname of the guest to "RHCSA":
         ```shell
 		hostnamectl set-hostname rhcsa
+        ```
+
+1. Asghar Ghori - Exercise 3-1: Create Compressed Archives
+
+	* Create tar files compressed with gzip and bzip2 and extract them:
+	    ```shell
+		# gzip
+		tar -czf home.tar.gz /home
+		tar -tf /home.tar.gz # list files
+		tar -xf home.tar.gz
+
+		# bzip
+		tar -cjf home.tar.bz2 /home
+		tar -xf home.tar.bz2 -C /tmp
+        ```
+
+1. Asghar Ghori - Exercise 3-2: Create and Manage Hard Links
+
+	* Create an empty file *hard1* under */tmp* and display its attributes. Create hard links *hard2* and *hard3*. Edit *hard2* and observe the attributes. Remove *hard1* and *hard3* and list the attributes again:
+	    ```shell
+		touch hard1
+		ln hard1 hard2
+		ln hard1 hard3
+		ll -i
+		# observe link count is 3 and same inode number
+		echo "hi" > hard2
+		# observe file size increased to the same value for all files
+		rm hard1
+		rm hard3
+		# observe link count is 1
+        ```
+
+1. Asghar Ghori - Exercise 3-3: Create and Manage Soft Links
+
+	* Create an empty file *soft1* under `/root` pointing to `/tmp/hard2`. Edit *soft1* and list the attributes after editing. Remove *hard2* and then list *soft1*:
+	    ```shell
+		ln -s /tmp/hard2 soft1
+		ll -i
+		# observe soft1 and hard2 have the same inode number
+		echo "hi" >> soft1
+		# observe file size increased
+		cd /root
+		ll -i 
+		# observe the soft link is now broken
+        ```
+
+1. Asghar Ghori - Exercise 4-1: Modify Permission Bits Using Symbolic Form
+
+	* Create a file *permfile1* with read permissions for owner, group and other. Add an execute bit for the owner and a write bit for group and public. Revoke the write bit from public and assign read, write and execute bits to the three user categories at the same time. Revoke write from the owning group and write and execute bits from public:
+	    ```shell
+		touch permfile1
+		chmod 444 permfile1
+		chmod -v u+x,g+w,o+w permfile1
+		chmod -v o-w,a=rwx permfile1
+		chmod -v g-w,o-wx permfile1
+        ```
+
+1. Asghar Ghori - Exercise 4-2: Modify Permission Bits Using Octal Form
+
+	* Create a file *permfile2* with read permissions for owner, group and other. Add an execute bit for the owner and a write bit for group and public. Revoke the write bit from public and assign read, write and execute permissions to the three user categories at the same time:
+	    ```shell
+		touch permfile2
+		chmod 444 permfile2
+		chmod -v 566 permfile2
+		chmod -v 564 permfile2
+		chmod -v 777 permfile2
+        ```
+
+1. Asghar Ghori - Exercise 4-3: Test the Effect of setuid Bit on Executable Files
+
+	* As root, remove the setuid bit from `/usr/bin/su`. Observe the behaviour for another user attempting to switch into root, and then add the setuid bit back:
+	    ```shell
+		chmod -v u-s /usr/bin/su
+		# users now receive authentication failure when attempting to switch
+		chmod -v u+s /usr/bin/su
+        ```
+
+1. Asghar Ghori - Exercise 4-4: Test the Effect of setgid Bit on Executable Files
+
+	* As root, remove the setgid bit from `/usr/bin/write`. Observe the behaviour when another user attempts to run this command, and then add the setgid bit back:
+	    ```shell
+		chmod -v g-s /usr/bin/write
+		# Other users can no longer write to root
+		chmod -v g+s /usr/bin/write
+        ```
+
+1. Asghar Ghori - Exercise 4-5: Set up Shared Directory for Group Collaboration
+
+	* Create users *user100* and *user200*. Create a group *sgrp* with GID 9999 and add *user100* and *user200* to this group. Create a directory `/sdir` with ownership and owning groups belong to *root* and *sgrp*, and set the setgid bit on */sdir* and test:
+	    ```shell
+		groupadd sgrp -g 9999
+		useradd user100 -G sgrp 
+		useradd user200 -G sgrp 
+		mkdir /sdir
+		chown root:sgrp sdir
+		chmod g+s,g+w sdir
+		# as user100
+		cd /sdir
+		touch file
+		# owning group is sgrp and not user100 due to setgid bit
+		# as user200
+		vi file
+		# user200 can also read and write
+        ```
+
+1. Asghar Ghori - Exercise 4-6: Test the Effect of Sticky Bit
+
+	* Create a file under `/tmp` as *user100* and try to delete it as *user200*. Unset the sticky bit on `/tmp` and try to erase the file again. Restore the sticky bit on `/tmp`:
+	    ```shell
+		# as user100
+		touch /tmp/myfile
+		# as user200
+		rm /tmp/myfile
+		# cannot remove file: Operation not permitted
+		# as root
+		chmod -v o-t tmp
+		# as user200
+		rm /tmp/myfile
+		# file can now be removed
+		# as root
+		chmod -v o+t tmp
+        ```
+
+1. Asghar Ghori - Exercise 4-7: Identify, Apply, and Erase Access ACLs
+
+	* Create a file *acluser* as *user100* in `/tmp` and check if there are any ACL settings on the file. Apply access ACLs on the file for *user100* for read and write access. Add *user200* to the file for full permissions. Remove all access ACLs from the file:
+	    ```shell
+		# as user100
+		touch /tmp/acluser
+		cd /tmp
+		getfacl acluser
+		# no ACLs on the file
+		setfacl -m u:user100:rw,u:user200:rwx acluser
+		getfacl acluser
+		# ACLs have been added
+		setfacl -x user100,user200 acluser
+		getfacl acluser
+		# ACLs have been removed
+        ```
+
+1. Asghar Ghori - Exercise 4-8: Apply, Identify, and Erase Default ACLs
+
+	* Create a directory *projects* as *user100* under `/tmp`. Set the default ACLs on the directory for *user100* and *user200* to give them full permissions. Create a subdirectory *prjdir1* and a file *prjfile1* under *projects* and observe the effects of default ACLs on them. Delete the default entries:
+	    ```shell
+		# as user100
+		cd /tmp
+		mkdir projects
+		getfacl projects
+		# No default ACLs for user100 and user200
+		setfacl -dm u:user100:rwx,u:user200:rwx projects
+		getfacl projects
+		# Default ACLs added for user100 and user200
+		mkdir projects/prjdir1
+		getfacl prjdir1
+		# Default ACLs inherited
+		touch prjdir1/prjfile1
+		getfacl prjfile1
+		# Default ACLs inherited
+		setfacl -k projects
         ```
