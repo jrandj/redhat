@@ -1520,7 +1520,7 @@
 
 1. Restrict network access using firewall-cmd/firewall
 
-	* Netfilter is a framework provided by the Linux kernel that provides functions for packet filtering. In RHEL 7 and earlier iptables was the default way of configuring Netfilter. Disadvantages of ipables were that a seperate version (ip6tables) was required for ipv6, and that the user interface is not very user friendly.
+	* Netfilter is a framework provided by the Linux kernel that provides functions for packet filtering. In RHEL 7 and earlier iptables was the default way of configuring Netfilter. Disadvantages of ipables were that a separate version (ip6tables) was required for ipv6, and that the user interface is not very user friendly.
 
     * The default firewall system in RHEL 8 is *firewalld*. Firewalld is a zone-based firewall. Each zone can be associated with one or more network interfaces, and each zone can be configured to accept or deny services and ports. The *firewall-cmd* command is the command line client for firewalld.
 
@@ -2725,4 +2725,114 @@
 		getfacl prjfile1
 		# Default ACLs inherited
 		setfacl -k projects
+        ```
+
+1. Asghar Ghori - Exercise 5.1: Create a User Account with Default Attributes
+
+	* Create *user300* with the default attributes in the *useradd* and *login.defs* files. Assign this user a password and show the line entries from all 4 authentication files:
+	    ```shell
+		useradd user300
+		passwd user300
+		grep user300 /etc/passwd /etc/shadow /etc/group /etc/gshadow
+        ```
+
+
+1. Asghar Ghori - Exercise 5.2: Create a User Account with Custom Values
+
+	* Create *user300* with the default attributes in the *useradd* and *login.defs* files. Assign this user a password and show the line entries from all 4 authentication files:
+	    ```shell
+		useradd user300
+		passwd user300
+		grep user300 /etc/passwd /etc/shadow /etc/group /etc/gshadow
+        ```
+
+1. Asghar Ghori - Exercise 5.3: Modify and Delete a User Account
+
+	* For *user200* change the login name to *user200new*, UID to 2000, home directory to `/home/user200new`, and login shell to `/sbin/nologin`. Display the line entry for *user2new* from the *passwd* for validation. Remove this user and confirm the deletion:
+	    ```shell
+		usermod -l user200new -m -d /home/user200new -s /sbin/nologin -u 2000 user200
+		grep user200new /etc/passwd # confirm updated values
+		userdel -r user200new
+		grep user200new /etc/passwd # confirm user200new deleted
+        ```
+
+1. Asghar Ghori - Exercise 5.4: Create a User Account with No-Login Access
+
+	* Create an account *user400* with default attributes but with a non-interactive shell. Assign this user the nologin shell to prevent them from signing in. Display the new line entry frmo the *passwd* file and test the account:
+	    ```shell
+		useradd user400 -s /sbin/nologin
+		passwd user400 # change password
+		grep user400 /etc/passwd
+		sudo -i -u user400 # This account is currently not available
+        ```
+
+1. Asghar Ghori - Exercise 6.1: Set and Confirm Password Aging with chage
+
+	* Configure password ageing for user100 using the *chage* command. Set the mindays to 7, maxdays to 28, and warndays to 5. Verify the new settings. Rerun the command and set account expiry to January 31, 2020:
+	    ```shell
+		chage -m 7 -M 28 -W 5 user100
+		chage -l user100
+		chage -E 2021-01-31 user100
+		chage -l
+        ```
+
+1. Asghar Ghori - Exercise 6.2: Set and Confirm Password Aging with passwd
+
+	* Configure password aging for *user100* using the *passwd* command. Set the mindays to 10, maxdays to 90, and warndays to 14, and verify the new settings. Set the number of inactivity days to 5 and ensure that the user is forced to change their password upon next login:
+	    ```shell
+		passwd -n 10 -x 90 -w 14 user100
+		passwd -S user100 # view status
+		passwd -i 5 user100
+		passwd -e user100
+		passwd -S user100
+        ```
+
+1. Asghar Ghori - Exercise 6.3: Lock and Unlock a User Account with usermod and passwd
+
+	* Disable the ability of user100 to log in using the *usermod* and *passwd* commands. Verify the change and then reverse it:
+	    ```shell
+		grep user100 /etc/shadow # confirm account not locked by absence of "!" in password
+		passwd -l user100 # usermod -L also works
+		grep user100 /etc/shadow
+		passwd -u user100 # usermod -U also works
+        ```
+
+1. Asghar Ghori - Exercise 6.4: Create a Group and Add Members
+
+	* Create a group called *linuxadm* with GID 5000 and another group called *dba* sharing the GID 5000. Add *user100* as a secondary member to group *linxadm*:
+	    ```shell
+		groupadd -g 5000 linuxadm
+		groupadd -o -g 5000 dba # note need -o to share GID
+		usermod -G linuxadm user100
+		grep user100 /etc/group # confirm user added to group
+        ```
+
+1. Asghar Ghori - Exercise 6.5: Modify and Delete a Group Account
+
+	* Change the *linuxadm* group name to *sysadm* and the GID to 6000. Modify the primary group for user100 to *sysadm*. Remove the *sysadm* group and confirm:
+	    ```shell
+		groupmod -n sysadm -g 6000 linuxadm
+		usermod -g sysadm user100
+		groupdel sysadm # can't remove while user100 has as primary group
+        ```
+
+1. Asghar Ghori - Exercise 6.6: Modify File Owner and Owning Group
+
+	* Create a file *file10* and a directory *dir10* as *user200* under `/tmp`, and then change the ownership for *file10* to *user100* and the owning group to *dba* in 2 separate transactions. Apply ownership on *file10* to *user200* and owning group to *user100* at the same time. Change the 2 attributes on the directory to *user200:dba* recursively:
+	    ```shell
+		# as user200
+		mkdir /tmp/dir10
+		touch /tmp/file10
+		sudo chown user100 /tmp/file10 		
+		sudo chgrp dba /tmp/file10
+		sudo chown user200:user100 /tmp/file10
+		sudo chown -R user200:user100 /tmp/dir10
+        ```
+
+1. Asghar Ghori - Exercise 7.1: Modify Primary Command Prompt
+
+	* Customise the primary shell prompt to display the information enclosed within the quotes "\<username on hostname in pwd\>:" using variable and command substitution. Edit the `~/.profile`file for *user100* and define the new value in there for permenence:
+	    ```shell
+		export PS1="< $LOGNAME on $(hostname) in \$PWD>"
+		# add to ~/.profile for user100
         ```
