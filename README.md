@@ -105,6 +105,11 @@
 
     * Instead of > to create or overwrite, >> can be used to append to a file.
 
+    * To redirect both stdout and stderror to a file:
+        ```shell
+        echo test &> result.txt
+        ```
+
 1. Use grep and regular expressions to analyse text
     * The grep command is used to find text. For example:
         ```shell
@@ -2113,8 +2118,8 @@
         vi addDate.sh
         # contents of hello.sh
         #####
-        # #!/bin/bash
-        # date >> alice
+        ##!/bin/bash
+        #date >> alice
         #####
         /testresults/alice/addDate.sh
         crontab -e
@@ -2506,14 +2511,14 @@
 		vi script.sh
 		# contents of script.sh
         #####
-        # #!/bin/sh
-		# cat /etc/redhat-release > /home/derek/release
+        ##!/bin/sh
+		#cat /etc/redhat-release > /home/derek/release
         #####
 		chmod +x script.sh
 		crontab -u derek -e
 		# contents of crontab
         #####
-        # 27 16 * * * /home/derek/script.sh
+        #27 16 * * * /home/derek/script.sh
         #####
 		crontab -u derek -l # confirm
         ```
@@ -2831,8 +2836,68 @@
 
 1. Asghar Ghori - Exercise 7.1: Modify Primary Command Prompt
 
-	* Customise the primary shell prompt to display the information enclosed within the quotes "\<username on hostname in pwd\>:" using variable and command substitution. Edit the `~/.profile`file for *user100* and define the new value in there for permenence:
+	* Customise the primary shell prompt to display the information enclosed within the quotes "\<username on hostname in pwd\>:" using variable and command substitution. Edit the `~/.profile`file for *user100* and define the new value in there for permanence:
 	    ```shell
 		export PS1="< $LOGNAME on $(hostname) in \$PWD>"
 		# add to ~/.profile for user100
+        ```
+
+1. Asghar Ghori - Exercise 8.1: Submit, View, List, and Remove an at Job
+
+	* Submit a job as *user100* to run the *date* command at 11:30pm on March 31, 2021, and have the output and any error messages generated redirected to `/tmp/date.out`. List the submitted job and then remove it:
+	    ```shell
+		# as user100
+		at 11:30pm 03/31/2021
+		# enter "date &> /tmp/date.out"
+		atq # view job in queue
+		at -c 1 # view job details
+		atrm 1 # remove job
+        ```
+
+1. Asghar Ghori - Exercise 8.2: Add, List, and Remove a Cron Job
+
+	* Assume all users are currently denied access to cron. Submit a cron job as *user100* to echo "Hello, this is a cron test.". Schedule this command to execute at every fifth minute past the hour between 10:00 am and 11:00 am on the fifth and twentieth of every month. Have the output redirected to `/tmp/hello.out`. List the cron entry and then remove it: 
+	    ```shell
+		# as root
+		echo "user100" > /etc/cron.allow
+		# ensure cron.deny is empty
+		# as user100
+		crontab
+		# */5 10,11 5,20 * * echo "Hello, this is a cron test." >> /tmp/hello.out
+		crontab -e # list
+		crontab -l # remove
+        ```
+
+1. Asghar Ghori - Exercise 9.1: Perform Package Management Tasks Using rpm
+
+	* Verify the integrity and authenticity of a package called *dcraw* located in the `/mnt/AppStream/Packages` directory on the installation image and then install it. Display basic information about the package, show files it contains, list documentation files, verify the package attributes and remove the package: 
+	    ```shell
+		ls -l /mnt/AppStream/Packages/dcraw*
+		rpmkeys -K /mnt/AppStream/Packages/dcraw-9.27.0-9.e18.x86_64.rpm # check integrity
+		sudo rpm -ivh /mnt/AppStream/Packages/dcraw-9.27.0-9.e18.x86_64.rpm # -i is install, -v is verbose and -h is hash
+		rpm -qi dcraw # -q is query and -i is install
+		rpm -qd dcraw # -q is query and -d is docfiles
+		rpm -Vv dcraw # -V is verify and -v is verbose
+		sudo rpm -ve # -v is verbose and -e is erase
+        ```
+
+1. Asghar Ghori - Exercise 10.1: Configure Access to Pre-Built ISO Repositories
+
+	* Access 2 DNF repositories that are available on the RHEL 8 image. Create a definition file for the repositories and confirm: 
+	    ```shell
+		df -h # after mounting optical drive in VirtualBox
+		vi /etc/yum.repos.d/centos.local
+		# contents of centos.local
+        #####
+        #[BaseOS]
+		#name=BaseOS
+		#baseurl=file:///run/media/$name/BaseOS
+		#gpgcheck=0
+		#
+        #[AppStream]
+		#name=AppStream
+		#gpgcheck=0
+        #####
+		#baseurl=file:///run/media/$name/AppStream
+		dnf repolist # confirm new repos are added
         ```
