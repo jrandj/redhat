@@ -2732,7 +2732,7 @@
 		setfacl -k projects
         ```
 
-1. Asghar Ghori - Exercise 5.1: Create a User Account with Default Attributes
+1. Asghar Ghori - Exercise 5-1: Create a User Account with Default Attributes
 
 	* Create *user300* with the default attributes in the *useradd* and *login.defs* files. Assign this user a password and show the line entries from all 4 authentication files:
 	    ```shell
@@ -2742,7 +2742,7 @@
         ```
 
 
-1. Asghar Ghori - Exercise 5.2: Create a User Account with Custom Values
+1. Asghar Ghori - Exercise 5-2: Create a User Account with Custom Values
 
 	* Create *user300* with the default attributes in the *useradd* and *login.defs* files. Assign this user a password and show the line entries from all 4 authentication files:
 	    ```shell
@@ -2751,7 +2751,7 @@
 		grep user300 /etc/passwd /etc/shadow /etc/group /etc/gshadow
         ```
 
-1. Asghar Ghori - Exercise 5.3: Modify and Delete a User Account
+1. Asghar Ghori - Exercise 5-3: Modify and Delete a User Account
 
 	* For *user200* change the login name to *user200new*, UID to 2000, home directory to `/home/user200new`, and login shell to `/sbin/nologin`. Display the line entry for *user2new* from the *passwd* for validation. Remove this user and confirm the deletion:
 	    ```shell
@@ -2761,7 +2761,7 @@
 		grep user200new /etc/passwd # confirm user200new deleted
         ```
 
-1. Asghar Ghori - Exercise 5.4: Create a User Account with No-Login Access
+1. Asghar Ghori - Exercise 5-4: Create a User Account with No-Login Access
 
 	* Create an account *user400* with default attributes but with a non-interactive shell. Assign this user the nologin shell to prevent them from signing in. Display the new line entry frmo the *passwd* file and test the account:
 	    ```shell
@@ -2771,7 +2771,7 @@
 		sudo -i -u user400 # This account is currently not available
         ```
 
-1. Asghar Ghori - Exercise 6.1: Set and Confirm Password Aging with chage
+1. Asghar Ghori - Exercise 6-1: Set and Confirm Password Aging with chage
 
 	* Configure password ageing for user100 using the *chage* command. Set the mindays to 7, maxdays to 28, and warndays to 5. Verify the new settings. Rerun the command and set account expiry to January 31, 2020:
 	    ```shell
@@ -2781,7 +2781,7 @@
 		chage -l
         ```
 
-1. Asghar Ghori - Exercise 6.2: Set and Confirm Password Aging with passwd
+1. Asghar Ghori - Exercise 6-2: Set and Confirm Password Aging with passwd
 
 	* Configure password aging for *user100* using the *passwd* command. Set the mindays to 10, maxdays to 90, and warndays to 14, and verify the new settings. Set the number of inactivity days to 5 and ensure that the user is forced to change their password upon next login:
 	    ```shell
@@ -2792,7 +2792,7 @@
 		passwd -S user100
         ```
 
-1. Asghar Ghori - Exercise 6.3: Lock and Unlock a User Account with usermod and passwd
+1. Asghar Ghori - Exercise 6-3: Lock and Unlock a User Account with usermod and passwd
 
 	* Disable the ability of user100 to log in using the *usermod* and *passwd* commands. Verify the change and then reverse it:
 	    ```shell
@@ -2802,7 +2802,7 @@
 		passwd -u user100 # usermod -U also works
         ```
 
-1. Asghar Ghori - Exercise 6.4: Create a Group and Add Members
+1. Asghar Ghori - Exercise 6-4: Create a Group and Add Members
 
 	* Create a group called *linuxadm* with GID 5000 and another group called *dba* sharing the GID 5000. Add *user100* as a secondary member to group *linxadm*:
 	    ```shell
@@ -2812,7 +2812,7 @@
 		grep user100 /etc/group # confirm user added to group
         ```
 
-1. Asghar Ghori - Exercise 6.5: Modify and Delete a Group Account
+1. Asghar Ghori - Exercise 6-5: Modify and Delete a Group Account
 
 	* Change the *linuxadm* group name to *sysadm* and the GID to 6000. Modify the primary group for user100 to *sysadm*. Remove the *sysadm* group and confirm:
 	    ```shell
@@ -2821,7 +2821,7 @@
 		groupdel sysadm # can't remove while user100 has as primary group
         ```
 
-1. Asghar Ghori - Exercise 6.6: Modify File Owner and Owning Group
+1. Asghar Ghori - Exercise 6-6: Modify File Owner and Owning Group
 
 	* Create a file *file10* and a directory *dir10* as *user200* under `/tmp`, and then change the ownership for *file10* to *user100* and the owning group to *dba* in 2 separate transactions. Apply ownership on *file10* to *user200* and owning group to *user100* at the same time. Change the 2 attributes on the directory to *user200:dba* recursively:
 	    ```shell
@@ -2834,7 +2834,7 @@
 		sudo chown -R user200:user100 /tmp/dir10
         ```
 
-1. Asghar Ghori - Exercise 7.1: Modify Primary Command Prompt
+1. Asghar Ghori - Exercise 7-1: Modify Primary Command Prompt
 
 	* Customise the primary shell prompt to display the information enclosed within the quotes "\<username on hostname in pwd\>:" using variable and command substitution. Edit the `~/.profile`file for *user100* and define the new value in there for permanence:
 	    ```shell
@@ -2842,7 +2842,7 @@
 		# add to ~/.profile for user100
         ```
 
-1. Asghar Ghori - Exercise 8.1: Submit, View, List, and Remove an at Job
+1. Asghar Ghori - Exercise 8-1: Submit, View, List, and Remove an at Job
 
 	* Submit a job as *user100* to run the *date* command at 11:30pm on March 31, 2021, and have the output and any error messages generated redirected to `/tmp/date.out`. List the submitted job and then remove it:
 	    ```shell
@@ -2854,9 +2854,9 @@
 		atrm 1 # remove job
         ```
 
-1. Asghar Ghori - Exercise 8.2: Add, List, and Remove a Cron Job
+1. Asghar Ghori - Exercise 8-2: Add, List, and Remove a Cron Job
 
-	* Assume all users are currently denied access to cron. Submit a cron job as *user100* to echo "Hello, this is a cron test.". Schedule this command to execute at every fifth minute past the hour between 10:00 am and 11:00 am on the fifth and twentieth of every month. Have the output redirected to `/tmp/hello.out`. List the cron entry and then remove it: 
+	* Assume all users are currently denied access to cron. Submit a cron job as *user100* to echo "Hello, this is a cron test.". Schedule this command to execute at every fifth minute past the hour between 10:00 am and 11:00 am on the fifth and twentieth of every month. Have the output redirected to `/tmp/hello.out`. List the cron entry and then remove it:
 	    ```shell
 		# as root
 		echo "user100" > /etc/cron.allow
@@ -2868,7 +2868,7 @@
 		crontab -l # remove
         ```
 
-1. Asghar Ghori - Exercise 9.1: Perform Package Management Tasks Using rpm
+1. Asghar Ghori - Exercise 9-1: Perform Package Management Tasks Using rpm
 
 	* Verify the integrity and authenticity of a package called *dcraw* located in the `/mnt/AppStream/Packages` directory on the installation image and then install it. Display basic information about the package, show files it contains, list documentation files, verify the package attributes and remove the package: 
 	    ```shell
@@ -2881,9 +2881,9 @@
 		sudo rpm -ve # -v is verbose and -e is erase
         ```
 
-1. Asghar Ghori - Exercise 10.1: Configure Access to Pre-Built ISO Repositories
+1. Asghar Ghori - Exercise 10-1: Configure Access to Pre-Built ISO Repositories
 
-	* Access 2 DNF repositories that are available on the RHEL 8 image. Create a definition file for the repositories and confirm: 
+	* Access the repositories that are available on the RHEL 8 image. Create a definition file for the repositories and confirm:
 	    ```shell
 		df -h # after mounting optical drive in VirtualBox
 		vi /etc/yum.repos.d/centos.local
@@ -2900,4 +2900,90 @@
         #####
 		#baseurl=file:///run/media/$name/AppStream
 		dnf repolist # confirm new repos are added
+        ```
+
+1. Asghar Ghori - Exercise 10-2: Manipulate Individual Packages
+
+	* Determine if the *cifs-utils* package is installed and if it is available for installation. Display its information before installing it. Install the package and display its information again. Remove the package along with its dependencies and confirm the removal:
+	    ```shell
+		dnf config-manager --disable AppStream
+		dnf config-manager --disable BaseOS
+		dnf list installed | greps cifs-utils # confirm not installed
+		dnf info cifs-utils # display information
+		dnf install cifs-utils -y
+		dnf info cifs-utils # Repository now says @System
+		dnf remove cifs-utils -y
+        ```
+
+1. Asghar Ghori - Exercise 10-3: Manipulate Package Groups
+
+	* Perform management operations on a package group called *system tools*. Determine if this group is already installed and if it is available for installation. List the packages it contains and install it. Remove the group along with its dependencies and confirm the removal:
+	    ```shell
+		dnf group list # shows System Tools as an available group
+		dnf group info "System Tools"
+		dnf group install "System Tools" -y
+		dnf group list "System Tools" # shows installed
+		dnf group remove "System Tools" -y
+        ```
+
+1. Asghar Ghori - Exercise 10-4: Manipulate Modules
+
+	* Perform management operations on a module called *postgresql*. Determine if this module is already installed and if it is available for installation. Show its information and install the default profile for stream 10. Remove the module profile along with any dependencies and confirm its removal:
+	    ```shell
+		dnf module list "postgresql" # no [i] tag shown so not installed
+		dnf module info postgresql:10 # note there are multiple streams
+		sudo dnf module install --profile postgresql:10 -y
+		dnf module list "postgresql" # [i] tag shown so it's installed
+		sudo dnf module remove postgresql:10 -y
+        ```
+
+1. Asghar Ghori - Exercise 10-5: Install a Module from an Alternative Stream
+
+	* Downgrade a module to a lower version. Remove the stream *perl* 5.26 and confirm its removal. Manually enable the stream *perl* 5.24 and confirm its new status. Install the new version of the module and display its information:
+	    ```shell
+		dnf module list perl # 5.26 shown as installed
+		dnf module remove perl -y
+		dnf module reset perl # make no version enabled
+		dnf module install perl:5.26/minimal --allowerasing
+		dnf module list perl # confirm module installed
+        ```
+
+1. Asghar Ghori - Exercise 11-1: Reset the root User Password
+
+	* Terminate the boot process at an early stage to access a debug shell to reset the root password:
+	    ```shell
+		# add rd.break affter "rhgb quiet" to reboot into debug shell
+		mount -o remount, rw /sysroot
+		chroot /sysroot
+		passwd # change password
+		touch /.autorelabel
+        ```
+
+1. Asghar Ghori - Exercise 11-2: Download and Install a New Kernel
+
+	* Download the latest available kernel packages from the Red Hat Customer Portal and install them:
+	    ```shell
+		uname -r # view kernel version
+		rpm -qa | grep "kernel"
+		# find versions on access.redhat website, download and move to /tmp
+		sudo dnf install /tmp/kernel* -y
+        ```
+
+1. Asghar Ghori - Exercise 12-1: Manage Tuning Profiles
+
+	* Install the *tuned* service, start it and enable it for auto-restart upon reboot. Display all available profiles and the current active profile. Switch to one of the available profiles and confirm. Determine the recommended profile for the system and switch to it. Deactive tuning and reactivate it:
+	    ```shell
+		sudo systemctl status tuned-adm # already installed and enabled
+		sudo tuned-adm profile # active profile is virtual-guest
+		sudo tuned-adm profile desktop # switch to desktop profile
+		sudo tuned-adm profile recommend # virtual-guest is recommended
+		sudo tuned-adm off # turn off profile
+        ```
+
+1. Asghar Ghori - Exercise 13-1: Add Required Storage to server2
+
+	* Add 4x250MB, 1x4GB, and 2x1GB disks:
+	    ```shell
+		# in virtual box add a VDI disk to the SATA controller
+		lsblk # added disks shown as sdb, sdc, sdd
         ```
