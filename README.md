@@ -2987,3 +2987,90 @@
 		# in virtual box add a VDI disk to the SATA controller
 		lsblk # added disks shown as sdb, sdc, sdd
         ```
+
+1. Asghar Ghori - Exercise 13-2: Create an MBR Partition
+
+	* Assign partition type "msdos" to `/dev/sdb` for using it as an MBR disk. Create and confirm a 100MB primary partition on the disk:
+	    ```shell
+		parted /dev/sdb print # first line shows unrecognised disk label
+		parted /dev/sdb mklabel msdos
+		parted /dev/sdb mkpart primary 1m 101m
+		parted /dev/sdb print # confirm added partition
+        ```
+
+1. Asghar Ghori - Exercise 13-3: Delete an MBR Partition
+
+	* Delete the *sdb1* partition that was created in Exercise 13-2 above:
+	    ```shell
+		parted /dev/sdb rm 1
+		parted /dev/sdb print # confirm deletion
+        ```
+
+1. Asghar Ghori - Exercise 13-4: Create a GPT Partition
+
+	* Assign partition type "gpt" to `/dev/sdc` for using it as a GPT disk. Create and confirm a 200MB partition on the disk:
+	    ```shell
+		gdisk /dev/sdc
+		# enter n for new
+		# enter default partition number
+		# enter default first sector
+		# enter +200MB for last sector
+		# enter default file system type
+		# enter default hex code
+		# enter w to write
+		lsblk # can see sdc1 partition with 200M
+        ```
+
+1. Asghar Ghori - Exercise 13-5: Delete a GPT Partition
+
+	* Delete the *sdc1* partition that was created in Exercise 13-4 above:
+	    ```shell
+		gdisk /dev/sdc
+		# enter d for delete
+		# enter w to write
+		lsblk # can see no partitions under sdc
+        ```
+
+1. Asghar Ghori - Exercise 13-6: Install Software and Activate VDO
+
+	* Install the VDO software packages, start the VDO services, and mark it for autostart on subsequent reboots:
+	    ```shell
+		dnf install vdo kmod-kvdo -y
+		systemctl start vdo.service & systemctl enable vdo.service
+        ```
+
+1. Asghar Ghori - Exercise 13-7: Create a VDO Volume
+
+	* Create a volume called *vdo-vol1* of logical size 16GB on the `/dev/sdc` disk (the actual size of `/dev/sdc` is 4GB). List the volume and display its status information. Show the activation status of the compresssion and de-duplication features:
+	    ```shell
+		wipefs -a /dev/sdc # couldn't create without doing this first
+		vdo create --name vdo-vol1 --device /dev/sdc --vdoLogicalSize 16G --vdoSlabSize 128
+		# VDO instance 0 volume is ready at /dev/mapper/vdo-vol1
+		lsblk # confirm vdo-vol1 added below sdc
+		vdo list # returns vdo-vol1
+		vdo status --name vdo-vol1 # shows status
+		vdo status --name vdo-vol1 | grep -i "compression" # enabled
+		vdo status --name vdo-vol1 | grep -i "deduplication" # enabled
+        ```
+
+1. Asghar Ghori - Exercise 13-8: Delete a VDO Volume
+
+	* Delete the *vdo-vol1* volume that was created in Exercise 13-7 above and confirm the removal:
+	    ```shell
+		vdo remove --name vdo-vol1
+		vdo list # confirm removal
+        ```
+
+1. Asghar Ghori - Exercise 14-1: Create a Physical Volume and Volume Group
+
+	* Initialise one partition *sdd1* (90MB) and one disk *sdb* (250MB) for use in LVM. Create a volume group called *vgbook* and add both physical volumes to it. Use the PE size of 16MB and list and display the volume group and the physical volumes:
+	    ```shell
+		parted /dev/sdd mklabel msdos
+		parted /dev/sdd mkpart primary 1m 91m
+		parted /dev/sdd set 1 lvm on
+		pvcreate /dev/sdd1 /dev/sdb
+		vgcreate -vs 16 vgbook /dev/sdd1 /dev/sdb
+		vgs vgbook # list information about vgbook
+		vgdisplay -v vbook # list detailed information about vgbook
+		pvs # list information about pvs
+        ```
