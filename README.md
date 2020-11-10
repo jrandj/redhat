@@ -2082,11 +2082,6 @@
         find / -perm /4000 > setuid.list
         ```
 
-    * Find all setuid files on the system and save the list to `/testresults/setuid.list`:
-        ```shell
-        find / -perm /4000 > setuid.list
-        ```
-
     * Set the system FQDN to *centos.local* and alias to *centos*:
         ```shell
         hostnamectl set-hostname centos --pretty
@@ -3073,4 +3068,42 @@
 		vgs vgbook # list information about vgbook
 		vgdisplay -v vbook # list detailed information about vgbook
 		pvs # list information about pvs
+        ```
+
+1. Asghar Ghori - Exercise 14-2: Create Logical Volumes
+
+	* Create two logical volumes, *lvol0* and *lvbook1*, in the *vgbook* volume group. Use 120MB for *lvol0* and 192MB for *lvbook1*. Display the details of the volume group and the logical volumes:
+	    ```shell
+		lvcreate -vL 120M vgbook
+		lvcreate -vL 192M -n lvbook1 vgbook
+		lvs # display information
+		vgdisplay -v vgbook # display detailed information about volume group
+        ```
+
+1. Asghar Ghori - Exercise 14-3: Extend a Volume Group and a Logical Volume
+
+	* Add another partition *sdd2* of size 158MB to *vgbook* to increase the pool of allocatable space. Initialise the new partition prior to adding it to the volume group. Increase the size of *lvbook1* to 336MB. Display the basic information for the physical volumes, volume group, and logical volume:
+	    ```shell
+		parted mkpart /dev/sdd primary 90 250
+		parted /dev/sdd set 2 lvm on
+		parted /dev/sdd print # confirm new partition added
+		vgextend vgbook /dev/sdd2
+		pvs # display information
+		vgs # display information
+		lvextend vgbook/lvbook1 -L +144M
+		lvs # display information
+        ```
+
+1. Asghar Ghori - Exercise 14-4: Rename, Reduce, Extend, and Remove Logical Volumes
+
+	* Rename *lvol0* to *lvbook2*. Decrease the size of *lvbook2* to 50MB using the *lvreduce* command and then add 32MB with the *lvresize* command. Remove both logical volumes. Display the summary for the volume groups, logical volumes, and physical volumes:
+	    ```shell
+		lvrename vgbook/lvol0 vgbook/lvbook2
+		lvreduce vgbook/lvbook2 -L 50M
+		lvextend vgbook/lvbook2 -L +32M
+		lvremove vgbook/lvbook1
+		lvremove vgbook/lvbook2
+		pvs # display information
+		vgs # display information
+		lvs # display information
         ```
