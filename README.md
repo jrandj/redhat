@@ -3107,3 +3107,126 @@
 		vgs # display information
 		lvs # display information
         ```
+
+1. Asghar Ghori - Exercise 14-5: Reduce and Remove a Volume Group
+
+	* Reduce *vgbook* by removing the *sdd1* and *sdd2* physical volumes from it, then remove the volume group. Confirm the deletion of the volume group and the logical volumes at the end:
+	    ```shell
+		vgreduce vgbook /dev/sdd1 /dev/sdd2
+		vgremove vgbook
+		vgs # confirm removals
+		pvs # can be used to show output of vgreduce
+        ```
+
+1. Asghar Ghori - Exercise 14-5: Reduce and Remove a Volume Group
+
+	* Reduce *vgbook* by removing the *sdd1* and *sdd2* physical volumes from it, then remove the volume group. Confirm the deletion of the volume group and the logical volumes at the end:
+	    ```shell
+		vgreduce vgbook /dev/sdd1 /dev/sdd2
+		vgremove vgbook
+		vgs # confirm removals
+		pvs # can be used to show output of vgreduce
+        ```
+
+1. Asghar Ghori - Exercise 14-6: Uninitialise Physical Volumes
+
+	* Uninitialise all three physical volumes - *sdd1*, *sdd2*, and *sdb* - by deleting the LVM structural information from them. Use the *pvs* command for confirmation. Remove the partitions from the *sdd* disk and verify that all disks are now in their original raw state:
+	    ```shell
+		pvremove /dev/sdd1 /dev/sdd2 /dev/sdb
+		pvs
+		parted /dev/sdd
+		# enter print to view partitions
+		# enter rm 1
+		# enter rm 2
+        ```
+
+1. Asghar Ghori - Exercise 14-7: Install Software and Activate Stratis
+
+	* Install the Stratis software packages, start the Stratis service, and mark it for autostart on subsequent system reboots:
+	    ```shell
+		dnf install stratis-cli -y
+		systemctl start stratisd.service & systemctl enable stratisd.service
+        ```
+
+1. Asghar Ghori - Exercise 14-8: Create and Confirm a Pool and File System
+
+	* Create a Stratis pool and a file system in it. Display information about the pool, file system, and device used:
+	    ```shell
+		stratis pool create mypool /dev/sdd
+		stratis pool list # confirm stratis pool created
+		stratis filesystem create mypool myfs
+		stratis filesystem list # confirm filesystem created, get device path
+		mkdir /myfs1
+		mount /stratis/mypool/myfs /myfs1
+        ```
+
+1. Asghar Ghori - Exercise 14-9: Expand and Rename a Pool and File System
+
+	* Expand the Stratis pool *mypool* using the *sdd* disk. Rename the pool and the file system it contains:
+	    ```shell
+		stratis pool add-data mypool /dev/sdd
+		stratis pool rename mypool mynewpool
+		stratis pool list # confirm changes
+        ```
+
+1. Asghar Ghori - Exercise 14-10: Destroy a File System and Pool
+
+	* Destroy the Stratis file system and the pool that was created, expanded, and renamed in the above exercises. Verify the deletion with appropriate commands:
+	    ```shell
+		umount /bookfs1
+		stratis filesystem destroy mynewpool myfs
+		stratis filesystem list # confirm deletion
+		stratis pool destroy mynewpool
+		stratis pool list # confirm deletion
+        ```
+
+1. Asghar Ghori - Exercise 15-1: Create and Mount Ext4, VFAT, and XFS File Systems in Partitions
+
+	* Create 2x100MB partitions on the `/dev/sdb` disk, initialise them separately with the Ext4 and VFAT file system types, define them for persistence using their UUIDs, create mount points called `/ext4fs` and `/vfatfs1`, attach them to the directory structure, and verify their availability and usage. Use the disk `/dev/sdc` and repeat the above procedure to establish an XFS file system in it and mount it on `/xfsfs1`:
+	    ```shell
+		parted /dev/sdb
+		# enter mklabel 
+		# enter msdos 
+		# enter mkpart 
+		# enter primary
+		# enter ext4
+		# enter start as 0
+		# enter end as 100MB
+		# enter print to verify
+		parted /dev/sdb mkpart primary 101MB 201MB
+		# file system entered during partition created is different
+		lsblk # verify partitions
+		mkfs.ext4 /dev/sdb1
+		mkfs.vfat /dev/sdb2
+		parted /dev/sdc
+		# enter mklabel 
+		# enter msdos 
+		# enter mkpart
+		# enter primary
+		# enter xfs
+		# enter start as 0
+		# enter end as 100MB
+		mkfs.xfs /dev/sdc1
+		mkdir /ext4fs /vfatfs1 /xfsfs1
+		lsblk -f # get UUID for each file system
+		vi /etc/fstab
+		# add entries using UUIDs with defaults and file system name
+		df -hT # view file systems and mount points
+        ```
+
+1. Asghar Ghori - Exercise 15-2: Create and Mount XFS File System in VDO Volume
+
+	* Create a VDO volume called *vdo1* of logical size 16GB on the *sdc* disk (actual size 4GB). Initialise the volume with the XFS file system type, define it for persistence using its device files, create a mount point called `/xfsvdo1`, attach it to the directory structure, and verify its availability and usage:
+	    ```shell
+		wipefs -a /dev/sdc
+		vdo create --device /dev/sdc --vdoLogicalSize 16G --name vdo1 --vdoSlabSize 128
+		vdo list # list the vdo
+		lsblk /dev/sdc # show information about disk
+		mkdir /xfsvdo1
+		vdo status # get vdo path
+		mkfs.xfs /dev/mapper/vdo1
+		vi /etc/fstab
+		# copy example from man vdo create
+		mount -a
+		df -hT # view file systems and mount points
+        ```
