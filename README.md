@@ -3230,3 +3230,101 @@
 		mount -a
 		df -hT # view file systems and mount points
         ```
+
+1. Asghar Ghori - Exercise 15-3: Create and Mount Ext4 and XFS File Systems in LVM Logical Volumes
+
+	* Create a volume group called *vgfs* comprised of a 160MB physical volume created in a partition on the `/dev/sdd` disk. The PE size for the volume group should be set at 16MB. Create 2 logical volumes called *ext4vol* and *xfsvol* of sizes 80MB each and initialise them with the Ext4 and XFS file system types. Ensure that both file systems are persistently defined using their logical volume device filenames. Create mount points */ext4fs2* and */xfsfs2*, mount the file systems, and verify their availability and usage:
+	    ```shell
+		vgcreate vgfs /dev/sdd --physicalextentsize 16MB
+		lvcreate vgfs --name ext4vol -L 80MB
+		lvcreate vgfs --name xfsvol -L 80MB
+		mkfs.ext4 /dev/vgfs/ext4vol
+		mkfs.xfs /dev/vgfs/xfsvol
+		blkid # copy UUID for /dev/mapper/vgfs-ext4vol and /dev/mapper/vgfs-xfsvol
+		vi /etc/fstab
+		# add lines with copied UUID
+		mount -a
+		df -hT # confirm added
+        ```
+
+1. Asghar Ghori - Exercise 15-4: Resize Ext4 and XFS File Systems in LVM Logical Volumes
+
+	* Grow the size of the *vgfs* volume group that was created above by adding the whole *sdc* disk to it. Extend the *ext4vol* logical volume along with the file system it contains by 40MB using 2 separate commands. Extend the *xfsvol* logical volume along with the file system it contains by 40MB using a single command:
+	    ```shell
+		vdo remove --name vdo1 # need to use this disk
+		vgextend vgfs /dev/sdc
+		lvextend -L +80 /dev/vgfs/ext4vol
+		fsadm resize /dev/vgfs/ext4vol
+		lvextend -L +80 /dev/vgfs/xfsvol
+		fsadm resize /dev/vgfs/xfsvol
+		lvresize -r -L +40 /dev/vgfs/xfsvol # -r resizes file system
+		lvs # confirm resizing
+        ```
+
+1. Asghar Ghori - Exercise 15-5: Create, Mount, and Expand XFS File System in Stratis Volume
+
+	* Create a Stratis pool called *strpool* and a file system *strfs2* by reusing the 1GB *sdc* disk. Display information about the pool, file system, and device used. Expand the pool to include another 1GB disk *sdh* and confirm:
+	    ```shell
+		stratis pool create strpool /dev/sdc
+		stratis filesystem create strpool strfs2
+		stratis pool list # view created stratis pool
+		stratis filesystem list # view created filesystem
+		stratis pool add-data strpool /dev/sdd
+		stratis blockdev list strpool # list block devices in pool
+		mkdir /strfs2
+		lsblk /stratis/strpool/strfs2 -o UUID
+		vi /etc/fstab
+		# add line
+		# UUID=2913810d-baed-4544-aced-a6a2c21191fe /strfs2 xfs x-systemd.requires=stratisd.service 0 0
+        ```
+
+
+1. Asghar Ghori - Exercise 15-6: Create and Activate Swap in Partition and Logical Volume
+
+	* Create 1 swap area in a new 40MB partition called *sdc3* using the *mkswap* command. Create another swap area in a 140MB logical volume called *swapvol* in *vgfs*. Add their entries to the `/etc/fstab` file for persistence. Use the UUID and priority 1 for the partition swap and the device file and priority 2 for the logical volume swap. Activate them and use appropriate tools to validate the activation:
+	    ```shell
+		parted /dev/sdc
+		# enter mklabel msdos
+		# enter mkpart primary 0 40
+		parted /dev/sdd
+		# enter mklabel msdos
+		# enter mkpart primary 0 140
+		mkswap -L sdc3 /dev/sdc 40
+		vgcreate vgfs /dev/sdd1
+		lvcreate vgfs --name swapvol -L 132
+		mkswap swapvol /dev/sdd1
+		mkswap /dev/vgfs/swapvol
+		lsblk -f # get UUID
+		vi /etc/fstab
+		# add 2 lines, e.g. first line
+		# UUID=WzDb5Y-QMtj-fYeo-iW0f-sj8I-ShRu-EWRIcp swap swap pri=2 0 0
+		mount -a
+        ```
+
+1. Asghar Ghori - Exercise 16-1: Export Share on NFS Server
+
+	* Create a directory called `/common` and export it to *server1* in read/write mode. Ensure that NFS traffic is allowed through the firewall. Confirm the export:
+	    ```shell
+		dnf install nfs-utils -y
+		mkdir /common
+		firewall-cmd --permanent --add-service=nfs
+		firewall-cmd --reload
+		systemctl start nfs-server.service & systemctl enable nfs-server.service
+		echo "/nfs *(rw)" >> /etc/exports
+		exportfs -av
+        ```
+
+1. Asghar Ghori - Exercise 16-2: Mount Share on NFS Client
+
+	* Mount the `/common` share exported above. Create a mount point called `/local`, mount the remote share manually, and confirm the mount. Add the remote share to the file system table for persistence. Remount the share and confirm the mount. Create a test file in the mount point and confirm the file creation on the NFS server:
+	    ```shell
+		dnf install cifs-utils -y
+		mkdir /local
+		chmod 755 local
+		mount 10.0.2.15:/common /local
+		vi /etc/fstab
+		# add line
+		# 10.0.2.15:/common /local nfs _netdev 0 0
+		mount -a
+		touch /local/test # confirm that it appears on server in common
+        ```
