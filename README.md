@@ -944,10 +944,31 @@
         mount -a 
         ```
 
-     * To unmount the network file system:
-        ```shell   
-        umount /mnt
-        ```
+     * Using AutoFS with NFS:
+        ```shell
+		# on the server
+        systemctl status 
+		mkdir /common
+		echo "/common *(rw)" >> /etc/exports
+		systemctl restart nfs-server.service
+
+		# on the client
+		dnf install autofs -y
+		mkdir /autodir
+		vi /etc/auto.master
+		# add line
+		#/- /etc/auto.master.d/auto.dir
+		vi /etc/auto.master.d/auto.dir
+		# add line
+		#/autodir 172.25.1.4:/common
+		systemctl restart autofs & systemctl enable autofs
+
+		# on the server
+		touch /common/test
+		
+		# on the client
+		ls /autodir # confirm test file is created
+        ``` 
 
 1. Extend existing logical volumes
 
@@ -3327,4 +3348,61 @@
 		# 10.0.2.15:/common /local nfs _netdev 0 0
 		mount -a
 		touch /local/test # confirm that it appears on server in common
+        ```
+
+1. Asghar Ghori - Exercise 16-3: Access NFS Share Using Direct Map
+
+	* Configure a direct map to automount the NFS share `/common` that is available from *server2*. Install the relevant software, create a local mount point `/autodir`, and set up AutoFS maps to support the automatic mounting. Note that `/common` is already mounted on the `/local` mount point on *server1* via *fstab*. Ensure there is no conflict in configuration or functionality between the 2:
+	    ```shell
+		dnf install autofs -y
+		mkdir /autodir
+		vi /etc/auto.master
+		# add line
+		#/- /etc/auto.master.d/auto.dir
+		vi /etc/auto.master.d/auto.dir
+		# add line
+		#/autodir 172.25.1.4:/common
+		systemctl restart autofs
+        ```
+
+1. Asghar Ghori - Exercise 16-4: Access NFS Share Using Indirect Map
+
+	* Configure an indirect map to automount the NFS share `/common` that is available from *server2*. Install the relevant software and set up AutoFS maps to support the automatic mounting. Observe that the specified mount point "autoindir" is created automatically under `/misc`. Note that `/common` is already mounted on the `/local` mount point on *server1* via *fstab*. Ensure there is no conflict in configuration or functionality between the 2:
+	    ```shell
+		dnf install autofs -y
+		grep /misc /etc/auto.master # confirm entry is there
+		vi /etc/auto.misc
+		# add line
+		#autoindir 172.25.1.4:/common
+		systemctl restart autofs
+        ```
+
+1. Asghar Ghori - Exercise 16-5: Automount User Home Directories Using Indirect Map
+
+	* On *server1* (NFS server), create a user account called *user30* with UID 3000. Add the `/home` directory to the list of NFS shares so that it becomes available for remote mount. On *server2* (NFS client), create a user account called *user30* with UID 3000, base directory `/nfshome`, and no user home directory. Create an umbrella mount point called `/nfshome` for mounting the user home directory from the NFS server. Install the relevent software and establish an indirect map to automount the remote home directory of *user30* under `/nfshome`. Observe that the home directory of *user30* is automounted under `/nfshome` when you sign in as *user30*:
+	    ```shell
+		# on server 1 (NFS server)
+		useradd user30 --uid 3000
+		dnf install nfs-utils -y
+		systemctl enable nfs-server.service & systemctl start nfs-server.service
+		vi /etc/exports
+		# add line
+		#/home *(rw)
+		exportfs -av
+		sudo passwd user30
+		# enter new password
+
+		# on server 2 (NFS client)
+		useradd user30 -u 3000 -M
+		mkdir /nfshome
+		dnf install autofs -y
+		vi /etc/auto.master
+		# add line
+		#/nfshome /etc/auto.master.d/auto.home
+		vi /etc/auto.master.d/auto.home
+		# add line
+		#* -rw &:/home&
+		systemctl enable autofs.service & systemctl start autofs.service
+		sudo su - user30
+		# confirm home directory is mounted
         ```
