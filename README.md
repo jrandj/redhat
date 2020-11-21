@@ -3382,20 +3382,18 @@
 	* On *server1* (NFS server), create a user account called *user30* with UID 3000. Add the `/home` directory to the list of NFS shares so that it becomes available for remote mount. On *server2* (NFS client), create a user account called *user30* with UID 3000, base directory `/nfshome`, and no user home directory. Create an umbrella mount point called `/nfshome` for mounting the user home directory from the NFS server. Install the relevent software and establish an indirect map to automount the remote home directory of *user30* under `/nfshome`. Observe that the home directory of *user30* is automounted under `/nfshome` when you sign in as *user30*:
 	    ```shell
 		# on server 1 (NFS server)
-		useradd user30 --uid 3000
-		dnf install nfs-utils -y
-		systemctl enable nfs-server.service & systemctl start nfs-server.service
+		useradd -u 3000 user30
+		echo password1 | passwd --stdin user30
 		vi /etc/exports
 		# add line
 		#/home *(rw)
-		exportfs -av
-		sudo passwd user30
-		# enter new password
+		exportfs -avr
 
 		# on server 2 (NFS client)
-		useradd user30 -u 3000 -M
+		dnf install autofs -y		
+		useradd user30 -u 3000 -Mb /nfshome
+		echo password1 | passwd --stdin user30
 		mkdir /nfshome
-		dnf install autofs -y
 		vi /etc/auto.master
 		# add line
 		#/nfshome /etc/auto.master.d/auto.home
@@ -3405,4 +3403,81 @@
 		systemctl enable autofs.service & systemctl start autofs.service
 		sudo su - user30
 		# confirm home directory is mounted
+        ```
+
+1. Asghar Ghori - Exercise 17.1: Change System Hostname
+
+	* Change the hostnames of *server1* to *server10.example.com* and *server2* to *server20.example.com* by editing a file and restarting the corresponding service daemon and using a command respectively:
+	    ```shell
+		# on server 1
+		vi /etc/hostname
+		# change line to server10.example.com
+		systemctl restart systemd-hostnamed
+		
+		# on server 2
+		hostnamectl set-hostname server20.example.com
+        ```
+
+1. Asghar Ghori - Exercise 17.2: Add Network Devices to server10 and server20
+
+	* Add one network interface to *server10* and one to *server20* using VirtualBox:
+	    ```shell
+		# A NAT Network has already been created and attached to both servers in VirtualBox to allow them to have seperate IP addresses (note that the MAC addressed had to be changed)
+		# Add a second Internal Network adapter named intnet to each server
+		nmcli conn show # observe enp0s8 added as a connection
+        ```
+
+1. Asghar Ghori - Exercise 17.3: Configure New Network Connection Manually
+
+	* Create a connection profile for the new network interface on *server10* using a text editing tool. Assign the IP 172.10.10.110/24 with gateway 172.10.10.1 and set it to autoactivate at system reboots. Deactivate and reactive this interface at the command prompt:
+	    ```shell
+		vi /etc/sysconfig/network-scripts/ifcfg-enp0s8
+		# add contents of file
+		#TYPE=Ethernet
+		#BOOTPROTO=static
+		#IPV4_FAILURE_FATAL=no
+		#IPV6INIT=no
+		#NAME=enp0s8
+		#DEVICE=enp0s8
+		#ONBOOT=yes
+		#IPADDR=172.10.10.110
+		#PREFIX=24
+		#GATEWAY=172.10.10.1
+		ifdown enp0s8
+		ifup enp0s8
+		ip a # verify activation
+        ```
+
+1. Asghar Ghori - Exercise 17.4: Configure New Network Connection Using nmcli
+
+	* Create a connection profile using the *nmcli* command for the new network interface enp0s8 that was added to *server20*. Assign the IP 172.10.10.120/24 with gateway 172.10.10.1, and set it to autoactivate at system reboot. Deactivate and reactivate this interface at the command prompt:
+	    ```shell
+		nmcli dev status # show devices with enp0s8 disconnected
+		nmcli con add type Ethernet ifname enp0s8 con-name enp0s8 ip4 172.10.10.120/24 gw4 172.10.10.1
+		nmcli conn show # verify connection added
+		nmcli con down enp0s8
+		nmcli con up enp0s8
+		ip a # confirm ip address is as specified
+        ```
+
+1. Asghar Ghori - Exercise 17.5: Update Hosts Table and Test Connectivity
+
+	* Update the `/etc/hosts` file on both *server10* and *server20*. Add the IP addresses assigned to both connections and map them to hostnames *server10*, *server10s8*, *server20*, and *server20s8* appropriately. Test connectivity from *server10* to *server20* to and from *server10s8* to *server20s8* using their IP addresses and then their hostnames:
+	    ```shell
+		## on server20
+		vi /etc/hosts
+		# add lines
+		#172.10.10.120 server20.example.com server20
+		#172.10.10.120 server20s8.example.com server20s8
+		#192.168.0.110 server10.example.com server10
+		#192.168.0.110 server10s8.example.com server10s8
+
+		## on server10
+		vi /etc/hosts
+		# add lines
+		#172.10.10.120 server20.example.com server20
+		#172.10.10.120 server20s8.example.com server20s8
+		#192.168.0.110 server10.example.com server10
+		#192.168.0.110 server10s8.example.com server10s8
+		ping server10 # confirm host name resolves
         ```
