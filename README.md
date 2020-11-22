@@ -107,7 +107,7 @@
 
     * To redirect both stdout and stderror to a file:
         ```shell
-        echo test &> result.txt
+        echo test >> result.txt 2>&1
         ```
 
 1. Use grep and regular expressions to analyse text
@@ -3480,4 +3480,134 @@
 		#192.168.0.110 server10.example.com server10
 		#192.168.0.110 server10s8.example.com server10s8
 		ping server10 # confirm host name resolves
+        ```
+
+1. Asghar Ghori - Exercise 18.1: Configure NTP Client
+
+	* Install the Chrony software package and activate the service without making any changes to the default configuration. Validate the binding and operation:
+	    ```shell
+		dnf install chrony -y
+		vi /etc/chrony.conf # view default configuration
+		systemctl start chronyd.service & systemctl enable chronyd.service
+		chronyc sources # view time sources
+		chronyc tracking # view clock performance
+        ```
+
+1. Asghar Ghori - Exercise 18.1: Configure NTP Client
+
+	* Install the Chrony software package and activate the service without making any changes to the default configuration. Validate the binding and operation:
+	    ```shell
+		dnf install chrony -y
+		vi /etc/chrony.conf # view default configuration
+		systemctl start chronyd.service & systemctl enable chronyd.service
+		chronyc sources # view time sources
+		chronyc tracking # view clock performance
+        ```
+
+1. Asghar Ghori - Exercise 19.1: Access RHEL System from Another RHEL System
+
+	* Issue the *ssh* command as *user1* on *server10* to log in to *server20*. Run appropriate commands on *server20* for validation. Log off and return to the originating system:
+	    ```shell
+		# on server 10
+		ssh user1@server20
+		whoami
+		pwd
+		hostname # check some basic information
+		# ctrl + D to logout
+        ```
+
+1. Asghar Ghori - Exercise 19.2: Access RHEL System from Windows
+
+	* Use a program called PuTTY to access *server20* using its IP address and as *user1*. Run appropriate commands on *server20* for validation. Log off to terminate the session:
+	    ```shell
+		# as above but using the server20 IP address in PuTTy
+        ```
+
+1. Asghar Ghori - Exercise 19.3: Generate, Distribute, and Use SSH Keys
+
+	* Generate a password-less ssh key pair using RSA for *user1* on *server10*. Display the private and public file contents. Distribute the public key to *server20* and attempt to log on to *server20* from *server10*. Show the log file message for the login attempt:
+	    ```shell
+		# on server10
+		ssh-keygen
+		# press enter to select default file names and no password
+		ssh-copy-id server20
+		ssh server20 # confirm you can login
+
+		# on server20
+		vi /var/log/secure # view login event
+        ```
+
+1. Asghar Ghori - Exercise 20.1: Add Services and Ports, and Manage Zones
+
+	* Determine the current active zone. Add and activate a permanent rule to allow HTTP traffic on port 80, and then add a runtime rule for traffic intended for TCP port 443. Add a permanent rule to the *internal* zone for TCP port range 5901 to 5910. Confirm the changes and display the contents of the affected zone files. Switch the default zone to the *internal* zone and activate it:
+	    ```shell
+		# on server10
+		firewall-cmd --get-active-zones # returns public with enp0s8 interface
+		firewall-cmd --add-service=http --permanent
+		firewall-cmd --add-service=https
+		firewall-cmd --add-port=80/tcp --permanent
+		firewall-cmd --add-port=443/tcp
+		firewall-cmd --zone=internal --add-port=5901-5910/tcp --permanent
+		firewall-cmd --reload
+		firewall-cmd --list-services # confirm result
+		firewall-cmd --list-ports # confirm result
+		vi /etc/firewalld/zones/public.xml # view configuration
+		vi /etc/firewalld/zones/internal.xml # view configuration
+		firewall-cmd --set-default-zone=internal
+		firewall-cmd --reload
+		firewall-cmd --get-active-zones # returns internal with enp0s8 interface
+        ```
+
+1. Asghar Ghori - Exercise 20.2: Remove Services and Ports, and Manage Zones
+
+	* Remove the 2 permanent rules added above. Switch back to the *public* zone as the default zone, and confirm the changes:
+	    ```shell
+		firewall-cmd --set-default-zone=public
+		firewall-cmd --remove-service=http --permanent
+		firewall-cmd --remove-port=80/tcp --permanent
+		firewall-cmd --reload
+		firewall-cmd --list-services # confirm result
+		firewall-cmd --list-ports # confirm result
+        ```
+
+1. Asghar Ghori - Exercise 20.3: Test the Effect of Firewall Rule
+
+	* Remove the *sshd* service rule from the runtime configuration on *server10*, and try to access the server from *server20* using the *ssh* command:
+	    ```shell
+		# on server10
+		firewall-cmd --remove-service=ssh --permanent
+		firewall-cmd --reload
+		
+		# on server20
+		ssh user1@server10
+		# no route to host message displayed
+
+		# on server10
+		firewall-cmd --add-service=ssh --permanent
+		firewall-cmd --reload
+		
+		# on server20
+		ssh user1@server10
+		# success
+        ```
+
+1. Asghar Ghori - Exercise 21.1: Modify SELinux File Context
+
+	* Create a directory *sedir1* under `/tmp` and a file *sefile1* under *sedir1*. Check the context on the directory and file. Change the SELinux user and type to user_u and public_content_t on both and verify:
+	    ```shell
+		mkdir /tmp/sedir1
+		touch /tmp/sedir1/sefile1
+		cd /tmp/sedir1
+		ll -Z # unconfined_u:object_r:user_tmp_t:s0 shown
+		chcon -u user_u -R sedir1
+		chcon -t public_content_t -R sedir1
+        ```
+
+1. Asghar Ghori - Exercise 21.2: Add and Apply File Context
+
+	* Add the current context on *sedir1* to the SELinux policy database to ensure a relabeling will not reset it to its previous value. Next, you will change the context on the directory to some random values. Restore the default context from the policy database back to the directory recursively:
+	    ```shell
+		semanage fcontext -a -t public_content_t -s user_u '/tmp/sedir1(/.*)?'
+		cat /etc/selinux/targeted/contexts/files/file_contexts.local # view recently added policies
+		restorecon -Rv sedir1 # any chcon changes are reverted with this
         ```
