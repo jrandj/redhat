@@ -1514,7 +1514,7 @@
     * To change the DNS server being used:
         ```shell
         nmcli con mod <name> ipv4.dns <dns>
-        systemctl restart network
+        systemctl restart NetworkManager.service
         ```
    
 1. Configure hostname resolution
@@ -3611,3 +3611,62 @@
 		cat /etc/selinux/targeted/contexts/files/file_contexts.local # view recently added policies
 		restorecon -Rv sedir1 # any chcon changes are reverted with this
         ```
+
+1. Asghar Ghori - Exercise 21.3: Add and Delete Network Ports
+
+	* Add a non-standard port 8010 to the SELinux policy database for the *httpd* service and confirm the addition. Remove the port from the policy and verify the deletion:
+	    ```shell
+		semanage port -a -t http_port_t -p tcp 8010
+		semanage port -l | grep http # list all port settings
+		semanage port -d -t http_port_t -p tcp 8010
+		semanage port -l | grep http
+        ```
+
+1. Asghar Ghori - Exercise 21.4: Copy Files with and without Context
+
+	* Create a file called *sefile2* under `/tmp` and display its context. Copy this file to the `/etc/default` directory, and observe the change in the context. Remove *sefile2* from `/etc/default`, and copy it again to the same destination, ensuring that the target file receives the source file's context:
+	    ```shell
+		cd /tmp
+		touch sefile2
+		ll -Zrt # sefile2 context is unconfined_u:object_r:user_tmp_t:s0
+		cp sefile2 /etc/default
+		cd /etc/default
+		ll -Zrt # sefile2 context is unconfined_u:object_r:etc_t:s0
+		rm /etc/default/sefile2
+		cp /tmp/sefile2 /etc/default/sefile2 --preserve=context
+		ll -Zrt # sefile2 context is unconfined_u:object_r:user_tmp_t:s0
+        ```
+
+1. Asghar Ghori - Exercise 21.5: View and Toggle SELinux Boolean Values
+
+	* Display the current state of the Boolean nfs_export_all_rw. Toggle its value temporarily, and reboot the system. Flip its value persistently after the system has been back up:
+	    ```shell
+		getsebool nfs_export_all_rw # nfs_export_all_rw --> on
+		sestatus -b | grep nfs_export_all_rw # also works
+		setsebool nfs_export_all_rw_off
+		reboot
+		setsebool nfs_export_all_rw_off -P
+        ```
+
+1. Prince Bajaj - Managing Containers
+
+	* Download the Apache web server container image (httpd 2.4) and inspect the container image. Check the exposed ports in the container image configuration:
+	    ```shell
+		# as root
+		usermod user1 -aG wheel
+		cat /etc/groups | grep wheel # confirm
+		
+		# as user1
+		podman search httpd # get connection refused
+		# this was because your VM was setup as an Internal Network and not a NAT network so it couldn't access the internet
+		# see result registry.access.redhat.com/rhscl/httpd-24-rhel7
+		skopeo inspect --creds name:password docker://registry.access.redhat.com/rhscl/httpd-24-rhel7
+		podman pull registry.access.redhat.com/rhscl/httpd-24-rhel7
+		podman inspect registry.access.redhat.com/rhscl/httpd-24-rhel7
+		# exposed ports shown as 8080 and 8443
+        ```
+
+	* Run the httpd container in the background. Assign the name *myweb* to the container, verify that the container is running, stop the container and verify that it has stopped, and delete the container and the container image :
+	    ```shell
+        ```
+
