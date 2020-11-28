@@ -3666,7 +3666,48 @@
 		# exposed ports shown as 8080 and 8443
         ```
 
-	* Run the httpd container in the background. Assign the name *myweb* to the container, verify that the container is running, stop the container and verify that it has stopped, and delete the container and the container image :
+	* Run the httpd container in the background. Assign the name *myweb* to the container, verify that the container is running, stop the container and verify that it has stopped, and delete the container and the container image:
 	    ```shell
+		podman run --name myweb -d registry.access.redhat.com/rhscl/httpd-24-rhel7
+		podman ps # view running containers
+		podman stop myweb
+		podman ps # view running containers
+		podman rm myweb
+		podman rmi registry.access.redhat.com/rhscl/httpd-24-rhel7
         ```
 
+	* Pull the Apache web server container image (httpd 2.4) and run the container with the name *webserver*. Configure *webserver* to display content "Welcome to container-based web server". Use port 3333 on the host machine to receive http requests. Start a bash shell in the container to verify the configuration:
+	    ```shell
+		# as root
+		dnf install httpd -y
+		vi /var/www/html/index.html
+		# add row "Welcome to container-based web server"
+
+		# as user1
+		podman search httpd
+		podman pull registry.access.redhat.com/rhscl/httpd-24-rhel7
+		podman inspect registry.access.redhat.com/rhscl/httpd-24-rhel7 # shows 8080 in exposedPorts, and /opt/rh/httpd24/root/var/www is shown as HTTPD_DATA_ORIG_PATH 
+		podman run -d=true -p:3333:8080 --name=webserver -v /var/www/html:/opt/rh/httpd24/root/var/www/html registry.access.redhat.com/rhscl/httpd-24-rhel7
+		curl http://localhost:3333 # success!
+				
+		# to go into the container and (for e.g.) check the SELinux context
+		podman exec -it -u 0 webserver
+		cd /opt/rh/httpd24/root/var/www/html
+		ls -ldZ
+        ```
+
+	* Configure the system to start the *webserver* container at boot as a systemd service. Start/enable the systemd service to make sure the container will start at book, and reboot the system to verify if the container is running as expected:
+	    ```shell
+		# as root
+		podman pull registry.access.redhat.com/rhscl/httpd-24-rhel7
+		vi /var/www/html/index
+		# add row "Welcome to container-based web server"
+		podman run -d=true -p:3333:8080 --name=webserver -v /var/www/html:/opt/rh/httpd24/root/var/www/html 
+		cd /etc/systemd/system
+		podman generate systemd webserver >> httpd-container.service
+		systemctl daemon-reload
+		systemctl enable httpd-container.service --now
+		reboot
+		systemctl status httpd-container.service
+		curl http://localhost:3333 # success
+        ```
