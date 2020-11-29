@@ -3711,3 +3711,107 @@
 		systemctl status httpd-container.service
 		curl http://localhost:3333 # success
         ```
+
+	* Pull the *mariadb* image to your system and run it publishing the exposed port. Set the root password for the mariadb service as *mysql*. Verify if you can login as root from local host:
+	    ```shell
+		# as user1
+		sudo dnf install mysql -y
+		podman search mariadb
+		podman pull docker.io/library/mariadb
+		podman inspect docker.io/library/mariadb # ExposedPorts 3306 
+		podman run --name mariadb -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=mysql docker.io/library/mariadb
+		podman inspect mariadb # IPAddress is 10.88.0.22
+		mysql -h 10.88.0.22 -u root -p
+        ```
+
+1. Linux Hint - Bash Script Examples
+
+	* Create a hello world script:
+	    ```shell
+		!#/bin/bash
+		echo "Hello World!"
+		exit
+        ```
+
+	* Create a script that uses a while loop to count to 5:
+	    ```shell
+		!#/bin/bash
+		count=0
+		while [ $count -le 5 ]
+		do
+			echo "$count"
+			count = $(($count + 1))
+		done
+		exit
+        ```
+
+	* Note the formatting requirements. For example, there can be no space between the equals and the variable names, there must be a space between the "]" and the condition, and there must be 2 sets of round brackets in the variable incrementation.
+
+	* Create a script that uses a for loop to count to 5:
+	    ```shell
+		!#/bin/bash
+		count=5
+		for ((i=1; i<=$count; i++))
+		do
+			echo "$i"
+		done
+		exit
+        ```
+
+	* Create a script that uses a for loop to count to 5 printing whether the number is even or odd:
+	    ```shell
+		!#/bin/bash
+		count=5
+		for ((i=1; i<=$count; i++))
+		do
+			if [ $(($i%2)) -eq 0 ]
+			then
+				echo "$i is even"
+			else
+				echo "$i is odd"
+			fi
+		done
+		exit
+        ```
+
+	* Create a script that uses a for loop to count to a user defined number printing whether the number is even or odd:
+	    ```shell
+		!#/bin/bash
+		echo "Enter a number: "
+		read count
+		for ((i=1; i<=$count; i++))
+		do
+			if [ $(($i%2)) -eq 0 ]
+			then
+				echo "$i is even"
+			else
+				echo "$i is odd"
+			fi
+		done
+		exit
+        ```
+
+	* Create a script that uses a function to multiply 2 numbers together:
+	    ```shell
+		!#/bin/bash
+		Rectangle_Area() {
+			area=$(($1 * $2))
+			echo "Area is: $area"
+		}
+		
+		Rectangle_Area 10 20
+		exit
+        ```
+
+	* Create a script that uses the output of another command to make a decision:
+	    ```shell
+		!#/bin/bash
+		ping -c 1 $1 > /dev/null 2>&1
+		if [ $? -eq 0 ]
+		then
+			echo "Connectivity to $1 established"
+		else
+			echo "Connectivity to $1 unavailable"
+		fi
+		exit
+        ```
