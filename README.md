@@ -3815,3 +3815,168 @@
 		fi
 		exit
         ```
+
+1. RHCSA 8 Practise Exam
+
+	* Interrupt the boot process and reset the root password:
+	    ```shell
+		# interrupt boot process and add rd.break line
+		mount -o remount, rw /sysroot
+		chroot /sysroot
+		passwd 
+		# enter new passwd
+		touch /.autorelabel
+		# ctrl + D
+		reboot
+        ```
+
+	* Repos are available from the repo server at http://repo.eight.example.com/BaseOS and http://repo.eight.example.com/AppStream for you to use during the exam. Setup these repos:
+	    ```shell
+		vi /etc/yum.repos.d/localrepo.repo
+		#[BaseOS]
+		#name=BaseOS
+		#baseurl=http://repo.eight.example.com/BaseOS
+		#enabled=1
+		#
+		#[AppStream]
+		#name=AppStream
+		#baseurl=http://repo.eight.example.com/AppStream
+		#enabled=1
+		dnf repolist # confirm
+        ```
+
+	* The system time should be set to your (or nearest to you) timezone and ensure NTP sync is configured:
+	    ```shell
+		timedatectl set-timezone Australia/Sydney
+		timedatectl set-ntp true
+		timedatectl status # confirm status
+        ```
+
+	* Add the following secondary IP addresses statically to your current running interface. Do this in a way that doesn’t compromise your existing settings:
+	    ```shell
+		# IPV4 - 10.0.0.5/24
+		# IPV6 - fd01::100/64
+		nmcli con edit System\ eth0
+		set ipv4.addresses 10.0.0.5/24
+		set ipv6.addresses fd01::100/64
+		save
+		nmcli con edit System\ eth1
+		set ipv4.addresses 10.0.0.5/24
+		set ipv6.addresses fd01::100/64
+		# enter yes when asked if you want to set to manual
+        ```
+
+	* Enable packet forwarding on system1. This should persist after reboot:
+	    ```shell
+		TBC
+        ```
+
+	* System1 should boot into the multiuser target by default and boot messages should be present (not silenced):
+	    ```shell
+		systemctl set-default multi-user.target
+        ```
+
+	* Create a new 2GB volume group named “vgprac”:
+	    ```shell
+		lsblk
+		# /dev/sdb is available with 8GB
+		# the file system already has ~36MB in use and is mounted to /extradisk1
+		umount /dev/sdb
+		parted /dev/sdb
+		mklabek
+		# enter msdos
+		mkpart
+		# enter primary
+		# enter xfs
+		# enter 0
+		# enter 2.1GB
+		set
+		# enter 1
+		# enter lvm
+		# enter on
+		vgcreate vgprac /dev/sdb1
+		# enter y to wipe	
+        ```
+
+	* Create a 500MB logical volume named “lvprac” inside the “vgprac” volume group:
+	    ```shell
+		lvcreate --name lvprac -L 500MB vgprac
+        ```
+
+	* The “lvprac” logical volume should be formatted with the xfs filesystem and mount persistently on the `/mnt/lvprac` directory:
+	    ```shell
+		mkdir /mnt/lvprac
+		mkfs.xfs /dev/mapper/vgprac-lvprac
+		vi /etc/fstab
+		# comment out line for old /dev/sdb
+		# add line for /dev/mapper/vgprac-lvprac
+		mount -a
+		df -h # confirm mounted
+        ```
+
+	* Extend the xfs filesystem on “lvprac” by 500MB:
+	    ```shell
+		lvextend -r -L +500MB /dev/vgprac/lvprac
+        ```
+
+	* Use the appropriate utility to create a 5TiB thin provisioned volume:
+	    ```shell
+		lsblk
+		# /dev/sdc is available with 8GB
+		dnf install vdo -y
+		umount /extradisk2
+		vdo create --name=myvolume --device=/dev/sdc --vdoLogicalSize=5T --force
+        ```
+
+	* Configure a basic web server that displays “Welcome to the web server” once connected to it. Ensure the firewall allows the http/https services:
+	    ```shell
+		vi /var/www/html/index.html
+		# add line "Welcome to the web server"
+		systemctl restart httpd.service
+		curl http://localhost
+		# success
+		# from server1
+		curl http://server2.eight.example.com
+		# no route to host shown
+		# on server2
+		firewall-cmd --add-port=80/tcp --permanent
+		firewall-cmd --reload
+		# from server1
+		curl http://server2.eight.example.com
+		# success
+        ```
+
+	* Find all files that are larger than 5MB in the /etc directory and copy them to /find/largefiles:
+	    ```shell
+		TBC
+        ```
+
+	* Write a script named awesome.sh in the root directory on system1. If “me” is given as an argument, then the script should output “Yes, I’m awesome.” If “them” is given as an argument, then the script should output “Okay, they are awesome.” If the argument is empty or anything else is given, the script should output “Usage ./awesome.sh me|them”:
+	    ```shell
+		TBC
+        ```
+
+	* Create users phil, laura, stewart, and kevin. All new users should have a file named “Welcome” in their home folder after account creation. All user passwords should expire after 60 days and be at least 8 characters in length. Phil and laura should be part of the “accounting” group. If the group doesn’t already exist, create it. Stewart and kevin should be part of the “marketing” group. If the group doesn’t already exist, create it:
+	    ```shell
+		TBC
+        ```
+
+	* Only members of the accounting group should have access to the `/accounting` directory. Make laura the owner of this directory. Make the accounting group the group owner of the `/accounting` directory:
+	    ```shell
+		TBC
+        ```
+
+	* Only members of the marketing group should have access to the `/marketing` directory. Make stewart the owner of this directory. Make the marketing group the group owner of the `/marketing` directory:
+	    ```shell
+		TBC
+        ```
+
+	* New files should be owned by the group owner and only the file creator should have the permissions to delete their own files:
+	    ```shell
+		TBC
+        ```
+
+	* Create a cron job that writes “This practice exam was easy and I’m ready to ace my RHCSA” to `/var/log/messages` at 12pm only on weekdays:
+	    ```shell
+		TBC
+        ```
