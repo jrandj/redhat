@@ -3820,12 +3820,13 @@
 
 	* Interrupt the boot process and reset the root password:
 	    ```shell
-		# interrupt boot process and add rd.break line
+		# interrupt boot process and add rd.break at end of linux line
 		mount -o remount, rw /sysroot
 		chroot /sysroot
 		passwd 
 		# enter new passwd
 		touch /.autorelabel
+		# you could also add enforcing=0 to the end of the Linux line to avoid having to do this
 		# ctrl + D
 		reboot
         ```
@@ -3843,6 +3844,7 @@
 		#baseurl=http://repo.eight.example.com/AppStream
 		#enabled=1
 		dnf repolist # confirm
+		# you could also use dnf config-manager --add-repo
         ```
 
 	* The system time should be set to your (or nearest to you) timezone and ensure NTP sync is configured:
@@ -3857,23 +3859,36 @@
 		# IPV4 - 10.0.0.5/24
 		# IPV6 - fd01::100/64
 		nmcli con edit System\ eth0
-		set ipv4.addresses 10.0.0.5/24
-		set ipv6.addresses fd01::100/64
+		goto ipv4.addresses 
+		add 10.0.0.5/24
+		goto ipv6.addresses 
+		add fd01::100/64
+		back
 		save
 		nmcli con edit System\ eth1
-		set ipv4.addresses 10.0.0.5/24
-		set ipv6.addresses fd01::100/64
+		goto ipv4.addresses 
+		add 10.0.0.5/24
+		goto ipv6.addresses 
+		add fd01::100/64
+		back
+		save
+		nmcli con reload
 		# enter yes when asked if you want to set to manual
         ```
 
 	* Enable packet forwarding on system1. This should persist after reboot:
 	    ```shell
-		TBC
+		vi /etc/sysctl.conf
+		# add line for net.ipv4.port_forward=1
         ```
 
 	* System1 should boot into the multiuser target by default and boot messages should be present (not silenced):
 	    ```shell
 		systemctl set-default multi-user.target
+		vi /etc/default/grub
+		# remove rhgb quiet from GRUB_CMDLINE_LINUX
+		grub2-mkconfig -o /boot/grub2/grub.cfg
+		reboot
         ```
 
 	* Create a new 2GB volume group named “vgprac”:
@@ -3923,9 +3938,11 @@
 	    ```shell
 		lsblk
 		# /dev/sdc is available with 8GB
-		dnf install vdo -y
+		dnf install vdo kmod-vdo -y
 		umount /extradisk2
 		vdo create --name=myvolume --device=/dev/sdc --vdoLogicalSize=5T --force
+		vi /etc/fstab
+		# comment out line for old /dev/sdc
         ```
 
 	* Configure a basic web server that displays “Welcome to the web server” once connected to it. Ensure the firewall allows the http/https services:
@@ -3948,35 +3965,69 @@
 
 	* Find all files that are larger than 5MB in the /etc directory and copy them to /find/largefiles:
 	    ```shell
-		TBC
+		mkdir -p /find/largefiles
+		find /etc/ -size +5M -exec cp {} /find/largefiles \;
+		# the {} is substituted by the output of find, and the ; is mandatory for an exec but must be escaped
         ```
 
 	* Write a script named awesome.sh in the root directory on system1. If “me” is given as an argument, then the script should output “Yes, I’m awesome.” If “them” is given as an argument, then the script should output “Okay, they are awesome.” If the argument is empty or anything else is given, the script should output “Usage ./awesome.sh me|them”:
 	    ```shell
-		TBC
+		vi /awesome.sh
+		chmod +x /awesome.sh
+		# contents of awesome.sh
+		##!/bin/bash
+		#if [ $1 = "me" ]; then
+		#	echo "Yes, I'm awesome."
+		#elif [ $1  = "them"]; then
+		#	echo "Okay, they are awesome."
+		#else
+		#	echo "Usage /.awesome.sh me|them"
+		#fi
+		#note that = had to be used and not -eq
         ```
 
 	* Create users phil, laura, stewart, and kevin. All new users should have a file named “Welcome” in their home folder after account creation. All user passwords should expire after 60 days and be at least 8 characters in length. Phil and laura should be part of the “accounting” group. If the group doesn’t already exist, create it. Stewart and kevin should be part of the “marketing” group. If the group doesn’t already exist, create it:
 	    ```shell
-		TBC
+		groupadd accounting
+		groupadd marketing
+		vi /etc/security/pwquality.conf
+		# uncomment out the line that already had minlen = 8
+		mkdir /etc/skel/Welcome
+		useradd phil -G accounting
+		useradd laura -G accounting
+		useradd stewart -G marketing
+		useradd kevin -G marketing
+		chage -M 60 phil
+		chage -M 60 laura
+		chage -M 60 stewart
+		chage -M 60 kevin
+		chage -l phil # confirm
+		# can also change in /etc/login.defs
         ```
 
 	* Only members of the accounting group should have access to the `/accounting` directory. Make laura the owner of this directory. Make the accounting group the group owner of the `/accounting` directory:
 	    ```shell
-		TBC
+		mkdir /accounting
+		chmod 770 /accounting
+		chown laura:accounting /accounting
         ```
 
 	* Only members of the marketing group should have access to the `/marketing` directory. Make stewart the owner of this directory. Make the marketing group the group owner of the `/marketing` directory:
 	    ```shell
-		TBC
+		mkdir /marketing
+		chmod 770 /marketing
+		chown stewart:marketing /marketing
         ```
 
 	* New files should be owned by the group owner and only the file creator should have the permissions to delete their own files:
 	    ```shell
-		TBC
+		chmod +ts /marketing
+		chmod +ts /accounting
         ```
 
 	* Create a cron job that writes “This practice exam was easy and I’m ready to ace my RHCSA” to `/var/log/messages` at 12pm only on weekdays:
 	    ```shell
-		TBC
+		crontab -e
+		#* 12 * * 1-5 echo "This practise exam was easy and I'm ready to ace my RHCSA" >> /var/log/messagees
+		# you can look at info crontab if you forget the syntax
         ```
