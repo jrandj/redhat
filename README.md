@@ -2912,9 +2912,9 @@
 		#
         #[AppStream]
 		#name=AppStream
+		#baseurl=file:///run/media/$name/AppStream
 		#gpgcheck=0
         #####
-		#baseurl=file:///run/media/$name/AppStream
 		dnf repolist # confirm new repos are added
         ```
 
@@ -3854,7 +3854,7 @@
 		vi /etc/hosts
 		# add rhcsa1.example.com and rhcsa1 to first line
 		systemctl restart NetworkManager.service
-		vi ~/.profile
+		vi ~/.bashrc
 		# add line export PS1 = <($hostname)>
         ```
 
@@ -3878,73 +3878,133 @@
 
 	* Change the primary command prompt for the root user to display the hostname, username, and current working directory information in that order. Update the per-user initialisation file for permanence:
 	    ```shell
-		vi /root/.profile
+		vi /root/.bashrc
 		# add line export PS1 = '<$(whoami) on $(hostname) in $(pwd)>'$
         ```
 
 	* Create user accounts called user10, user20, and user30. Set their passwords to Temp1234. Make accounts for user10 and user30 to expire on December 31, 2021:
 	    ```shell
-		TBC
+		useradd user10
+		useradd user20
+		useradd user30
+		passwd user10 # enter password
+		passwd user20 # enter password
+		passwd user30 # enter password
+		chage -E 2021-12-31 user10
+		chage -E 2021-12-31 user30
+		chage -l user10 # confirm
         ```
 
 	* Create a group called group10 and add users user20 and user30 as secondary members:
 	    ```shell
-		TBC
+		groupadd group10
+		usermod -aG group10 user20
+		usermod -aG group10 user30
+		cat /etc/group | grep "group10" # confirm
         ```
 
 	* Create a user account called user40 with UID 2929. Set the password to user1234:
 	    ```shell
-		TBC
+		useradd -u 2929 user40
+		passwd user40 # enter password
         ```
 
 	* Create a directory called dir1 under `/tmp` with ownership and owning groups set to root. Configure default ACLs on the directory and give user user10 read, write, and execute permissions:
 	    ```shell
-		TBC
+		mkdir /tmp/dir1
+		cd /tmp
+		# tmp already has ownership with root
+		setfacl -m u:user10:rwx dir1
         ```
 
 	* Attach the RHEL 8 ISO image to the VM and mount it persistently to `/mnt/cdrom`. Define access to both repositories and confirm:
 	    ```shell
-		TBC
+		# add ISO to the virtualbox optical drive
+		mkdir /mnt/cdrom
+		mount /dev/sr0 /mnt/cdrom
+		vi /etc/yum.repos.d/image.repo
+		# contents of image.repo
+		#####
+        #[BaseOS]
+		#name=BaseOS
+		#baseurl=file:///mnt/cdrom/BaseOS
+		#enabled=1
+		#
+        #[AppStream]
+		#name=AppStream
+		#baseurl=file:///mnt/cdrom/AppStream
+		#enabled=1
+        #####
+		yum repolist # confirm
         ```
 
 	* Create a logical volume called lvol1 of size 300MB in vgtest volume group. Mount the Ext4 file system persistently to `/mnt/mnt1`:
 	    ```shell
-		TBC
+		mkdir /mnt/mnt1
+		# /dev/sdb is already 300MB so don't need to worry about partitioning
+		vgcreate vgtest /dev/sdb
+		lvcreate --name lvol1 -L 296MB vgtest
+		lsblk # confirm
+		mkfs.ext4 /dev/mapper/vgtest-lvol1
+		vi /etc/fstab
+		# add line
+		# /dev/mapper/vgtest-lvol1 /mnt/mnt1 ext4 defaults 0 0
+		mount -a
+		lsblk # confirm
         ```
 
 	* Change group membership on `/mnt/mnt1` to group10. Set read/write/execute permissions on `/mnt/mnt1` for group members, and revoke all permissions for public:
 	    ```shell
-		TBC
+		chgrp group10 /mnt/mnt1
+		chmod 770 /mnt/mnt1
         ```
 
 	* Create a logical volume called lvswap of size 300MB in the vgtest volume group. Initialise the logical volume for swap use. Use the UUID and place an entry for persistence:
 	    ```shell
-		TBC
+		# /dev/sdc is already 300MB so don't need to worry about partitioning
+		vgcreate vgswap /dev/sdc
+		lvcreate --name lvswap -L 296MB vgswap /dev/sdc
+		mkswap /dev/mapper-vgswap-lvswap # UUID returned
+		blkid /dev/sdc >> /etc/fstab
+		# organise new line so that it has UUID= swp swap defaults 0 0
+		swapon -a
+		lsblk # confirm
         ```
 
 	* Use tar and bzip2 to create a compressed archive of the `/etc/sysconfig` directory. Store the archive under `/tmp` as etc.tar.bz2:
 	    ```shell
-		TBC
+		tar -cvzf /tmp/etc.tar.bz2 /etc/sysconfig
         ```
 
-	* Create a directory hierarchy `/dr1/dir2/dir3/dir4`, and apply SELinux contexts for `/etc` on it recursively:
+	* Create a directory hierarchy `/dir1/dir2/dir3/dir4`, and apply SELinux contexts for `/etc` on it recursively:
 	    ```shell
-		TBC
+		mkdir -p /dir1/dir2/dir3/dir4
+		ll -Z 
+		# etc shown as system_u:object_r:etc_t:s0
+		# dir1 shown as unconfined_u:object_r:default_t:s0
+		semanage fcontext -a -t etc_t "/dir1(/.*)?"
+		restorecon -R -v /dir1
+		ll -Z # confirm
         ```
 
 	* Enable access to the atd service for user20 and deny for user30:
 	    ```shell
-		TBC
+		echo "user30" >> /etc/at.deny
+		# just don't create at.allow
         ```
 
-	* Add a custom message "This is the RHCSA sample exam on $(date) by $LOGNAME" to the `/var/log/messages` file as the root user. Use regular expression to confirm the message entry to the log file":
+	* Add a custom message "This is the RHCSA sample exam on $(date) by $LOGNAME" to the `/var/log/messages` file as the root user. Use regular expression to confirm the message entry to the log file:
 	    ```shell
-		TBC
+		logger "This is the RHCSA sample exam on $(date) by $LOGNAME"
+		grep "This is the" /var/log/messages
         ```
 
 	* Allow user20 to use sudo without being prompted for their password:
 	    ```shell
-		TBC
+		usermod -aG wheel user20
+		# still prompts for password, could change the wheel group behaviour or add new line to sudoers
+		visudo
+		# add line at end user20 ALL=(ALL) NOPASSWD: ALL
         ```
 
 1. RHCSA 8 Practise Exam
