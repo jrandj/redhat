@@ -462,7 +462,7 @@
 
     * *systemctl* is the primary command for interaction with systemd. 
 
-    * To boot into a custom target the *e* key can be pressed at the GRUB2 menu, and the desired target specified using systemd.unit. After editing press *Ctrl+x* to boot into the target state. To boot into the emergency target: 
+    * To boot into a custom target the *e* key can be pressed at the GRUB2 menu, and the desired target specified using systemd.unit. After editing press *ctrl+x* to boot into the target state. To boot into the emergency target: 
         ```shell
         systemd.unit=emergency.target
         ```
@@ -478,7 +478,7 @@
 
     * Press *e* at the GRUB2 menu and add "rd.break" in place of "ro crash". This boot option tells the boot sequence to stop while the system is still using initramfs so that we can access the emergency shell.
     
-    * Press *Ctrl+x* to reboot.
+    * Press *ctrl+x* to reboot.
     
     * Run the following command to remount the `/sysroot` directory with rw privileges:
         ```shell
@@ -535,7 +535,7 @@
         kill -9 `pgrep crond`
         ```
 
-    * The *killall* command can be used to terminate all processes that match a specified criteria.
+    * The *killall* command can be used to terminate all processes that match a specified criterion.
     
 1. Adjust process scheduling
 
@@ -668,7 +668,7 @@
 
     * GPT is a newer 64-bit partitioning standard developed and integrated to UEFI firmware. GPT allows for 128 partitions, use of disks much larger than 2TB, and redundant locations for the storage of partition information. GPT also allows a BIOS-based system to boot from a GPT disk, using the boot loader program stored in a protective MBR at the first disk sector.
 
-    * To list the mount points, size and available space:
+    * To list the mount points, size, and available space:
         ```shell   
         df -h
         ```
@@ -1131,7 +1131,7 @@
         at 11:30pm 6/30/15
         ```
 
-    * The commands to execute are defined in the terminal, press *Ctrl+d* when finished. The added job can be viewed with *at* and can be removed with the *-d* option.
+    * The commands to execute are defined in the terminal, press *ctrl+d* when finished. The added job can be viewed with *at* and can be removed with the *-d* option.
 
     * A shell script can also be provided:
         ```shell
@@ -1950,7 +1950,7 @@
 
 	* To start, stop and remove a container:
         ```shell
-		podman run -dt -p 8080:80/tcp docker.io/library/httpd # redirect requests on 8080 to 80
+		podman run -dt -p 8080:80/tcp docker.io/library/httpd # redirect requests on 8080 host port to 80 container port
 	    podman ps -a # view container details, use -a to see all
 	    # check using 127.0.0.1:8080 on a browser
 	    podman stop af1fc4ca0253 # container ID from podman ps -a
@@ -2022,7 +2022,7 @@
         ```shell
 		ls /dev/sda1 # using this disk
 		mkdir -p /home/containers/disk1
-		podman run --privileged -it -v /home/containers/disk1:/mnt docker.io/library/httpd /bin/bash #  --privileged to allow with SELinux, -it for interactive terminal, -v to mount, and provide a terminal
+		podman run --privileged -it -v /home/containers/disk1:/mnt docker.io/library/httpd /bin/bash #  --privileged to allow with SELinux, -it for interactive terminal, -v to mount, and /bin/bash to provide a terminal
         ```
 
 ### Exercises
@@ -3676,13 +3676,15 @@
 		podman search httpd
 		podman pull registry.access.redhat.com/rhscl/httpd-24-rhel7
 		podman inspect registry.access.redhat.com/rhscl/httpd-24-rhel7 # shows 8080 in exposedPorts, and /opt/rh/httpd24/root/var/www is shown as HTTPD_DATA_ORIG_PATH 
-		podman run -d=true -p:3333:8080 --name=webserver -v /var/www/html:/opt/rh/httpd24/root/var/www/html registry.access.redhat.com/rhscl/httpd-24-rhel7
+		podman run -d=true -p 3333:8080 --name=webserver -v /var/www/html:/opt/rh/httpd24/root/var/www/html registry.access.redhat.com/rhscl/httpd-24-rhel7
 		curl http://localhost:3333 # success!
 				
 		# to go into the container and (for e.g.) check the SELinux context
-		podman exec -it -u 0 webserver
+		podman exec -it webserver /bin/bash
 		cd /opt/rh/httpd24/root/var/www/html
 		ls -ldZ
+
+		# you can also just go to /var/www/html/index.html in the container and change it there
         ```
 
 	* Configure the system to start the *webserver* container at boot as a systemd service. Start/enable the systemd service to make sure the container will start at book, and reboot the system to verify if the container is running as expected:
@@ -4300,7 +4302,7 @@
 	    ```shell
 		# on rhcsa3
 		mkdir /rh_share3
-		chmod 755 rh_share3
+		chmod 777 rh_share3
 		useradd user80
 		passwd user80
 		# enter Temp1234
@@ -4317,25 +4319,60 @@
 		passwd user80
 		# enter Temp1234
 		mkdir /mnt/rh_share4
-		mount rhcsa3:/rh_share3 /mnt/nfs
-		mount | grep nfs # get details for /etc/fstab
-		vi /etc/fstab
+		chmod 777 rh_share4
+		# mount rhcsa3:/rh_share3 /mnt/nfs
+		# mount | grep nfs # get details for /etc/fstab
+		# vi /etc/fstab
 		# add line rhcsa3:/rh_share3 /mnt/rh_share4 nfs4 _netdev 0 0
+		# above not required with AutoFS
+		dnf install autofs -y
+		vi /etc/auto.master
+		# add line /mnt/rh_rhcsa3 /etc/auto.master.d/auto.home
+		vi /etc/auto.master.d/auto.home
+		# add line * -rw rhcsa3:/rh_share3
         ```
 
 	* Configure NFS service on rhcsa4 and share the home directory for user user60 (create on both systems) with rhcsa3. Configure AutoFS indirect map on rhcsa3 to automatically mount the home directory under `/nfsdir` when user60 logs on to rhcsa3:
 	    ```shell
-		TBC
+		# on rhcsa3
+		useradd user60
+		passwd user60
+		# enter Temp1234
+		dnf install autofs -y
+		mkdir /nfsdir
+		vi /etc/auto.master
+		# add line for /nfsdir /etc/auto.master.d/auto.home
+		vi /etc/auto.master.d/auto.home
+		# add line for * -rw rhcsa4:/home/user60
+		systemctl enable autofs.service --now
+
+		# on rhcsa4
+		useradd user60
+		passwd user60
+		# enter Temp1234
+		vi /etc/exports
+		# add line for /home rhcsa3(rw)
+		exportfs -va	
         ```
 
 	* On rhcsa4, create Stratis pool pool1 and volume str1 on a 1GB disk, and mount it to `/mnt/str1`:
 	    ```shell
-		TBC
+		dnf provides stratis
+		dnf install stratis-cli -y
+		systemctl enable stratisd.service --now
+		stratis pool create pool1 /dev/sdc
+		stratis filesystem create pool1 vol1
+		mkdir /mnt/str1
+		mount /stratis/pool1/vol1 /mnt/str1
+		blkid # get information for /etc/fstab
+		vi /etc/fstab
+		# add line for UUID /mnt/str1 xfs defaults 0 0	
         ```
 
 	* On rhcsa4, expand Stratis pool pool1 using the other 1GB disk. Confirm that `/mnt/str1` sees the storage expansion:
 	    ```shell
-		TBC
+		stratis pool add-data pool1 /dev/sdb
+		stratis blockdev # extra disk visible
         ```
 
 	* On rhcsa3, create a group called group30 with GID 3000, and add user60 and user80 to this group. Create a directory called `/sdata`, enable setgid bit on it, and add write permission bit for the group. Set ownership and owning group to root and group30. Create a file called file1 under `/sdata` as user user60 and modify the file as user80 successfully:
@@ -4350,32 +4387,44 @@
 
 	* On rhcsa3, search for all manual pages for the description containing the keyword "password" and redirect the output to file `/tmp/man.out`:
 	    ```shell
-		TBC
+		man -k password >> /tmp.man.out
+		# or potentially man -wK "password" if relying on the description is not enough
         ```
 
 	* On rhcsa3, create file lnfile1 under `/tmp` and create one hard link `/tmp/lnfile2` and one soft link `/boot/file1`. Edit lnfile1 using the links and confirm:
 	    ```shell
-		TBC
+		cd /tmp
+		touch lnfile1
+		ln lnfile1 lnfile2
+		ln -s /boot/file1 lnfile1
         ```
 
 	* On rhcsa3, install module postgresql version 9.6:
 	    ```shell
-		TBC
+		dnf module list postgresql # stream 10 shown as default
+		dnf module install postgresql:9.6
+		dnf module list # stream 9.6 shown as installed
         ```
 
 	* On rhcsa3, add the http service to the "external" firewalld zone persistently:
 	    ```shell
-		TBC
+		firewall-cmd --zone=external --add-service=http --permanent
         ```
 
 	* On rhcsa3, set SELinux type shadow_t on a new file testfile1 in `/usr` and ensure that the context is not affected by a SELinux relabelling:
 	    ```shell
-		TBC
+		cd /usr
+		touch /usr/testfile1
+		ll -Zrt # type shown as unconfined_u:object_r:usr_t:s0
+		semange fcontext -a -t /usr/testfile1
+		restorecon -R -v /usr/testfile1
         ```
 
 	* Configure password-less ssh access for user60 from rhcsa3 to rhcsa4:
 	    ```shell
-		TBC
+		sudo su - user60
+		ssh-keygen # do not provide a password
+		ssh-copy-id rhcsa4 # enter user60 pasword on rhcsa4
         ```
 
 1. RHCSA 8 Practise Exam
@@ -4460,7 +4509,7 @@
 		# the file system already has ~36MB in use and is mounted to /extradisk1
 		umount /dev/sdb
 		parted /dev/sdb
-		mklabek
+		mklabel
 		# enter msdos
 		mkpart
 		# enter primary
