@@ -258,7 +258,7 @@
 
 1. List, set, and change standard ugo/rwx permissions
 
-    * Permissions are set for the user, group, and others. User is the owner of the file or the directory, group is a set of users with identical access defined in `/etc/group`, and others are all other users. The types of permission are read, write and execute.
+    * Permissions are set for the user, group, and others. User is the owner of the file or the directory, group is a set of users with identical access defined in `/etc/group`, and others are all other users. The types of permission are read, write, and execute.
     
     * Permission combinations are shown below:
         | Octal Value | Binary Notation | Symbolic Notation | Explanation                           |
@@ -1780,6 +1780,12 @@
         getfacl testFile
         ```
 
+    * To restrict a user from accessing a file using an access control list:
+        ```shell
+        setfacl -m u:user1:000 testFile
+        getfacl testFile
+        ```
+
     * To remove an access control list for a user:
         ```shell
         setfacl -x u:user1 testFile
@@ -2331,7 +2337,7 @@
     * Modify the NTP pools:
         ```shell
         vi /etc/chrony.conf
-        # modify the lines at the top of the file
+        # modify the pool directive at the top of the file
         ```
 
     * Modify GRUB to boot a different kernel:
@@ -2635,7 +2641,7 @@
 
 1. Asghar Ghori - Exercise 4-1: Modify Permission Bits Using Symbolic Form
 
-	* Create a file *permfile1* with read permissions for owner, group and other. Add an execute bit for the owner and a write bit for group and public. Revoke the write bit from public and assign read, write and execute bits to the three user categories at the same time. Revoke write from the owning group and write and execute bits from public:
+	* Create a file *permfile1* with read permissions for owner, group and other. Add an execute bit for the owner and a write bit for group and public. Revoke the write bit from public and assign read, write, and execute bits to the three user categories at the same time. Revoke write from the owning group and write, and execute bits from public:
 	    ```shell
 		touch permfile1
 		chmod 444 permfile1
@@ -2646,7 +2652,7 @@
 
 1. Asghar Ghori - Exercise 4-2: Modify Permission Bits Using Octal Form
 
-	* Create a file *permfile2* with read permissions for owner, group and other. Add an execute bit for the owner and a write bit for group and public. Revoke the write bit from public and assign read, write and execute permissions to the three user categories at the same time:
+	* Create a file *permfile2* with read permissions for owner, group and other. Add an execute bit for the owner and a write bit for group and public. Revoke the write bit from public and assign read, write, and execute permissions to the three user categories at the same time:
 	    ```shell
 		touch permfile2
 		chmod 444 permfile2
@@ -3057,7 +3063,7 @@
 
 1. Asghar Ghori - Exercise 13-7: Create a VDO Volume
 
-	* Create a volume called *vdo-vol1* of logical size 16GB on the `/dev/sdc` disk (the actual size of `/dev/sdc` is 4GB). List the volume and display its status information. Show the activation status of the compresssion and de-duplication features:
+	* Create a volume called *vdo-vol1* of logical size 16GB on the `/dev/sdc` disk (the actual size of `/dev/sdc` is 4GB). List the volume and display its status information. Show the activation status of the compression and de-duplication features:
 	    ```shell
 		wipefs -a /dev/sdc # couldn't create without doing this first
 		vdo create --name vdo-vol1 --device /dev/sdc --vdoLogicalSize 16G --vdoSlabSize 128
@@ -3693,7 +3699,7 @@
 		podman pull registry.access.redhat.com/rhscl/httpd-24-rhel7
 		vi /var/www/html/index
 		# add row "Welcome to container-based web server"
-		podman run -d=true -p:3333:8080 --name=webserver -v /var/www/html:/opt/rh/httpd24/root/var/www/html 
+		podman run -d=true -p 3333:8080/tcp --name=webserver -v /var/www/html:/opt/rh/httpd24/root/var/www/html registry.access.redhat.com/rhscl/httpd-24-rhel7
 		cd /etc/systemd/system
 		podman generate systemd webserver >> httpd-container.service
 		systemctl daemon-reload
@@ -3701,6 +3707,18 @@
 		reboot
 		systemctl status httpd-container.service
 		curl http://localhost:3333 # success
+
+		# this can also be done as a non-root user
+		podman pull registry.access.redhat.com/rhscl/httpd-24-rhel7
+		sudo vi /var/www/html/index.html
+		# add row "Welcome to container-based web server"
+		sudo setsebool -P container_manage_cgroup true
+		podman run -d=true -p 3333:8080/tcp --name=webserver -v /var/www/html:/opt/rh/httpd24/root/var/www/html registry.access.redhat.com/rhscl/httpd-24-rhel7
+		podman generate systemd webserver > /home/jr/.config/systemd/user/httpd-container.service
+		cd /home/jr/.config/systemd/user
+		sudo semanage fcontext -a -t systemd_unit_file_t httpd-container.service
+		sudo restorecon httpd-container.service
+		systemctl enable --user httpd-container.service --now
         ```
 
 	* Pull the *mariadb* image to your system and run it publishing the exposed port. Set the root password for the mariadb service as *mysql*. Verify if you can login as root from local host:
