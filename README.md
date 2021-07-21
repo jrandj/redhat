@@ -1,5 +1,8 @@
 # Redhat
 
+- [RHCSA](#RHCSA)
+- [RHCE](#RHCE)
+
 ## RHCSA
 
 - [Understand and use essential tools](#Understand-and-use-essential-tools)
@@ -4660,3 +4663,137 @@
 		#* 12 * * 1-5 echo "This practise exam was easy and I'm ready to ace my RHCSA" >> /var/log/messagees
 		# you can look at info crontab if you forget the syntax
         ```
+
+## RHCE
+
+- [Understand core components of Ansible](#Understand-core-components-of-Ansible)
+- [Install and configure an Ansible control node](#Install-and-configure-an-Ansible-control-node)
+- [Configure Ansible managed nodes](#Configure-Ansible-managed-nodes)
+- [Script administration tasks](#Script-administration-tasks)
+- [Create Ansible plays and playbooks](#Create-Ansible-plays-and-playbooks)
+- [Use Ansible modules for system administration tasks that work with](#Use-Ansible-modules-for-system-administration-tasks-that-work-with)
+- [Work with roles](#Work-with-roles)
+- [Use advanced Ansible features](#Use-advanced-Ansible-features)
+
+### Understand core components of Ansible
+
+1. Inventories
+
+	* Inventories are what Ansible uses to locate and run against multiple hosts. The default ansible 'hosts' file is `/etc/ansible/hosts`. The default location of the hosts file can be set in `/etc/ansible/ansible.cfg`.
+
+	* The file can contain individual hosts, groups of hosts, groups of groups, and host and group level variables. It can also contain variables that determine how you connect to a host.
+
+	* An example of an INI-based host inventory file is shown below:
+		```shell
+		mail.example.com
+		
+		[webservers]
+		web01.example.com
+		web02.example.com
+
+		[dbservers]
+		db[01:04].example.com
+        ```
+
+	* Note that square brackets can be used instead of writing a separate line for each host.
+
+	* An example of a YAML-based host inventory file is shown below:
+		```shell
+		all:
+			hosts:
+				mail.example.com
+			children:
+				webservers:
+					hosts:
+						web01.example.com
+						web02.example.com
+				dbservers:
+					hosts:
+						db[01:04].example.com
+        ```
+
+1. Modules
+
+1. Variables
+
+1. Facts
+
+1. Plays
+
+1. Playbooks
+
+1. Configuration Files
+
+1. Use provided documentation to look up specific information about Ansible modules and commands
+
+### Install and configure an Ansible control node
+
+1. Install required packages
+
+1. Create a static host inventory file
+
+1. Create a configuration file
+
+1. Create and use static inventories to define groups of hosts
+
+1. Manage parallelism
+
+### Configure Ansible managed nodes
+
+1. Create and distribute SSH keys to managed nodes
+
+1. Configure privilege escalation on managed nodes
+
+1. Validate a working configuration using ad hoc Ansible commands
+
+### Script administration tasks
+
+1. Create simple shell scripts
+
+1. Create simple shell scripts that run ad hoc Ansible commands
+
+### Create Ansible plays and playbooks
+
+1. Know how to work with commonly used Ansible modules
+
+1. Use variables to retrieve the results of running a command
+
+1. Use conditionals to control play execution
+
+1. Configure error handling
+
+1. Create playbooks to configure systems to a specified state
+
+### Use Ansible modules for system administration tasks that work with
+
+1. Software packages and repositories
+
+1. Services
+
+1. Firewall rules
+
+1. File systems
+
+1. Storage devices
+
+1. File content
+
+1. Archiving
+
+1. Scheduled tasks
+
+1. Security
+
+1. Users and groups
+
+### Work with roles
+
+1. Create roles
+
+1. Download roles from an Ansible Galaxy and use them
+
+### Use advanced Ansible features
+
+1. Create and use templates to create customized configuration files
+
+1. Use Ansible Vault in playbooks to protect sensitive data
