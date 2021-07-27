@@ -4679,44 +4679,70 @@
 
 1. Inventories
 
-	* Inventories are what Ansible uses to locate and run against multiple hosts. The default ansible 'hosts' file is `/etc/ansible/hosts`. The default location of the hosts file can be set in `/etc/ansible/ansible.cfg`.
+    * Inventories are what Ansible uses to locate and run against multiple hosts. The default ansible 'hosts' file is `/etc/ansible/hosts`. The default location of the hosts file can be set in `/etc/ansible/ansible.cfg`.
 
-	* The file can contain individual hosts, groups of hosts, groups of groups, and host and group level variables. It can also contain variables that determine how you connect to a host.
+    * The file can contain individual hosts, groups of hosts, groups of groups, and host and group level variables. It can also contain variables that determine how you connect to a host.
 
-	* An example of an INI-based host inventory file is shown below:
-		```shell
-		mail.example.com
-		
-		[webservers]
-		web01.example.com
-		web02.example.com
+    * An example of an INI-based host inventory file is shown below:
+        ```shell
+        mail.example.com
 
-		[dbservers]
-		db[01:04].example.com
+        [webservers]
+        web01.example.com
+        web02.example.com
+
+        [dbservers]
+        db[01:04].example.com
         ```
 
-	* Note that square brackets can be used instead of writing a separate line for each host.
+    * Note that square brackets can be used instead of writing a separate line for each host.
 
-	* An example of a YAML-based host inventory file is shown below:
-		```shell
-		all:
-			hosts:
-				mail.example.com
-			children:
-				webservers:
-					hosts:
-						web01.example.com
-						web02.example.com
-				dbservers:
-					hosts:
-						db[01:04].example.com
+    * An example of a YAML-based host inventory file is shown below:
+        ```shell
+        all:
+            hosts:
+                mail.example.com
+            children:
+                webservers:
+                    hosts:
+                        web01.example.com
+                        web02.example.com
+                dbservers:
+                    hosts:
+                        db[01:04].example.com
         ```
 
 1. Modules
 
+    * Modules are essentially tools for particular tasks. They usually take parameters and return JSON. Modules can be run from the command line or within a playbook. Ansible ships with a significant amount of modules by default, and custom modules can also be written.
+
 1. Variables
 
+    * Variable names should only contain letters, numbers, and underscores. A variable name should also start with a letter. There are three main scopes for variables: Global, Host and Play.
+
+    * Variables are typically used for configuration values and various parameters. They can store the return value of executed commands and may also be dictionaries. Ansible provides a number of predefined variables.
+
+    * An example of INI-based based variables:
+        ```shell
+        [webservers]
+        host1 http_port=80 maxRequestsPerChild=500
+        host2 http_port=305 maxRequestsPerChild=600
+        ```
+
+    * An example of YAML-based based variables:
+        ```shell
+        webservers
+            host1:
+                http_port: 80
+                maxRequestsPerChild: 500
+            host2:
+                http_port: 305
+                maxRequestsPerChild: 600
+        ```
+
 1. Facts
+
+    * Facts provide certain information about a given target host. They are automatically discovered by Ansible when it reaches out to a host. Facts can be disabled and can be cached for use in playbook executions.
 
 1. Plays
 
