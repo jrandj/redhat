@@ -4746,7 +4746,40 @@
 
 1. Plays
 
+	* The goal of a play is to map a group of hosts to some well-defined roles. A play can consist of one or more tasks which make calls to Ansible modules.
+
 1. Playbooks
+
+	* A playbook is a series of plays. An example of a playbook:
+        ```shell
+		---
+		- hosts: webservers
+		  become: yes
+		  tasks:
+		    - name: ensure apache is at the latest version
+		      yum:
+		        name: httpd
+		        state: latest
+		    - name: write our custom apache config file
+		      template:
+		        src: /srv/httpd.j2
+		        dest: /etc/httpd/conf/httpd.conf
+		    - name: ensure that apache is started
+		      service:
+		        name: httpd
+		        state: started
+		    - hosts: dbservers
+		      become: yes
+		      tasks:
+		      - name: ensure postgresql is at the latest version
+		        yum:
+		          name: postgresql
+		          state: latest
+		      - name: ensure that postgres is started
+		        service:
+		          name: postgresql
+		          state: started
+        ```
 
 1. Configuration Files
 
