@@ -4783,6 +4783,25 @@
 
 1. Configuration Files
 
+	* The Ansible configuration files are taken from the below locations in order:
+		* ANSIBLE_CONFIG (environment variable)
+		* ansible.cfg (in the current directory)
+		* `~/.ansible.cfg` (in the home directory)
+		* `/etc/ansible/ansible.cfg`
+
+	* A configuration file will not automatically load if it is in a world-writable directory.
+
+	* The ansible-config command can be used to view configurations:
+		* list - Prints all configuration options
+		* dump - Dumps configuration
+		* view - View the configuration file
+
+	* Commonly used settings:
+		* inventory - Specifies the default inventory file
+		* roles_path - Sets paths to search in for roles
+		* forks - Specifies the amount of hosts configured by Ansible at the same time (Parallelism)
+		* ansible_managed - Text inserted into templates which indicate that file is managed by Ansible and changes will be overwritten
+
 1. Use provided documentation to look up specific information about Ansible modules and commands
 
 ### Install and configure an Ansible control node
