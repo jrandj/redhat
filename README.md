@@ -4808,7 +4808,47 @@
 
 1. Install required packages
 
+	* To install Ansible using dnf:
+        ```shell
+		subscription-manager repos --list | grep ansible
+		# find latest version
+		sudo subscription-manager repos --enable ansible-2.8-for-rhel-8-x86_64-rpms
+		dnf search ansible
+		# confirm available
+		dnf install -y ansible
+        ```
+
+	* To install Ansible from disk:
+        ```shell
+		sudo dnf install git
+		mkdir ansible
+		mkdir git
+		cd git
+		git clone --single-branch --branch stable -2.8 https://github.com/ansible/ansible.git
+		cd ansible
+		source ./hacking/env-setup
+		# make permanent
+		vi ~/.bash_profile
+		# add line
+		source ~/git/ansible/hacking/env-setup
+		pip2.7 install --user -r ./requirements.txt
+		# test the installation
+		ansible 127.0.0.1 -m ping
+        ```
+
 1. Create a static host inventory file
+
+	* An inventory is a list of hosts that Ansible manages. Inventory files may contain hosts, patterns, groups and variables. Multiple inventory files may be specified using a directory. Inventory files may be specified in INI or YAML format.
+
+	* The default location is `/etc/ansible/hosts`. The location can be set in ansible.cfg or specified in the CLI using:
+	    ```shell
+		ansible -i <filename>
+		```
+
+	* Best practices for inventory variables:
+		* Variables should be stored in YAML files located relative to the inventory file.
+		* Host and group variables should be stored in the host_vars and group_vars directories respectively (the directories need to be created).
+		* Variable files should be named after the host or group for which they contain variables (files may end in .yml or .yaml).
 
 1. Create a configuration file
 
