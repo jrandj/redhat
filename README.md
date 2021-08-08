@@ -4852,6 +4852,26 @@
 
 1. Create a configuration file
 
+	* An example of creating a custom configuration file, and updating the default configuration file:
+		```shell
+		cd ansible
+		vi ansible.cfg
+
+		### contents of file
+		[defaults]
+
+		interpreter_python = auto
+		inventory = /home/cloud_user/ansible/inventory/inv.ini
+		roles_path = /etc/ansible/roles:/home/cloud_user/ansible/roles
+		###
+
+		mkdir roles
+		# add property to default ansible.cfg
+		sudo vi /etc/ansible/ansible.cfg
+		# add line
+		interpreter_python = auto
+		```
+
 1. Create and use static inventories to define groups of hosts
 
 1. Manage parallelism
@@ -4860,9 +4880,54 @@
 
 1. Create and distribute SSH keys to managed nodes
 
+	* A control node is any machine with Ansible installed. You can run Ansible commands and playbooks from any control node. A managed node (also sometimes called a "host") is a network device or server you manage with Ansible. Ansible is not installed on managed nodes.
+
+	* The following is an example of generating SSH keys on the control node and distributing them to managed nodes mypearson2c and mypearson3c:
+		```shell
+		ssh-keygen
+		# enter password
+		# now we have id.rsa and id_rsa.pub in /home/cloud_user/.ssh/
+		ssh-copy-id cloud_user@mspearson2c.mylabserver.com
+		# enter password
+		ssh-copy-id cloud_user@mspearson3c.mylabserver.com
+		# enter password
+		```
+
 1. Configure privilege escalation on managed nodes
 
+	* The following is an example of configuring privilege escalation on managed nodes mypearson2c and mypearson3c:
+		```shell
+		# perform these steps on both mypearson2c and mypearson3c
+		sudo visudo
+		# add line
+		cloud_user ALL=(ALL) NOPASSWD: ALL
+		```
+
 1. Validate a working configuration using ad hoc Ansible commands
+	
+	* An ad hoc command is used to execute one line commands. They are useful for non-routine tasks such as file transfers, package management, managing services, user and group management, fact gathering, general system information, software deployment from Git, and playbook creation testing.
+ 
+	* The syntax of an ad hoc command is shown below:
+		```shell
+		ansible host -i inventory_file -m module -a "arguments"
+		```
+
+	* Arguments require double quotes and are space delimited, and commands are executed as the user that is running them. The -b option can be used to execute the command as the root user. The -a option may be used without the -m command to run shell commands.
+
+	* Examples of ad hoc commands are shown below:
+		```shell
+		# an example for the ping module
+		ansible -i inventory/inv.ini all -m ping
+
+		# an example for the setup module against the mypearson2 host
+		ansible mypearson2 -i inventory/inv.ini all -m setup
+
+		# an example of a shell command against the mypearson2 host
+		ansible mspearson2 -a "ls -l /tmp"
+
+		# an example of a shell command against the labservers group
+		ansible labservers -a "ls -l /tmp"
+		```
 
 ### Script administration tasks
 
