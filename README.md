@@ -4933,7 +4933,54 @@
 
 1. Create simple shell scripts
 
+	* The first line of a shell script must include `#!/bin/bash`. Comments can be added by using the # symbol. Execute permissions are required on the script before it can be executed. The script can be executed using the absolute or relative path.
+
+	* A sample shell script is shown below:
+	```shell
+	#!/bin/bash
+	# hello world script
+	echo "Hello world!"
+	```
+
+	* A sample shell script using a for loop is shown below:
+	```shell
+	#!/bin/bash
+	# for loop
+	for i in {1..5}
+	do
+		echo "Hello $i times!"
+	done
+	```
+
 1. Create simple shell scripts that run ad hoc Ansible commands
+
+	* A script containing adhoc commands is shown below:
+		```shell
+		#!/bin/bash
+		
+		# Create the user matt
+		ansible mcpearson3c.mylabserver.com -i /home/cloud_user/ansible/inventory/inv.ini -b -m user -a "name=matt"
+
+		# Create the demo directory in matt's home directory
+		ansible mspearson3c.mylabserver.com -i /home/cloud_user/ansible/inventory/inv.ini -b -m file -a "path=/home/matt/demo state=directory owner=matt group=matt mode=0755"
+
+		# Copy testFile to matt's home directory
+		ansible mspearson3c.mylabserver.com -i /home/cloud_user/ansible/inventory/inv.ini -b -m copy -a "src=/home/cloud_user/ansible/testFile dest=/home/matt/testFile mode=0644 owner=matt group=matt"
+
+		# Install httpd to the webservers group and start and enable the httpd service
+		ansible webservers -i /home/cloud_user/ansible/inventory/inv.ini -b -m yum -a "name=httpd state=latest"
+		ansible webservers -i /home/cloud_user/ansible/inventory/inv.ini -b -m service -a "name=httpd state=started enabled=yes"
+		```
+
+	* Ad hoc commands can be a powerful tool for running commands across an inventory and getting the desired results. The following example can be run on a host to retrieve log files from multiple managed nodes:
+		```shell
+		#!/bin/bash
+
+		for i in webserver1 dbserver1 adminserver1;
+   		do ssh ansible@$i "sudo tar -czf messages.tar.gz /var/log/messages";
+		done
+		ansible -m fetch -a "src=/home/ansible/messages.tar.gz dest=/tmp/messages" all
+		```
 
 ### Create Ansible plays and playbooks
 
