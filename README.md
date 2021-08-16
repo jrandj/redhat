@@ -4986,7 +4986,60 @@
 
 1. Know how to work with commonly used Ansible modules
 
+	* Commonly used modules include:
+		* Ping
+			* Validates a server is running and reachable.
+			* No required parameters.
+		* Setup
+			* Gather Ansible facts.
+			* No required parameters.
+		* Yum
+			* Manage packages with the YUM package manager.
+			* Common parameters are name and state.
+		* Service
+			* Control services on remote hosts:
+			* Common parameters are name (required), state and enabled.
+		* User
+			* Manage user accounts and attributes.
+			* Common parameters are name (required), state, group and groups.
+		* Copy
+			* Copy files to a remote host.
+			* Common parameters are src, dest (required), owner, group and mode.
+		* File
+			* Manage files and directories.
+			* Common parameters are path (required), state, owner, group and mode.
+		* Git
+			* Interact with git repositories.
+			* Common parameters are repo (required), dest (required) and clone.
+
 1. Use variables to retrieve the results of running a command
+
+	* The register keyword is used to store the results of running a command as a variable. Variables can then be referenced by other tasks in the playbook. Registered variables are only valid on the host for the current playbook run. The return values differ from module to module.
+
+	* A sample playbook register.yml is shown below:
+		```shell
+		---
+		- hosts: mspearson2
+		  tasks:
+		    - name: create a file
+		      file:
+		        path: /tmp/testFile
+		        state: touch
+		      register: var
+		    - name: display debug msg
+		      debug: msg="Register output is {{ var }}"
+		    - name: edit file
+		      lineinfile:
+		        path: /tmp/testFile
+		        line: "The uid is {{ var.uid }} and gid is {{ var.gid }}"
+		```
+
+	* This playbook is run using:
+		```shell
+		ansible-playbook playbooks/register.yml
+		```
+
+	* The result stored in `/tmp/testFile` shows the variables for uid and gid.
 
 1. Use conditionals to control play execution
 
