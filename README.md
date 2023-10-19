@@ -4666,24 +4666,15 @@
 
 ## RHCE
 
+- [Be able to perform all tasks expected of a Red Hat Certified System Administrator](#Be-able-to-perform-all-tasks-expected-of-a-Red-Hat-Certified-System-Administrator)
 - [Understand core components of Ansible](#Understand-core-components-of-Ansible)
+- [Use roles and Ansible Content Collections](#Use-roles-and-Ansible-Content-Collections)
 - [Install and configure an Ansible control node](#Install-and-configure-an-Ansible-control-node)
 - [Configure Ansible managed nodes](#Configure-Ansible-managed-nodes)
-- [Script administration tasks](#Script-administration-tasks)
+- [Run playbooks with Automation content navigator](#Run-playbooks-with-Automation-content-navigator)
 - [Create Ansible plays and playbooks](#Create-Ansible-plays-and-playbooks)
-- [Use Ansible modules for system administration tasks that work with](#Use-Ansible-modules-for-system-administration-tasks-that-work-with)
-- [Work with roles](#Work-with-roles)
-- [Use advanced Ansible features](#Use-advanced-Ansible-features)
-
-Be able to perform all tasks expected of a Red Hat Certified System Administrator
-Understand core components of Ansible
-Use roles and Ansible Content Collections
-Install and configure an Ansible control node
-Configure Ansible managed nodes
-Run playbooks with Automation content navigator
-Create Ansible plays and playbooks
-Automate standard RHCSA tasks using Ansible modules that work with:
-Manage content
+- [Automate standard RHCSA tasks using Ansible modules that work with:](#Automate-standard-RHCSA tasks-using-Ansible-modules-that-work-with:)
+- [Manage-content](#Manage-content)
 
 ### Be able to perform all tasks expected of a Red Hat Certified System Administrator
 
