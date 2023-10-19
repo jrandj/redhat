@@ -4675,6 +4675,32 @@
 - [Work with roles](#Work-with-roles)
 - [Use advanced Ansible features](#Use-advanced-Ansible-features)
 
+Be able to perform all tasks expected of a Red Hat Certified System Administrator
+Understand core components of Ansible
+Use roles and Ansible Content Collections
+Install and configure an Ansible control node
+Configure Ansible managed nodes
+Run playbooks with Automation content navigator
+Create Ansible plays and playbooks
+Automate standard RHCSA tasks using Ansible modules that work with:
+Manage content
+
+### Be able to perform all tasks expected of a Red Hat Certified System Administrator
+
+1. Understand and use essential tools
+
+1. Operate running systems
+
+1. Configure local storage
+
+1. Create and configure file systems
+
+1. Deploy, configure, and maintain systems
+
+1. Manage users and groups
+
+1. Manage security
+
 ### Understand core components of Ansible
 
 1. Inventories
@@ -4744,9 +4770,15 @@
 
     * Facts provide certain information about a given target host. They are automatically discovered by Ansible when it reaches out to a host. Facts can be disabled and can be cached for use in playbook executions.
 
+1. Loops
+
+1. Conditional tasks
+
 1. Plays
 
 	* The goal of a play is to map a group of hosts to some well-defined roles. A play can consist of one or more tasks which make calls to Ansible modules.
+
+1. Handling task failure
 
 1. Playbooks
 
@@ -4802,7 +4834,19 @@
 		* forks - Specifies the amount of hosts configured by Ansible at the same time (Parallelism)
 		* ansible_managed - Text inserted into templates which indicate that file is managed by Ansible and changes will be overwritten
 
+1. Roles
+
 1. Use provided documentation to look up specific information about Ansible modules and commands
+
+### Use roles and Ansible Content Collections
+
+1. Create and work with roles
+
+1. Install roles and use them in playbooks
+
+1. Install Content Collections and use them in playbooks
+
+1. Obtain a set of related roles, supplementary modules, and other content from content collections, and use them in a playbook.
 
 ### Install and configure an Ansible control node
 
@@ -4874,8 +4918,6 @@
 
 1. Create and use static inventories to define groups of hosts
 
-1. Manage parallelism
-
 ### Configure Ansible managed nodes
 
 1. Create and distribute SSH keys to managed nodes
@@ -4902,6 +4944,113 @@
 		# add line
 		cloud_user ALL=(ALL) NOPASSWD: ALL
 		```
+
+1. Deploy files to managed nodes
+
+1. Be able to analyze simple shell scripts and convert them to playbooks
+
+### Run playbooks with Automation content navigator
+
+1. Know how to run playbooks with Automation content navigator
+
+1. Use Automation content navigator to find new modules in available Ansible Content Collections and use them
+
+1. Use Automation content navigator to create inventories and configure the Ansible environment
+
+### Create Ansible plays and playbooks
+
+1. Know how to work with commonly used Ansible modules
+
+	* Commonly used modules include:
+		* Ping
+			* Validates a server is running and reachable.
+			* No required parameters.
+		* Setup
+			* Gather Ansible facts.
+			* No required parameters.
+		* Yum
+			* Manage packages with the YUM package manager.
+			* Common parameters are name and state.
+		* Service
+			* Control services on remote hosts:
+			* Common parameters are name (required), state and enabled.
+		* User
+			* Manage user accounts and attributes.
+			* Common parameters are name (required), state, group and groups.
+		* Copy
+			* Copy files to a remote host.
+			* Common parameters are src, dest (required), owner, group and mode.
+		* File
+			* Manage files and directories.
+			* Common parameters are path (required), state, owner, group and mode.
+		* Git
+			* Interact with git repositories.
+			* Common parameters are repo (required), dest (required) and clone.
+
+1. Use variables to retrieve the results of running a command
+
+	* The register keyword is used to store the results of running a command as a variable. Variables can then be referenced by other tasks in the playbook. Registered variables are only valid on the host for the current playbook run. The return values differ from module to module.
+
+	* A sample playbook register.yml is shown below:
+		```shell
+		---
+		- hosts: mspearson2
+		  tasks:
+		    - name: create a file
+		      file:
+		        path: /tmp/testFile
+		        state: touch
+		      register: var
+		    - name: display debug msg
+		      debug: msg="Register output is {{ var }}"
+		    - name: edit file
+		      lineinfile:
+		        path: /tmp/testFile
+		        line: "The uid is {{ var.uid }} and gid is {{ var.gid }}"
+		```
+
+	* This playbook is run using:
+		```shell
+		ansible-playbook playbooks/register.yml
+		```
+
+	* The result stored in `/tmp/testFile` shows the variables for uid and gid.
+
+1. Use conditionals to control play execution
+
+1. Configure error handling
+
+1. Create playbooks to configure systems to a specified state
+
+### Automate standard RHCSA tasks using Ansible modules that work with:
+
+1. Software packages and repositories
+
+1. Services
+
+1. Firewall rules
+
+1. File systems
+
+1. Storage devices
+
+1. File content
+
+1. Archiving
+
+1. Task scheduling
+
+1. Security
+
+1. Users and groups
+
+### Manage content
+
+1. Create and use templates to create customized configuration files
+
+1. Use Ansible Vault in playbooks to protect sensitive data
+
+#### Archive
 
 1. Validate a working configuration using ad hoc Ansible commands
 	
@@ -4982,100 +5131,9 @@
 		ansible -m fetch -a "src=/home/ansible/messages.tar.gz dest=/tmp/messages" all
 		```
 
-### Create Ansible plays and playbooks
-
-1. Know how to work with commonly used Ansible modules
-
-	* Commonly used modules include:
-		* Ping
-			* Validates a server is running and reachable.
-			* No required parameters.
-		* Setup
-			* Gather Ansible facts.
-			* No required parameters.
-		* Yum
-			* Manage packages with the YUM package manager.
-			* Common parameters are name and state.
-		* Service
-			* Control services on remote hosts:
-			* Common parameters are name (required), state and enabled.
-		* User
-			* Manage user accounts and attributes.
-			* Common parameters are name (required), state, group and groups.
-		* Copy
-			* Copy files to a remote host.
-			* Common parameters are src, dest (required), owner, group and mode.
-		* File
-			* Manage files and directories.
-			* Common parameters are path (required), state, owner, group and mode.
-		* Git
-			* Interact with git repositories.
-			* Common parameters are repo (required), dest (required) and clone.
-
-1. Use variables to retrieve the results of running a command
-
-	* The register keyword is used to store the results of running a command as a variable. Variables can then be referenced by other tasks in the playbook. Registered variables are only valid on the host for the current playbook run. The return values differ from module to module.
-
-	* A sample playbook register.yml is shown below:
-		```shell
-		---
-		- hosts: mspearson2
-		  tasks:
-		    - name: create a file
-		      file:
-		        path: /tmp/testFile
-		        state: touch
-		      register: var
-		    - name: display debug msg
-		      debug: msg="Register output is {{ var }}"
-		    - name: edit file
-		      lineinfile:
-		        path: /tmp/testFile
-		        line: "The uid is {{ var.uid }} and gid is {{ var.gid }}"
-		```
-
-	* This playbook is run using:
-		```shell
-		ansible-playbook playbooks/register.yml
-		```
-
-	* The result stored in `/tmp/testFile` shows the variables for uid and gid.
-
-1. Use conditionals to control play execution
-
-1. Configure error handling
-
-1. Create playbooks to configure systems to a specified state
-
-### Use Ansible modules for system administration tasks that work with
-
-1. Software packages and repositories
-
-1. Services
-
-1. Firewall rules
-
-1. File systems
-
-1. Storage devices
-
-1. File content
-
-1. Archiving
-
-1. Scheduled tasks
-
-1. Security
-
-1. Users and groups
-
-### Work with roles
-
 1. Create roles
 
 1. Download roles from an Ansible Galaxy and use them
-
-### Use advanced Ansible features
 
 1. Create and use templates to create customized configuration files
 
