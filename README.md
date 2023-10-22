@@ -4673,7 +4673,7 @@
 - [Configure Ansible managed nodes](#Configure-Ansible-managed-nodes)
 - [Run playbooks with Automation content navigator](#Run-playbooks-with-Automation-content-navigator)
 - [Create Ansible plays and playbooks](#Create-Ansible-plays-and-playbooks)
-- [Automate standard RHCSA tasks using Ansible modules that work with:](#Automate-standard-RHCSA tasks-using-Ansible-modules-that-work-with:)
+- [Automate standard RHCSA tasks using Ansible modules that work with](#Automate-standard-RHCSA-tasks-using-Ansible-modules-that-work-with)
 - [Manage-content](#Manage-content)
 
 ### Be able to perform all tasks expected of a Red Hat Certified System Administrator
@@ -4696,7 +4696,7 @@
 
 1. Inventories
 
-    * Inventories are what Ansible uses to locate and run against multiple hosts. The default ansible 'hosts' file is `/etc/ansible/hosts`. The default location of the hosts file can be set in `/etc/ansible/ansible.cfg`.
+    * Inventories are what Ansible uses to locate and run against multiple hosts. The default ansible 'hosts' file is `/etc/ansible/hosts`. The default location of the hosts file can be set in `/etc/ansible/ansible.cfg`. The default location for roles is in `/etc/ansible/roles`.
 
     * The file can contain individual hosts, groups of hosts, groups of groups, and host and group level variables. It can also contain variables that determine how you connect to a host.
 
@@ -4732,6 +4732,20 @@
 1. Modules
 
     * Modules are essentially tools for particular tasks. They usually take parameters and return JSON. Modules can be run from the command line or within a playbook. Ansible ships with a significant amount of modules by default, and custom modules can also be written.
+
+	* Each specific task in Ansible is written through a Module. Multiple Modules are writtein in sequential order. Multiple Modules for related Tasks are called a Play. All Plays together make a Playbook.
+
+	* To run modules through a YAML file:
+        ```shell
+        ansible-playbook example.yml
+        ```
+
+	* The `--syntax-check` command can be used to check the syntax before running a playbook.
+
+	* To run a module independently:
+        ```shell
+        ansible myservers -m ping
+        ```
 
 1. Variables
 
@@ -4827,7 +4841,14 @@
 
 1. Roles
 
+	* Roles help to split playbooks into smaller groups. Roles let you automatically load related vars, files, tasks, handlers, and other Ansible artifacts based on a known file structure. After you group your content in roles, you can easily resuse them and share them with other users.
+
 1. Use provided documentation to look up specific information about Ansible modules and commands
+
+	* To check the documentation for the `yum` module:
+        ```shell
+		ansible-doc -t module yum
+        ```
 
 ### Use roles and Ansible Content Collections
 
@@ -4884,6 +4905,13 @@
 		* Variables should be stored in YAML files located relative to the inventory file.
 		* Host and group variables should be stored in the host_vars and group_vars directories respectively (the directories need to be created).
 		* Variable files should be named after the host or group for which they contain variables (files may end in .yml or .yaml).
+
+	* A host file can be static or dynamic. A dynamic host file can reflect updated IP addresses automatically but requires additional plugins.
+
+	* To view the hosts in the file:
+		```shell
+		ansible-inventory --list
+		```
 
 1. Create a configuration file
 
