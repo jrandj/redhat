@@ -5006,6 +5006,104 @@
 			* Interact with git repositories.
 			* Common parameters are repo (required), dest (required) and clone.
 
+	* A sample playbook to copy a file to a remote client:
+		```yaml
+		---
+		- name: Copy a file from local to remote
+		  hosts: all
+
+		  tasks:
+		  - name: Copying file
+		    copy:
+		      src: /apps/ansible/temp
+		      dest: /tmp
+		      owner: myname
+		      group: myname
+		      mode: 0644
+		```
+
+	* A sample playbook to change file permissions:
+		```shell
+		--
+		- name: Change file permissions
+		  hosts: all
+
+		  tasks:
+		    - name: File Permissions
+		      file:
+		        path: /etc/ansible/temp
+		        mode: '0777'
+		```
+
+	* A sample playbook to check a file or directory status:
+		```yaml
+		---
+		- name: File status module
+		  hosts: localhost
+
+		  tasks:
+		  - name: Check file status and attributes
+		    stat:
+		      path: /etc/hosts
+		    register: fs
+
+		  - name: Show results
+		    debug:
+		      msg: File attributes {{ fs }}
+		```
+
+	* A sample playbook to create a directory or file and remove
+		```yaml
+		---
+		- name: Create and Remove file
+		  hosts: all
+
+		  tasks:
+		  - name: Create a directory
+		    file:
+		      path: /tmp/seinfeld
+		      owner: myuser
+		      mode: 770
+		      state: directory
+
+		  - name: Create a file in that directory
+		    file:
+		      path: /tmp/seinfeld/jerry
+		      state: touch
+
+		  - name: Stat the new file jerry
+		    stat:
+		      path: /tmp/seinfeld/jerry
+		    register: jf
+
+		  - name: Show file status
+		    debug:
+		      msg: File status and attributes {{ jf }}
+
+		  - name: Remove file
+		    file:
+		      path: /tmp/seinfeld/jerry
+		      state: absent
+		```
+
+	* A sample playbook to create a file and add text:
+		```yaml
+		---
+		- name: Create a file and add text
+		  hosts: localhost
+
+		  tasks:
+		  - name: Create a new file
+		    file:
+		      path: /tmp/george
+		      state: touch
+
+		  - name: Add text to the file
+		    blockinfile:
+		      path: /tmp/george
+		      block: Sample text
+		```
+
 1. Use variables to retrieve the results of running a command
 
 	* The register keyword is used to store the results of running a command as a variable. Variables can then be referenced by other tasks in the playbook. Registered variables are only valid on the host for the current playbook run. The return values differ from module to module.
