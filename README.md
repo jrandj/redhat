@@ -5104,6 +5104,39 @@
 		      block: Sample text
 		```
 
+	* A sample playbook to setup httpd and open a firewall port:
+	    ```yaml
+		---
+		- name: Setup httpd and open firewall port
+		  hosts: all
+		  tasks:
+		    - name: Install apache packages
+		      yum:
+		        name: httpd
+		        state: present
+
+		    - name: Start httpd
+		      service:
+		        name: httpd
+		        state: started
+
+		    - name: Open port 80 for http access
+		      firewalld:
+		        service: httpd
+		        permanent: true
+		        state: enabled
+
+		    - name: Restart firewalld service to load firewall changes
+		      service:
+		        name: firewalld
+		        state: reloaded
+		```
+
+	* Note that managing firewalld requires the following collection:
+	    ```shell
+		ansible-galaxy collection install --ignore-certs ansible.posix
+		```
+
 1. Use variables to retrieve the results of running a command
 
 	* The register keyword is used to store the results of running a command as a variable. Variables can then be referenced by other tasks in the playbook. Registered variables are only valid on the host for the current playbook run. The return values differ from module to module.
@@ -5202,21 +5235,21 @@
 	* The first line of a shell script must include `#!/bin/bash`. Comments can be added by using the # symbol. Execute permissions are required on the script before it can be executed. The script can be executed using the absolute or relative path.
 
 	* A sample shell script is shown below:
-	```shell
-	#!/bin/bash
-	# hello world script
-	echo "Hello world!"
-	```
+		```shell
+		#!/bin/bash
+		# hello world script
+		echo "Hello world!"
+		```
 
 	* A sample shell script using a for loop is shown below:
-	```shell
-	#!/bin/bash
-	# for loop
-	for i in {1..5}
-	do
-		echo "Hello $i times!"
-	done
-	```
+		```shell
+		#!/bin/bash
+		# for loop
+		for i in {1..5}
+		do
+			echo "Hello $i times!"
+		done
+		```
 
 1. Create simple shell scripts that run ad hoc Ansible commands
 
@@ -5246,6 +5279,28 @@
    		do ssh ansible@$i "sudo tar -czf messages.tar.gz /var/log/messages";
 		done
 		ansible -m fetch -a "src=/home/ansible/messages.tar.gz dest=/tmp/messages" all
+		```
+
+	* To mount an ISO and use it as a repo:
+		```shell
+		mount -t iso9660 -o loop rhel-9.2-x86_64-dvd.iso /mnt/disc
+		# to make it permanent edit /etc/fstab
+		# /mnt/disc/rhel-9.2-x86_64-dvd.iso /mnt/disc iso9660 loop,ro,nofail 0 0
+		mount -a
+		# add the following entries to /etc/yum.repos.d/redhat.repo
+		#
+		# [BaseOS]
+		# name=BaseOS
+		# baseurl=file:///mnt/disc/BaseOS/
+		# enabled=1
+		# gpgcheck=0
+		#
+		# [AppStream]
+		# name=AppStream
+		# baseurl=file:///mnt/disc/AppStream/
+		# enabled=1
+		# gpgcheck=0
+		dnf repolist # confirm repos
 		```
 
 1. Create roles
