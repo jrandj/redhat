@@ -5122,7 +5122,7 @@
 
 		    - name: Open port 80 for http access
 		      firewalld:
-		        service: httpd
+		        service: http
 		        permanent: true
 		        state: enabled
 
@@ -5135,6 +5135,90 @@
 	* Note that managing firewalld requires the following collection:
 	    ```shell
 		ansible-galaxy collection install --ignore-certs ansible.posix
+		```
+
+	* A sample playbook to run a shell script:
+	    ```yaml
+		---
+		- name: Playbook for shell script
+		  hosts: all
+		  tasks:
+		    - name: Run shell script
+		      shell: "/home/username/cfile.sh"
+		```
+
+	* A sample playbook to setup a cronjob:
+	    ```yaml
+		---
+		- name: Create a cron job
+		  hosts: all
+
+		  tasks:
+		    - name: Schedule cron
+		      cron:
+		        name: This job is scheduled by Ansible
+		        minute: "0"
+		        hour: "10"
+		        day: "*"
+		        month: "*"
+		        weekday: "4"
+		        user: root
+		        job: "/home/username/cfile.sh"
+		```
+
+	* A sample playbook to download a file:
+	    ```yaml
+		---
+		- name: Download Tomcat from tomcat.apache.org
+		  hosts: all
+		  tasks:
+		    - name: Create a directory /opt/tomcat
+		      file:
+		        path: /opt/tomcat
+		        state: directory
+		        mode: 0755
+		        owner: root
+		        group: root
+		    - name: Download Tomcat using get_url
+		      get_url:
+		        url: https://dlcdn.apache.org/tomcat/tomcat-8/v8.5.95/bin/apache-tomcat-8.5.95.tar.gz
+		        dest: /opt/tomcat
+		        mode: 0755
+		```
+
+	* A sample playbook to download a file:
+	    ```yaml
+		---
+		- name: Create and mount new storage
+		  hosts: all
+
+		  tasks:
+		    - name: Create new partition
+		      parted:
+		        name: files
+		        label: gpt
+		        device: /dev/sdb
+		        number: 1
+		        state: present
+		        part_start: 1MiB
+		        part_end: 1GiB
+
+		    - name: Create xfs filesystem
+		      filesystem:
+		        dev: /dev/sdb1
+		        fstype: xfs
+
+		    - name: Create mount directory
+		      file:
+		        path: /data
+		        state: directory
+
+		    - name: Mount the filesystem
+		      mount:
+		        src: /dev/sdb1
+		        path: /data
+		        fstype: xfs
+		        state: mounted
 		```
 
 1. Use variables to retrieve the results of running a command
@@ -5285,7 +5369,7 @@
 		```shell
 		mount -t iso9660 -o loop rhel-9.2-x86_64-dvd.iso /mnt/disc
 		# to make it permanent edit /etc/fstab
-		# /mnt/disc/rhel-9.2-x86_64-dvd.iso /mnt/disc iso9660 loop,ro,nofail 0 0
+		# /mnt/disc/rhel-9.2-x86_64-dvd.iso /mnt/iso iso9660 loop,ro,nofail 0 0
 		mount -a
 		# add the following entries to /etc/yum.repos.d/redhat.repo
 		#
