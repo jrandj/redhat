@@ -4775,7 +4775,79 @@
 
     * Facts provide certain information about a given target host. They are automatically discovered by Ansible when it reaches out to a host. Facts can be disabled and can be cached for use in playbook executions.
 
+	* To gather a list of facts for a host:
+        ```shell
+        ansible localhost -m setup
+        ```
+
 1. Loops
+
+	* Loops work hand in hand with conditions as we can loop certain tasks until a condition is met. Ansible provides the `loop` and `with_*` directives for creating loops.
+
+	* An example is shown below:
+        ```yaml
+		---
+		- name: Create users with loop
+		  hosts: localhost
+
+		  tasks:
+		    - name: Create users
+		      user:
+		        name: "{{ item }}"
+		      loop:
+		        - jerry
+		        - kramer
+		        - elaine
+        ```
+
+	* An alternate example is shown below:
+        ```yaml
+		---
+		- name: Create users through loop
+		  hosts: localhost
+
+		  vars:
+		    users: [jerry,kramer,elaine]
+
+		  tasks:
+		    - name: Create users
+		      user:
+		        name: "{{ item }}"
+		      with_items: "{{ users }}"
+        ```
+
+	* An example for installing packages using a loop is shown below:
+        ```yaml
+		---
+		- name: Install packages using a loop
+		  hosts: localhost
+
+		  vars:
+		    packages: [ftp, telnet, htop]
+
+		  tasks:
+		    - name: Install package
+		      yum:
+		        name: "{{ item }}"
+		        state: present
+		      with_items: "{{ packages }}"
+        ```
+
+	* An alternate example for installing packages which is possible because yum provides the loop implementation natively:
+        ```yaml
+		---
+		- name: Install packages through loop
+		  hosts: localhost
+
+		  vars:
+		    packages: [ftp, telnet, htop]
+
+		  tasks:
+		    - name: Install packages
+		      yum:
+		        name: "{{ packages }}"
+		        state: present
+        ```
 
 1. Conditional tasks
 
@@ -5221,6 +5293,88 @@
 		        state: mounted
 		```
 
+	* A sample playbook to create a user:
+	    ```yaml
+		---
+		- name: Playbook for creating users
+		  hosts: all
+
+		  tasks:
+		    - name: Create users
+		      user:
+		        name: george
+		        home: /home/george
+		        shell: /bin/bash
+		```
+
+	* A sample playbook to update the password for a user:
+	    ```yaml
+		---
+		- name: Add or update user password
+		  hosts: all
+
+		  tasks:
+		    - name: Change "george" password
+		      user:
+		        name: george
+		        update_password: always
+		        password: "{{ newpassword|password_hash('sha512') }}"
+		```
+
+	* To run the playbook and provide a password:
+	    ```shell
+		ansible-playbook changepass.yml --extra-vars newpassword=abc123
+		```
+
+	* A sample playbook to kill a process:
+	    ```yaml
+		---
+		- name: Find a process and kill it
+		  hosts: 192.168.1.105
+
+		  tasks:
+		    - name: Get running process from remote host
+		      ignore_errors: yes
+		      shell: "ps -few | grep top | awk '{print $2}'"
+		      register: running_process
+
+		    - name: Show process
+		      debug:
+		        msg: Processes are {{ running_process }}
+
+		    - name: Kill running processes
+		      ignore_errors: yes
+		      shell: "kill {{ item }}"
+		      with_items: "{{ running_process.stdout_lines }}"
+		```
+
+	* A sample playbook to kill a process:
+	    ```yaml
+		---
+		- name: Find a process and kill it
+		  hosts: 192.168.1.105
+
+		  tasks:
+		    - name: Get running process from remote host
+		      ignore_errors: yes
+		      shell: "ps -few | grep top | awk '{print $2}'"
+		      register: running_process
+
+		    - name: Show process
+		      debug:
+		        msg: Processes are {{ running_process }}
+
+		    - name: Kill running processes
+		      ignore_errors: yes
+		      shell: "kill {{ item }}"
+		      with_items: "{{ running_process.stdout_lines }}"
+		```
+
+	* To run a playbook from a particular task:
+	    ```shell
+		ansible-playbook yamlfile.yml --start-at-task 'Task name'
+		```
+
 1. Use variables to retrieve the results of running a command
 
 	* The register keyword is used to store the results of running a command as a variable. Variables can then be referenced by other tasks in the playbook. Registered variables are only valid on the host for the current playbook run. The return values differ from module to module.
@@ -5251,6 +5405,58 @@
 	* The result stored in `/tmp/testFile` shows the variables for uid and gid.
 
 1. Use conditionals to control play execution
+
+	* Handlers are executed at the end of the play once all tasks are finished. They are typically used to start, reload, restart, or stop services.  Sometimes you only want to run a task when a change is made on a machine. For example, restarting a service only if a task updates the configuration of that service.
+
+	* A sample handler is shown below:
+		```yaml
+		---
+		- name: Verify Apache installation
+		  hosts: localhost
+
+		  tasks:
+		    - name: Ensure Apache is at the latest version
+		      yum:
+		        name: httpd
+		        state: latest
+
+		    - name: Copy updated Apache config file
+		      copy:
+		        src: /tmp/httpd.conf
+		        dest: /etc/httpd.conf
+		      notify:
+		        - Restart Apache
+
+		    - name: Ensure Apache is running
+		      service:
+		        name: httpd
+		        state: started
+
+		  handlers:
+		    - name: Restart Apache
+		      service:
+		        name: httpd
+		        state: restarted
+		```
+
+	* The when statement can be used to conditionally execute tasks. An example is shown below:
+		```yaml
+		---
+		- name: Install Apache WebServer
+		  hosts: localhost
+		  tasks:
+		    - name: Install Apache on an Ubuntu Server
+		      apt-get:
+		        name: apache2
+		        state: present
+		      when: ansible_os_family == "Ubuntu"
+
+		    - name: Install Apache on CentOS Server
+		      yum:
+		        name: httpd
+		        state: present
+		      when: ansible_os_family == "Redhat"
+		```
 
 1. Configure error handling
 
@@ -5310,6 +5516,51 @@
 
 		# an example of a shell command against the labservers group
 		ansible labservers -a "ls -l /tmp"
+
+		# ping localhost
+		ansible localhost -m ping
+
+		# create a file on all remote clients
+		ansible all -m file -a "path=/home/username/adhoc1 state=touch mode=700"
+
+		# delete a file on all remote clients
+		ansible all -m file -a "path=/home/username/adhoc1 state=absent"
+
+		# delete a file to all remote clients
+		ansible all -m copy -a "src=/tmp/adhoc2 dest=/home/username/adhoc2"
+
+		# installing a package
+		ansible all -m yum -a "name=telnet state=present"
+		ansible all -m yum -a "name=httpd-manual state=present"
+
+		# start a service
+		ansible all -m service -a "name=httpd state=started"
+
+		# start a service and enable at boot time
+		ansible all -m service -a "name=httpd state=started enabled=yes"
+
+		# check service status on remote client
+		ansible all -m shell -a "systemctl status httpd"
+
+		# remove package
+		ansible all -m yum -a "name=httpd state=absent"
+		# or
+		ansible all -m shell -a "yum remove httpd"
+
+		# create a user on remote clients
+		ansible all -m user -a "name=jsmith home=/home/jsmith shell=/bin/bash state=present"
+
+		# add a user to a different group
+		ansible all -m user -a "name=jsmith group=group"
+
+		# deleting a user on remote clients
+		ansible all -m user -a "name=jsmith home=/home/jsmith shell=/bin/bash state=absent"
+
+		# gather system information from remote clients
+		ansible all -m setup
+
+		# run a command on a remote host without a shell module
+		ansible client1 -a "/sbin/reboot"
 		```
 
 ### Script administration tasks
