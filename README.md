@@ -254,7 +254,7 @@
         ln -s file1 softlink
         ``` 
 
-    * A hard link associates multiple files to the same inode making them indistinguishable. If the original file is removed, you will still have access to the data through the linked file. To create a soft link to file1:
+    * A hard link associates multiple files to the same inode making them indistinguishable. If the original file is removed, you will still have access to the data through the linked file. To create a hard link to file1:
         ```shell
         ln file1 hardlink
         ``` 
@@ -316,87 +316,72 @@
 
 1. Conditionally execute code (use of: if, test, [], etc.)
 
-	* An example using if and test statements is shown with *example.sh* below:
+	* An example using if and test statements is shown below:
 	    ```shell
-		# contents of example.sh
-        #####
-        ##!/bin/bash
-		#ping -c 1 $1
-		#if test "$?" -eq "0"; then
-		#	echo "$1 IP is reachable"
-		#else
-		#	echo "$1 IP is not reachable"
-		#fi
-		#exit
-        #####
+		#!/bin/bash
+		ping -c 1 $1
+		if test "$?" -eq "0"; then
+		    echo "$1 IP is reachable"
+		else
+		    echo "$1 IP is not reachable"
+		fi
+		exit
         ```
 
 	* Input arguments can be passed in after the script name, with e.g. 1 being the first input argument. The *$?* term expands the exit status of the most recently executed command. When using *echo* the *-e* argument can be used to print characters such as new lines.
 
-	* An example using a case statement is shown with *example.sh* below:
+	* An example using a case statement is shown below:
 	    ```shell
-		# contents of example.sh
-        #####
-        ##!/bin/bash
-		#now=$(date + "%a")
-		#case $now in
-		#	Mon)
-		#		echo "Full Backup";
-		#		;;
-		#	Tue|Wed|Thu|Fri)
-		#		echo "Partial Backup";
-		#		;;
-		#	Sat|Sun)
-		#		echo "No Backup";
-		#		;;
-		#	*)	;;
-		#esac
-		#exit
-        #####
+		#!/bin/bash
+		now=$(date + "%a")
+		case $now in
+		    Mon)
+		        echo "Full Backup";
+		    ;;
+		    Tue|Wed|Thu|Fri)
+		        echo "Partial Backup";
+		    ;;
+		    Sat|Sun)
+		        echo "No Backup";
+		    ;;
+		    *)	;;
+		esac
+		exit
         ```
 
-	* An example using [] is shown with *example.sh* below:
+	* An example using [] is shown below:
 	    ```shell
-		# contents of example.sh
-        #####
-        ##!/bin/bash
-		#ping -c 1 $1
-		#if ["$?" -eq "0"]; then
-		#	echo "$1 IP is reachable"
-		#else
-		#	echo "$1 IP is not reachable"
-		#fi
-		#exit
-        #####
+		#!/bin/bash
+		ping -c 1 $1
+		if ["$?" -eq "0"]; then
+		    echo "$1 IP is reachable"
+		else
+		    echo "$1 IP is not reachable"
+		fi
+		exit
         ```
 
 1. Use Looping constructs (for, etc.) to process file, command line input
 
-	* An example of a for loop is shown with *example.sh* below:
+	* An example of a for loop is shown below:
 	    ```shell
-		# contents of example.sh
-        #####
-        ##!/bin/bash
-		#for file in ./*.log
-		#do
-		#	mv "${file}" "${file}".txt
-		#done
-		#exit
-        #####
+		#!/bin/bash
+		for file in ./*.log
+		do
+		    mv "${file}" "${file}".txt
+		done
+		exit
         ```
 
-	* An example of a while loop is shown with *example.sh* below:
+	* An example of a while loop is shown below:
 	    ```shell
-		# contents of example.sh
-        #####
-        ##!/bin/bash
-		#input = "/home/kafka.log"
-		#while IFS = read -r line
-		#do
-		#	echo "$line"
-		#done < "$input"
-		#exit
-        #####
+		#!/bin/bash
+		input = "/home/kafka.log"
+		while IFS = read -r line
+		do
+		    echo "$line"
+		done < "$input"
+		exit
         ```
 
 1. Process script inputs ($1, $2, etc.)
@@ -405,14 +390,11 @@
 
 1. Processing output of shell commands within a script
 
-	* An example is shown with *example.sh* below:
+	* An example is shown below:
 	    ```shell
-		# contents of example.sh
-        #####
-        ##!/bin/bash
-		#echo "Hello World!" >> example-`date +%Y%m%d-%H%M`.log
-		#exit
-        #####
+		#!/bin/bash
+		echo "Hello World!" >> example-`date +%Y%m%d-%H%M`.log
+		exit
         ```
 
 1. Processing shell command exit codes
@@ -4925,6 +4907,8 @@
 ### Use roles and Ansible Content Collections
 
 1. Create and work with roles
+
+	* Roles simplify long playbooks by grouping tasks into smaller playbooks.
 
 1. Install roles and use them in playbooks
 
