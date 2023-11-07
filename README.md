@@ -1,9 +1,9 @@
 # Redhat
 
-- [RHCSA](#RHCSA)
-- [RHCE](#RHCE)
+- [RHCSA 8](#RHCSA-8)
+- [RHCE 9](#RHCE-9)
 
-## RHCSA
+## RHCSA (RHEL 8)
 
 - [Understand and use essential tools](#Understand-and-use-essential-tools)
 - [Create simple shell scripts](#Create-simple-shell-scripts)
@@ -4646,7 +4646,7 @@
 		# you can look at info crontab if you forget the syntax
         ```
 
-## RHCE
+## RHCE (RHEL 9)
 
 - [Be able to perform all tasks expected of a Red Hat Certified System Administrator](#Be-able-to-perform-all-tasks-expected-of-a-Red-Hat-Certified-System-Administrator)
 - [Understand core components of Ansible](#Understand-core-components-of-Ansible)
@@ -4657,6 +4657,7 @@
 - [Create Ansible plays and playbooks](#Create-Ansible-plays-and-playbooks)
 - [Automate standard RHCSA tasks using Ansible modules that work with](#Automate-standard-RHCSA-tasks-using-Ansible-modules-that-work-with)
 - [Manage-content](#Manage-content)
+- [Exercises](#Exercises)
 
 ### Be able to perform all tasks expected of a Red Hat Certified System Administrator
 
@@ -4736,14 +4737,14 @@
     * Variables are typically used for configuration values and various parameters. They can store the return value of executed commands and may also be dictionaries. Ansible provides a number of predefined variables.
 
     * An example of INI-based based variables:
-        ```shell
+        ```yaml
         [webservers]
         host1 http_port=80 maxRequestsPerChild=500
         host2 http_port=305 maxRequestsPerChild=600
         ```
 
     * An example of YAML-based based variables:
-        ```shell
+        ```yaml
         webservers
             host1:
                 http_port: 80
@@ -4751,6 +4752,20 @@
             host2:
                 http_port: 305
                 maxRequestsPerChild: 600
+        ```
+
+	* An example of variables used within a playbook is shown below:
+        ```yaml
+		---
+		- name: Create a file with vars
+		  hosts: localhost
+		  vars:
+		    fileName: createdusingvars
+		  tasks:
+		    - name: Create a file
+		      file:
+		        state: touch
+		        path: /tmp/{{ fileName }}.txt
         ```
 
 1. Facts
@@ -4896,6 +4911,102 @@
 1. Roles
 
 	* Roles help to split playbooks into smaller groups. Roles let you automatically load related vars, files, tasks, handlers, and other Ansible artifacts based on a known file structure. After you group your content in roles, you can easily resuse them and share them with other users.
+
+	* Consider the playbook below:
+        ```yaml
+		---
+		- name: Setup httpd webserver
+		  hosts: east-webservers
+
+		  tasks:
+		    - name: Install httpd packages
+		      yum:
+		        name: httpd
+		        state: present
+
+		    - name: Start httpd
+		      service:
+		        name: httpd
+		        state: started
+
+		    - name: Open port http on firewall
+		      firewalld:
+		        service: http
+		        permanent: true
+		        state: enabled
+
+		    - name: Restart firewalld
+		      service:
+		        name: firewalld
+		        state: restarted
+
+		  hosts: west-webservers
+		  tasks:
+		    - name: Install httpd packages
+		      yum:
+		        name: httpd
+		        state: present
+
+		    - name: Start httpd
+		      service:
+		        name: httpd
+		        state: started
+        ```
+
+	* This playbook can be simplified with the addition of two roles. The first role is created in `/etc/ansible/roles/fullinstall/tasks/main.yml`:
+        ```yaml
+		---
+		- name: Install httpd packages
+		  yum:
+		    name: httpd
+		    state: present
+
+		- name: Start httpd
+		  service:
+		    name: httpd
+		    state: started
+
+		- name: Open port http on firewall
+		  firewalld:
+		    service: http
+		    permanent: true
+		    state: enabled
+
+		- name: Restart firewalld
+		  service:
+		    name: firewalld
+		    state: restarted
+        ```
+
+	* The second role is created in `/etc/ansible/roles/basicinstall/tasks/main.yml`:
+        ```yaml
+		---
+		- name: Install httpd packages
+		  yum:
+		    name: httpd
+		    state: present
+
+		- name: Start httpd
+		  service:
+		    name: httpd
+		    state: started
+        ```
+
+	* The simplified playbook is shown below:
+        ```yaml
+		---
+		- name: Full install
+		  hosts: all
+		  roles:
+		    - fullinstall
+
+		- name: Basic install
+		  hosts: all
+		  roles:
+		    - basicinstall
+        ```
+
+	* Many roles are available in the Ansible Galaxy. To install a role run `ansible-galaxy install $role`. These roles will be installed into the users home directory in the users home directory in `.ansible/roles`. The role can then be copied into the standard Ansible location.
 
 1. Use provided documentation to look up specific information about Ansible modules and commands
 
@@ -5442,6 +5553,29 @@
 		      when: ansible_os_family == "Redhat"
 		```
 
+	* Tags are references or aliases to a task. Instead of runing an entire playbook, use tags to target a specific task you need to run. Consider the playbook `httpbytags.yml` shown below:
+		```yaml
+		---
+		- name: Setup Apache server
+		  hosts: localhost
+		  tasks:
+		    - name: Install httpd
+		      yum:
+		        name: httpd
+		        state: present
+		      tags: i-httpd
+		    - name: Start httpd
+		      service:
+		        name: httpd
+		        state: started
+		      tags: s-httpd
+		```
+
+	* To list tags in a playbook run `ansible-playbook httpbytags.yml --list-tags`.
+
+	* To target tasks using tags run `ansible-playbook httpbytags.yml -t i-httpd`. To skip tasks using tags run `ansible-playbook httpbytags.yml --skip-tags i-httpd`
+
+
 1. Configure error handling
 
 1. Create playbooks to configure systems to a specified state
@@ -5473,6 +5607,14 @@
 1. Create and use templates to create customized configuration files
 
 1. Use Ansible Vault in playbooks to protect sensitive data
+
+	* An encrypted playbook can be created using `ansible-playbook $playbook_name --ask-vault-pass`. The YAML file can then be executed by `ansible-playbook $playbook_name --ask-vault-pass`.
+
+	* A non-encrypted playbook can be encrypted using `ansible-vault encrypt $playbook_name`.
+
+	* An encrypted playbook can be viewed using `ansible-vault view $playbook_name` and edited with `ansible-vault edit httpvault.yml`. You will be prompted for passwords where they are not provided in the command.
+
+	* Instead of encrypting the entire playbook, strings within the playbook can be encrypted. This is done using `ansible-vault encrypt_string $string`. The encrypted value can be substituted for the variable value inside of the playbook. The `--ask-vault-pass` option must be provided when running the playbook regardless of whether individual strings are encrypted or the entire playbook.
 
 #### Archive
 
