@@ -5616,6 +5616,42 @@
 
 	* Instead of encrypting the entire playbook, strings within the playbook can be encrypted. This is done using `ansible-vault encrypt_string $string`. The encrypted value can be substituted for the variable value inside of the playbook. The `--ask-vault-pass` option must be provided when running the playbook regardless of whether individual strings are encrypted or the entire playbook.
 
+### Exercises
+
+#### Practise Exam 1
+
+1. Setup
+
+	* VBOX additions not working..
+
+	* Mount and install kernals?
+
+
+
+
+mkdir /mnt/rheliso
+mount -o loop -t iso9660 rhel-9.2-x86_64-dvd.iso /mnt/rheliso
+blkid shows devices
+vi /etc/fstab
+
+	* dnf install kernel-headers kernel-devel
+
+	* Install guest additions
+
+update the yum.repos.d/
+
+[BaseOS]
+name=BaseOS
+enabled=1
+baseurl=file:///mnt/rheliso/BaseOS
+gpgcheck=0
+
+[AppStream]
+name=AppStream
+enabled=1
+baseurl=file:///mnt/rheliso/AppStream
+gpgcheck=0
+
 #### Archive
 
 1. Validate a working configuration using ad hoc Ansible commands
