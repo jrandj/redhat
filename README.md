@@ -5622,35 +5622,104 @@
 
 1. Setup
 
-	* VBOX additions not working..
+	* Create a VirtualBox machine for the control node. In VirtualBox create a new machine with the VirtualBox additions and the RHEL 9.2 installer ISOs attached as IDE devices. Set networking mode to Bridged Adapter. Set the Pointing Device to USB Tablet and enable the USB 3.0 Controller. Set shared Clipbloard and Drag'n'Drop to Bidirectional. Uncheck Audio output. Start the machine Install RHEL.
 
-	* Mount and install kernals?
+	* On the control node run the following setup as root:
+		```shell
+		blkid # note the UUID of the RHEL ISO
+		mkdir /mnt/rheliso
+		vi /etc/fstab
+		# add the below line
+		# UUID="2023-04-13-16-58-02-00" /mnt/rheliso iso9660 loop 0 0
+		mount -a # confirm no error is returned
+		```
 
+	* On the control node setup the dnf repositories as root:
+		```shell
+		vi /etc/yum.repos.d/redhat.repo # add the below content
+		# [BaseOS]
+		# name=BaseOS
+		# baseUrl=file:///mnt/rheliso/BaseOS
+		# enabled=1
+		# gpgcheck=0
+		#
+		# [AppStream]
+		# name=AppStream
+		# enabled=1
+		# baseurl=file:///mnt/rheliso/AppStream
+		# gpgcheck=0
+		dnf repolist # confirm repos are returned
+		```
 
+	* On the control node run the following setup as root to install guest additions:
+		```shell
+		dnf install kernel-headers kernel-devel
+		# run the guest additions installer
+		```
 
+	* On the control node run the following setup:
+		```shell
+		useradd ansible
+		echo password | passwd --stdin ansible
+		echo "ansible ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ansible
+		dnf install ansible-core -y
+		ssh-keygen # select all defaults
+		```
+	* Clone the control node machine five times for managed nodes 1-5. Atttach a 2GB SATA drive to nodes 1-3, and a 1GB SATA drive to node 4. Note that cloning means the above steps are also done on each managed node, but if the servers existed already we would have had to do this manually.
 
-mkdir /mnt/rheliso
-mount -o loop -t iso9660 rhel-9.2-x86_64-dvd.iso /mnt/rheliso
-blkid shows devices
-vi /etc/fstab
+	* On each managed node get the ip address using `ifconfig`. On the control node, switch to the toot user and add hostnames for the managed nodes:
+		```shell
+		vi /etc/hosts
+		# add the following lines
+		# 192.168.1.116 node1.example.com
+		# 192.168.1.117 node2.example.com
+		# 192.168.1.109 node3.example.com
+		# 192.168.1.118 node4.example.com
+		# 192.168.1.111 node5.example.com
+		```
 
-	* dnf install kernel-headers kernel-devel
+	* On the control node create run the following setup:
+		```shell
+		useradd ansible
+		echo password | passwd --stdin ansible # password is "password"
+		echo "ansible ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ansible
+		dnf install ansible-core -y
+		ssh-keygen # select all defaults
+		```
 
-	* Install guest additions
+1. Task 1
 
-update the yum.repos.d/
+	* Run the following commands:
+ 		```shell
+		vi /etc/ansible/ansible/hosts # add the below
+		# [dev]
+		# node1.example.com
+		# 
+		# [test]
+		# node2.example.com
+		# 
+		# [proxy]
+		# node3.example.com
+		# 
+		# [prod]
+		# node4.example.com
+		# node5.example.com
+		# 
+		# [webservers:children]
+		# prod
 
-[BaseOS]
-name=BaseOS
-enabled=1
-baseurl=file:///mnt/rheliso/BaseOS
-gpgcheck=0
+		vi /etc/ansible/ansible/ansible.cfg
+		# roles_path=/home/ansible/ansible/roles
+		# inventory=/home/ansible/ansible/inventory
+		# remote_user=ansible
+		# host_key_checking=false
 
-[AppStream]
-name=AppStream
-enabled=1
-baseurl=file:///mnt/rheliso/AppStream
-gpgcheck=0
+		# [privilege_escalation]
+		# become=true
+		# become_user=root
+		# become_method=sudo
+		# become_ask_pass=false
+		```
 
 #### Archive
 
