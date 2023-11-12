@@ -5709,6 +5709,7 @@
 		# prod
 
 		vi /etc/ansible/ansible/ansible.cfg
+		# [defaults]
 		# roles_path=/home/ansible/ansible/roles
 		# inventory=/home/ansible/ansible/hosts
 		# remote_user=ansible
@@ -5762,6 +5763,147 @@
 		        state: latest
 		      when: "'dev' in group_names"
 		```
+
+1. Task 4
+
+	* Create the following file `main.yml` at `/home/ansible/ansible/roles/sample-apache/tasks`:
+		```yaml
+		- name: Start and enable httpd
+		  service:
+		    name: httpd
+		    state: started
+		    enabled: yes
+
+		- name: Start and enable firewalld
+		  service:
+		    name: firewalld
+		    state: started
+		    enabled: yes
+
+		- name: Allow http service
+		  firewalld:
+		    service: http
+		    state: enabled
+		    permanent: true
+		    immediate: true
+
+		- name: Create and serve message
+		  template:
+		    src: /home/ansible/ansible/roles/sample-apache/templates/index.html.j2
+		    dest: /var/www/html/index.html
+		  notify:
+		    - restart
+		```
+
+	* Create the following file at `/home/ansible/ansible/roles/sample-apache/templates/index.html.j2`:
+		```shell
+		Welcome to {{  ansible_fqdn }} on {{  ansible_default_ipv4.address }}
+		```
+
+	* If you forget the ansible facts variables you can run `ansible localhost -m setup`. Note that the `firewalld` module requires you to run `ansible-galaxy collection install ansible.posix`.
+
+	* Create the following file `main.yml` at `/home/ansible/ansible/roles/sample-apache/handlers`:
+		```yaml
+		- name: restart
+		  service:
+		    name: httpd
+		    state: restarted
+		```
+
+1. Task 5
+
+	* Create a file `requirements.yml` at `/home/ansible/ansible/roles/requirements.yml`:
+		```yaml
+		- name: haproxy-role
+		  src: geerlingguy.haproxy
+
+		- name: php_role
+		  src: geerlingguy.php
+		```
+
+	* Install the roles using `ansible-galaxy install -r requirements.yml -p /home/ansible/ansible/roles`. Observe the new roles available in the directory.
+
+1. Task 6
+
+	* Create a file `requirements.yml` at `/home/ansible/ansible/roles/requirements.yml`:
+		```yaml
+		- name: haproxy-role
+		  src: geerlingguy.haproxy
+
+		- name: php_role
+		  src: geerlingguy.php
+		```
+
+	* Install the roles using `ansible-galaxy install -r requirements.yml -p /home/ansible/ansible/roles`. Observe the new roles available in the directory.
+
+1. Task 7
+
+	* Update the `/etc/hosts` file on managed node 3 to define the FQDNs used in the below playbook.
+
+	* Create the playbook `/home/ansible/ansible/role.yml`:
+		```yaml
+		---
+		- name: Install haproxy-role
+		  hosts: proxy
+		  become: true
+		  vars:
+		    haproxy_frontend_port: 81
+		    haproxy_backend_servers:
+		      - name: node4.example.com
+		        address: 192.168.1.118:80
+		      - name: node5.example.com
+		        address: 192.168.1.111:80
+
+		  tasks:
+		    - name: Install haproxy-role prereqs
+		      yum:
+		        name:
+		          - haproxy
+		        state: present
+
+		    - name: Open port 81
+		      firewalld:
+		        port: 81/tcp
+		        permanent: true
+		        state: enabled
+		        immediate: true
+		      notify: Restart httpd service
+
+		    - name: Install haproxy-role
+		      include_role:
+		        name: haproxy-role
+
+		  handlers:
+		    - name: Restart httpd service
+		      service:
+		        name: httpd
+		        state: restarted
+
+		- name: Install php_role
+		  hosts: prod
+		  become: true
+		  tasks:
+		    - name: Install php_role prereqs
+		      yum:
+		        name:
+		          - php
+		          - php-xml.x86_64
+		        state: present
+
+		    - name: Install php_role
+		      include_role:
+		        name: php_role
+
+		  handlers:
+		    - name: Restart httpd service
+		      service:
+		        name:
+		          - httpd
+		          - firewalld
+		        state: restarted
+		```
+
+	* Installation currently fails due to a missing php-xmlrpc package. This appears to be an incompatibility with RHEL 9. Attempting ot install this package from the EPEL repository gives an error about failing to download metadata.
 
 #### Archive
 
