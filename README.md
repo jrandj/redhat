@@ -5689,7 +5689,7 @@
 
 1. Task 1
 
-	* Run the following commands:
+	* Run the following commands on the control node:
  		```shell
 		vi /etc/ansible/ansible/hosts # add the below
 		# [dev]
@@ -5710,7 +5710,7 @@
 
 		vi /etc/ansible/ansible/ansible.cfg
 		# roles_path=/home/ansible/ansible/roles
-		# inventory=/home/ansible/ansible/inventory
+		# inventory=/home/ansible/ansible/hosts
 		# remote_user=ansible
 		# host_key_checking=false
 
@@ -5719,6 +5719,48 @@
 		# become_user=root
 		# become_method=sudo
 		# become_ask_pass=false
+		```
+
+1. Task 2
+
+	* To list the available modules run `ansible-doc -l`. To get help on a module run `ansible-doc -t module $module`.
+
+	* Create and run the following script on the control node:
+		```shell
+		#!/bin/bash
+		ansible all -m yum_repository -a "name=EPEL description=RHEL9 baseurl=https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm gpgcheck=no enabled=no"
+		```
+
+1. Task 3
+
+	* Create and run the following playbook on the control node. The playbook can be tested using `ansible-playbook packages.yml -C`.
+		```yaml
+		---
+		- name: Install packages
+		  hosts: dev,prod,webservers
+		  become: true
+		  tasks:
+		    - name: Install common packages
+		      yum:
+		        name:
+		          - httpd
+		          - mod_ssl
+		          - mariadb
+		        state: present
+
+		    - name: Install dev specific packages
+		      yum:
+		        name:
+		          - '@Development tools'
+		        state: latest
+		      when: "'dev' in group_names"
+
+		    - name: Update all packages on dev to the latest version
+		      yum:
+		        name:
+		          - '*'
+		        state: latest
+		      when: "'dev' in group_names"
 		```
 
 #### Archive
