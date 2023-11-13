@@ -1,7 +1,7 @@
-# Redhat
+# Red Hat
 
-- [RHCSA 8](#RHCSA-8)
-- [RHCE 9](#RHCE-9)
+- [RHCSA 8 (RHEL 8)](#RHCSA-8-(RHEL-8))
+- [RHCE 9 (RHEL 9)](#RHCE-9-(RHEL-9))
 
 ## RHCSA (RHEL 8)
 
@@ -316,90 +316,90 @@
 
 1. Conditionally execute code (use of: if, test, [], etc.)
 
-	* An example using if and test statements is shown below:
-	    ```shell
-		#!/bin/bash
-		ping -c 1 $1
-		if test "$?" -eq "0"; then
-		    echo "$1 IP is reachable"
-		else
-		    echo "$1 IP is not reachable"
-		fi
-		exit
+    * An example using if and test statements is shown below:
+        ```shell
+        #!/bin/bash
+        ping -c 1 $1
+        if test "$?" -eq "0"; then
+            echo "$1 IP is reachable"
+        else
+            echo "$1 IP is not reachable"
+        fi
+        exit
         ```
 
-	* Input arguments can be passed in after the script name, with e.g. 1 being the first input argument. The *$?* term expands the exit status of the most recently executed command. When using *echo* the *-e* argument can be used to print characters such as new lines.
+    * Input arguments can be passed in after the script name, with e.g. 1 being the first input argument. The *$?* term expands the exit status of the most recently executed command. When using *echo* the *-e* argument can be used to print characters such as new lines.
 
-	* An example using a case statement is shown below:
-	    ```shell
-		#!/bin/bash
-		now=$(date + "%a")
-		case $now in
-		    Mon)
-		        echo "Full Backup";
-		    ;;
-		    Tue|Wed|Thu|Fri)
-		        echo "Partial Backup";
-		    ;;
-		    Sat|Sun)
-		        echo "No Backup";
-		    ;;
-		    *)	;;
-		esac
-		exit
+    * An example using a case statement is shown below:
+        ```shell
+        #!/bin/bash
+        now=$(date + "%a")
+        case $now in
+            Mon)
+                echo "Full Backup";
+            ;;
+            Tue|Wed|Thu|Fri)
+                echo "Partial Backup";
+            ;;
+            Sat|Sun)
+                echo "No Backup";
+            ;;
+            *)    ;;
+        esac
+        exit
         ```
 
-	* An example using [] is shown below:
-	    ```shell
-		#!/bin/bash
-		ping -c 1 $1
-		if ["$?" -eq "0"]; then
-		    echo "$1 IP is reachable"
-		else
-		    echo "$1 IP is not reachable"
-		fi
-		exit
+    * An example using [] is shown below:
+        ```shell
+        #!/bin/bash
+        ping -c 1 $1
+        if ["$?" -eq "0"]; then
+            echo "$1 IP is reachable"
+        else
+            echo "$1 IP is not reachable"
+        fi
+        exit
         ```
 
 1. Use Looping constructs (for, etc.) to process file, command line input
 
-	* An example of a for loop is shown below:
-	    ```shell
-		#!/bin/bash
-		for file in ./*.log
-		do
-		    mv "${file}" "${file}".txt
-		done
-		exit
+    * An example of a for loop is shown below:
+        ```shell
+        #!/bin/bash
+        for file in ./*.log
+        do
+            mv "${file}" "${file}".txt
+        done
+        exit
         ```
 
-	* An example of a while loop is shown below:
-	    ```shell
-		#!/bin/bash
-		input = "/home/kafka.log"
-		while IFS = read -r line
-		do
-		    echo "$line"
-		done < "$input"
-		exit
+    * An example of a while loop is shown below:
+        ```shell
+        #!/bin/bash
+        input = "/home/kafka.log"
+        while IFS = read -r line
+        do
+            echo "$line"
+        done < "$input"
+        exit
         ```
 
 1. Process script inputs ($1, $2, etc.)
 
-	* The first variable passed into a script can be accessed with *$1*.
+    * The first variable passed into a script can be accessed with *$1*.
 
 1. Processing output of shell commands within a script
 
-	* An example is shown below:
-	    ```shell
-		#!/bin/bash
-		echo "Hello World!" >> example-`date +%Y%m%d-%H%M`.log
-		exit
+    * An example is shown below:
+        ```shell
+        #!/bin/bash
+        echo "Hello World!" >> example-`date +%Y%m%d-%H%M`.log
+        exit
         ```
 
 1. Processing shell command exit codes
 
-	* The *$?* term expands the exit status of the most recently executed command.
+    * The *$?* term expands the exit status of the most recently executed command.
 
 ### Operate running systems
 
@@ -931,28 +931,28 @@
 
      * Using AutoFS with NFS:
         ```shell
-		# on the server
+        # on the server
         systemctl status 
-		mkdir /common
-		echo "/common *(rw)" >> /etc/exports
-		systemctl restart nfs-server.service
+        mkdir /common
+        echo "/common *(rw)" >> /etc/exports
+        systemctl restart nfs-server.service
 
-		# on the client
-		dnf install autofs -y
-		mkdir /autodir
-		vi /etc/auto.master
-		# add line
-		#/- /etc/auto.master.d/auto.dir
-		vi /etc/auto.master.d/auto.dir
-		# add line
-		#/autodir 172.25.1.4:/common
-		systemctl restart autofs & systemctl enable autofs
+        # on the client
+        dnf install autofs -y
+        mkdir /autodir
+        vi /etc/auto.master
+        # add line
+        #/- /etc/auto.master.d/auto.dir
+        vi /etc/auto.master.d/auto.dir
+        # add line
+        #/autodir 172.25.1.4:/common
+        systemctl restart autofs & systemctl enable autofs
 
-		# on the server
-		touch /common/test
-		
-		# on the client
-		ls /autodir # confirm test file is created
+        # on the server
+        touch /common/test
+        
+        # on the client
+        ls /autodir # confirm test file is created
         ``` 
 
 1. Extend existing logical volumes
@@ -1531,7 +1531,7 @@
 
 1. Restrict network access using firewall-cmd/firewall
 
-	* Netfilter is a framework provided by the Linux kernel that provides functions for packet filtering. In RHEL 7 and earlier iptables was the default way of configuring Netfilter. Disadvantages of ipables were that a separate version (ip6tables) was required for ipv6, and that the user interface is not very user friendly.
+    * Netfilter is a framework provided by the Linux kernel that provides functions for packet filtering. In RHEL 7 and earlier iptables was the default way of configuring Netfilter. Disadvantages of ipables were that a separate version (ip6tables) was required for ipv6, and that the user interface is not very user friendly.
 
     * The default firewall system in RHEL 8 is *firewalld*. Firewalld is a zone-based firewall. Each zone can be associated with one or more network interfaces, and each zone can be configured to accept or deny services and ports. The *firewall-cmd* command is the command line client for firewalld.
 
@@ -1633,7 +1633,7 @@
         useradd -G IT user2
         ```
 
-	* Note that *-G* is a secondary group, and *-g* is the primary group. The primary group is the group that the operating system assigns to files to which a user belongs. A secondary group is one or more other groups to which a user also belongs. 
+    * Note that *-G* is a secondary group, and *-g* is the primary group. The primary group is the group that the operating system assigns to files to which a user belongs. A secondary group is one or more other groups to which a user also belongs. 
 
     * To delete a user:
         ```shell
@@ -1894,11 +1894,11 @@
 
 1. Find and retrieve container images from a remote registry
 
-	* A container is used for running multiple isolated applications on the same hardware. Unlike a virtual machine, containers share the host systems operating system. This is more lightweight but a little less flexible.
+    * A container is used for running multiple isolated applications on the same hardware. Unlike a virtual machine, containers share the host systems operating system. This is more lightweight but a little less flexible.
 
-	* Podman is a container engine developed by Redhat. Podman is an alternative to the well-known container engine Docker. It is used to directly manage pods and container images. The Podman Command Line Interface (CLI) uses the same commands as the Docker CLI. Docker is not officially supported in RHEL 8.
-	
-	* To search for an image in a remote repository and download it:
+    * Podman is a container engine developed by Redhat. Podman is an alternative to the well-known container engine Docker. It is used to directly manage pods and container images. The Podman Command Line Interface (CLI) uses the same commands as the Docker CLI. Docker is not officially supported in RHEL 8.
+    
+    * To search for an image in a remote repository and download it:
         ```shell
         dnf install podman -y
         podman search httpd # note that docker.io/library/httpd has 3000+ stars
@@ -1907,113 +1907,113 @@
 
 1. Inspect container images
 
-	* To view images after they have been downloaded:
-	    ```shell
+    * To view images after they have been downloaded:
+        ```shell
         podman images
         ```
 
-	* To inspect an image using Podman:
+    * To inspect an image using Podman:
         ```shell
         podman inspect -l # -l gets the latest container
         ```
 
-	* To inspect an image in a remote registry using Skopeo:
+    * To inspect an image in a remote registry using Skopeo:
         ```shell
         dnf install skopeo -y
-		skopeo inspect docker://registry.fedoraproject.org/fedora:latest
+        skopeo inspect docker://registry.fedoraproject.org/fedora:latest
         ```
 
 1. Perform container management using commands such as podman and skopeo
 
-	* The man page for Podman and bash-completion can be used to provide more details on the usage of Podman.
+    * The man page for Podman and bash-completion can be used to provide more details on the usage of Podman.
 
-	* To view the logs for a container:
+    * To view the logs for a container:
         ```shell
         podman logs -l
         ```
 
-	* To view the pids for a container:
+    * To view the pids for a container:
         ```shell
         podman top -l
         ```
 
 1. Perform basic container management such as running, starting, stopping, and listing running containers
 
-	* To start, stop and remove a container:
+    * To start, stop and remove a container:
         ```shell
-		podman run -dt -p 8080:80/tcp docker.io/library/httpd # redirect requests on 8080 host port to 80 container port
-	    podman ps -a # view container details, use -a to see all
-	    # check using 127.0.0.1:8080 on a browser
-	    podman stop af1fc4ca0253 # container ID from podman ps -a
-	    podman rm af1fc4ca0253
+        podman run -dt -p 8080:80/tcp docker.io/library/httpd # redirect requests on 8080 host port to 80 container port
+        podman ps -a # view container details, use -a to see all
+        # check using 127.0.0.1:8080 on a browser
+        podman stop af1fc4ca0253 # container ID from podman ps -a
+        podman rm af1fc4ca0253
         ```
 
 1. Run a service inside a container
 
-	* A Dockerfile can be used to create a custom container:
+    * A Dockerfile can be used to create a custom container:
         ```shell
         sudo setsebool -P container_manage_cgroup on
-		vi Dockerfile
-		# contents of Dockerfile
+        vi Dockerfile
+        # contents of Dockerfile
         #####
         #FROM registry.access.redhat.com/ubi8/ubi-init
-		#RUN yum -y install httpd; yum clean all; systemctl enable httpd;
-		#RUN echo "Successful Web Server Test" > /var/www/html/index.html
-		#RUN mkdir /etc/systemd/system/httpd.service.d/; echo -e '[Service]\nRestart=always' > /etc/systemd/system/httpd.service.d/httpd.conf
-		#EXPOSE 80
+        #RUN yum -y install httpd; yum clean all; systemctl enable httpd;
+        #RUN echo "Successful Web Server Test" > /var/www/html/index.html
+        #RUN mkdir /etc/systemd/system/httpd.service.d/; echo -e '[Service]\nRestart=always' > /etc/systemd/system/httpd.service.d/httpd.conf
+        #EXPOSE 80
         #####
-		podman build -t mysysd .
-		podman run -d --name=mysysd_run -p 80:80 mysysd
-		podman ps # confirm that container is running
+        podman build -t mysysd .
+        podman run -d --name=mysysd_run -p 80:80 mysysd
+        podman ps # confirm that container is running
         ```
 
-	* Note that the SELinux Boolean referred to above can be found using:
-	    ```shell
-		getsebool -a | grep "container"
+    * Note that the SELinux Boolean referred to above can be found using:
+        ```shell
+        getsebool -a | grep "container"
         ```
 
-	* Note that the registry above is the Podman Universal Base Image (UBI) for RHEL 8.
+    * Note that the registry above is the Podman Universal Base Image (UBI) for RHEL 8.
 
 1. Configure a container to start automatically as a systemd service
 
-	* Podman was not originally designed to bring up an entire Linux system or manage services for such things as start-up order, dependency, checking, and failed service recovery. That is the job of an initialisation system like systemd.
+    * Podman was not originally designed to bring up an entire Linux system or manage services for such things as start-up order, dependency, checking, and failed service recovery. That is the job of an initialisation system like systemd.
 
-	* By setting up a systemd unit file on your host computer, you can have the host automatically start, stop, check the status, and otherwise manage a container as a systemd service. Many Linux services are already packaged for RHEL to run as systemd services.
+    * By setting up a systemd unit file on your host computer, you can have the host automatically start, stop, check the status, and otherwise manage a container as a systemd service. Many Linux services are already packaged for RHEL to run as systemd services.
 
-	* To configure a container to run as a systemd service:
+    * To configure a container to run as a systemd service:
         ```shell
-		sudo setsebool -P container_manage_cgroup on
+        sudo setsebool -P container_manage_cgroup on
         podman run -d --name httpd-server -p 8080:80 # -d for detached, -p for port forwarding
-		podman ps # confirm the container is running
-		vi /etc/systemd/system/httpd-container.service
+        podman ps # confirm the container is running
+        vi /etc/systemd/system/httpd-container.service
         # contents of httpd-container.service
         #####
         #[Unit]
         #Description=httpd Container Service
-		#Wants=syslog.service
-		#
-		#[Service]
-		#Restart=always
-		#ExecStart=/usr/bin/podman start -a httpd-server
-		#ExecStop=/usr/bin/podman stop -t 2 httpd-server
-		#
-		#[Install]
-		#WantedBy=multi-user.target
+        #Wants=syslog.service
+        #
+        #[Service]
+        #Restart=always
+        #ExecStart=/usr/bin/podman start -a httpd-server
+        #ExecStop=/usr/bin/podman stop -t 2 httpd-server
+        #
+        #[Install]
+        #WantedBy=multi-user.target
         #####
-		systemctl start httpd-container.service
-		systemctl status httpd-container.service # confirm running
-		systemctl enable httpd-container.service # will not run as part multi-user.target
+        systemctl start httpd-container.service
+        systemctl status httpd-container.service # confirm running
+        systemctl enable httpd-container.service # will not run as part multi-user.target
         ```
 
-	* Note that other systemd services can be viewed in `/etc/systemd/system` and used as examples.
+    * Note that other systemd services can be viewed in `/etc/systemd/system` and used as examples.
 
 1. Attach persistent storage to a container
 
-	* To attach persistent storage to a container:
+    * To attach persistent storage to a container:
         ```shell
-		ls /dev/sda1 # using this disk
-		mkdir -p /home/containers/disk1
-		podman run --privileged -it -v /home/containers/disk1:/mnt docker.io/library/httpd /bin/bash #  --privileged to allow with SELinux, -it for interactive terminal, -v to mount, and /bin/bash to provide a terminal
+        ls /dev/sda1 # using this disk
+        mkdir -p /home/containers/disk1
+        podman run --privileged -it -v /home/containers/disk1:/mnt docker.io/library/httpd /bin/bash #  --privileged to allow with SELinux, -it for interactive terminal, -v to mount, and /bin/bash to provide a terminal
         ```
 
 ### Exercises
@@ -2386,2264 +2386,2264 @@
 
     * Install VDO and ensure the service is running:
         ```shell
-		dnf install vdo -y
-		systemctl start vdo && systemctl enable vdo
+        dnf install vdo -y
+        systemctl start vdo && systemctl enable vdo
         ```
 
     * Setup a 100G VM storage volume:
         ```shell
-		vdo create --name=ContainerStorage --device=/dev/nvme1n1 --vdoLogicalSize=100G --sparseIndex=disabled
-		# spareIndex set to meet requirement of dense index deduplication
-		mkfs.xfs -K /dev/mapper/ContainerStorage
-		mkdir /mnt/containers
-		mount /dev/mapper/ContainerStorage /mnt/containers
-		vi /etc/fstab # add line /dev/mapper/ContainerStorage /mnt/containers xfs defaults,_netdev,x-systemd.device-timeout=0,x-systemd.requires=vdo.service 0 0
+        vdo create --name=ContainerStorage --device=/dev/nvme1n1 --vdoLogicalSize=100G --sparseIndex=disabled
+        # spareIndex set to meet requirement of dense index deduplication
+        mkfs.xfs -K /dev/mapper/ContainerStorage
+        mkdir /mnt/containers
+        mount /dev/mapper/ContainerStorage /mnt/containers
+        vi /etc/fstab # add line /dev/mapper/ContainerStorage /mnt/containers xfs defaults,_netdev,x-systemd.device-timeout=0,x-systemd.requires=vdo.service 0 0
         ```
 
     * Setup a 60G website storage volume:
         ```shell
-		vdo create --name=WebsiteStorage --device=/dev/nvme2n1 --vdoLogicalSize=60G --deduplication=disabled
-		# deduplication set to meet requirement of no deduplication
-		mkfs.xfs -K /dev/mapper/WebsiteStorage
-		mkdir /mnt/website
-		mount /dev/mapper/WebsiteFiles /mnt/website
-		vi /etc/fstab # add line for /dev/mapper/WebsiteStorage /mnt/website xfs defaults,_netdev,x-systemd.device-timeout=0,x-systemd.requires=vdo.service 0 0
+        vdo create --name=WebsiteStorage --device=/dev/nvme2n1 --vdoLogicalSize=60G --deduplication=disabled
+        # deduplication set to meet requirement of no deduplication
+        mkfs.xfs -K /dev/mapper/WebsiteStorage
+        mkdir /mnt/website
+        mount /dev/mapper/WebsiteFiles /mnt/website
+        vi /etc/fstab # add line for /dev/mapper/WebsiteStorage /mnt/website xfs defaults,_netdev,x-systemd.device-timeout=0,x-systemd.requires=vdo.service 0 0
         ```
 
 1. Linux Academy - Final Practise Exam
 
     * Start the guest VM:
         ```shell
-		# use a VNC viewer connect to IP:5901
-		virsh list --all
-		virsh start --centos7.0
-		# we already have the VM installed, we just needed to start it (so we don't need virt-install)
-		dnf install virt-viewer -y
-		virt-viewer centos7.0 # virt-manager can also be used
-		# now we are connected to the virtual machine
-		# send key Ctrl+Alt+Del when prompted for password, as we don't know it
-		# press e on GRUB screen
-		# add rd.break on the linux16 line
-		# now at the emergency console
-		mount -o remount, rw /sysroot
-		chroot /sysroot
-		passwd
-		touch /.autorelabel
-		reboot -f # needs -f to work for some reason
-		# it will restart when it completes relabelling
+        # use a VNC viewer connect to IP:5901
+        virsh list --all
+        virsh start --centos7.0
+        # we already have the VM installed, we just needed to start it (so we don't need virt-install)
+        dnf install virt-viewer -y
+        virt-viewer centos7.0 # virt-manager can also be used
+        # now we are connected to the virtual machine
+        # send key Ctrl+Alt+Del when prompted for password, as we don't know it
+        # press e on GRUB screen
+        # add rd.break on the linux16 line
+        # now at the emergency console
+        mount -o remount, rw /sysroot
+        chroot /sysroot
+        passwd
+        touch /.autorelabel
+        reboot -f # needs -f to work for some reason
+        # it will restart when it completes relabelling
         ```
 
     * Create three users (Derek, Tom, and Kenny) that belong to the instructors group. Prevent Tom's user from accessing a shell, and make his account expire 10 day from now:
         ```shell
-		groupadd instructors
-		useradd derek -G instructors
-		useradd tom -s /sbin/nologin -G instructors
-		useradd kenny -G instructors
-		chage tom -E 2020-10-14
-		chage -l tom # to check
-		cat /etc/group | grep instructors # to check
+        groupadd instructors
+        useradd derek -G instructors
+        useradd tom -s /sbin/nologin -G instructors
+        useradd kenny -G instructors
+        chage tom -E 2020-10-14
+        chage -l tom # to check
+        cat /etc/group | grep instructors # to check
         ```
 
     * Download and configure apache to serve index.html from `/var/web` and access it from the host machine:
         ```shell
-		# there is some setup first to establish connectivity/repo
-		nmcli device # eth0 shown as disconnected
-		nmcli connection up eth0
-		vi /etc/yum.repos.d/centos7.repo
+        # there is some setup first to establish connectivity/repo
+        nmcli device # eth0 shown as disconnected
+        nmcli connection up eth0
+        vi /etc/yum.repos.d/centos7.repo
         # contents of centos.repo
         #####
         #[centos7]
         #name = centos
         #baseurl = http://mirror.centos.org/centos/7/os/x86_64/
-		#enabled = 1
-		#gpgcheck = 1
+        #enabled = 1
+        #gpgcheck = 1
         #gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
         #####
-		yum repolist # confirm
-		yum install httpd -y
-		systemctl start httpd.service
-		mkdir /var/web
-		vi /etc/httpd/conf/httpd.conf
-		# change DocumentRoot to "/var/web"
-		# change Directory tag to "/var/web"
-		# change Directory tag to "/var/web/html"
-		echo "Hello world" > /var/web/index.html
-		systemctl start httpd.service
-		ip a s # note the first inet address for eth0 # from the guest VM
-		curl http://192.168.122.213/ # from the host 
-		# note that no route to host returned
-		firewall-cmd --list-services # notice no http service
-		firewall-cmd --add-service=http --permanent
-		firewall-cmd --reload
-		firewall-cmd --list-services # confirm http service
-		curl http://192.168.122.255/ # from the host 
-		# note that 403 error is returned
-		# ll -Z comparision between /var/web and /var/www shows that the SELinux type of index.html should be httpd_sys_context_t and not var_t
-		yum provides \*/semanage # suggests policycoreutils-python
-		yum install policycoreutils-python -y
-		semanage fcontext -a -t httpd_sys_content_t "/var/web(/.*)?"
-		restorecon -R -v /var/web
-		curl http://192.168.122.255/ # from the host - success!
+        yum repolist # confirm
+        yum install httpd -y
+        systemctl start httpd.service
+        mkdir /var/web
+        vi /etc/httpd/conf/httpd.conf
+        # change DocumentRoot to "/var/web"
+        # change Directory tag to "/var/web"
+        # change Directory tag to "/var/web/html"
+        echo "Hello world" > /var/web/index.html
+        systemctl start httpd.service
+        ip a s # note the first inet address for eth0 # from the guest VM
+        curl http://192.168.122.213/ # from the host 
+        # note that no route to host returned
+        firewall-cmd --list-services # notice no http service
+        firewall-cmd --add-service=http --permanent
+        firewall-cmd --reload
+        firewall-cmd --list-services # confirm http service
+        curl http://192.168.122.255/ # from the host 
+        # note that 403 error is returned
+        # ll -Z comparision between /var/web and /var/www shows that the SELinux type of index.html should be httpd_sys_context_t and not var_t
+        yum provides \*/semanage # suggests policycoreutils-python
+        yum install policycoreutils-python -y
+        semanage fcontext -a -t httpd_sys_content_t "/var/web(/.*)?"
+        restorecon -R -v /var/web
+        curl http://192.168.122.255/ # from the host - success!
         ```
 
     * Configure umask to ensure all files created by any user cannot be accessed by the "other" users:
         ```shell
-		umask 0026 # also reflect change in /etc/profile and /etc/bashrc
-		# default for files is 0666 so will be 0640 after mask
+        umask 0026 # also reflect change in /etc/profile and /etc/bashrc
+        # default for files is 0666 so will be 0640 after mask
         ```
 
     * Find all files in `/etc` (not including subdirectories) that are older than 720 days, and output a list to `/root/oldfiles`:
         ```shell
-		find /etc -maxdepth 1 -mtime +720 > /root/oldfiles 
+        find /etc -maxdepth 1 -mtime +720 > /root/oldfiles 
         ```
 
     * Find all log messages in `/var/log/messages` that contain "ACPI", and export them to a file called `/root/logs`. Then archive all of `/var/log` and save it to `/tmp/log_archive.tgz`:
         ```shell
-		grep "ACPI" /var/log/messages > /root/logs
-		tar -czf /tmp/log_archive.tgz /var/log/ # note f flag must be last!
+        grep "ACPI" /var/log/messages > /root/logs
+        tar -czf /tmp/log_archive.tgz /var/log/ # note f flag must be last!
         ```
 
     * Modify the GRUB timeout and make it 1 second instead of 5 seconds:
         ```shell
-		find / -iname grub.cfgreboot
-		# /etc/grub.d, /etc/default/grub and grub2-mkconfig referred to in /boot/grub2/grub.cfg
-		vi /etc/default/grub # change GRUB_TIMEOUT to 1
-		grub2-mkconfig -o /boot/grub2/grub.cfg
-		reboot # confirm timeout now 1 second
+        find / -iname grub.cfgreboot
+        # /etc/grub.d, /etc/default/grub and grub2-mkconfig referred to in /boot/grub2/grub.cfg
+        vi /etc/default/grub # change GRUB_TIMEOUT to 1
+        grub2-mkconfig -o /boot/grub2/grub.cfg
+        reboot # confirm timeout now 1 second
         ```
 
     * Create a daily cron job at 4:27PM for the Derek user that runs `cat /etc/redhat-release` and redirects the output to `/home/derek/release`:
         ```shell
-		cd /home/derek
-		vi script.sh
-		# contents of script.sh
+        cd /home/derek
+        vi script.sh
+        # contents of script.sh
         #####
         ##!/bin/sh
-		#cat /etc/redhat-release > /home/derek/release
+        #cat /etc/redhat-release > /home/derek/release
         #####
-		chmod +x script.sh
-		crontab -u derek -e
-		# contents of crontab
+        chmod +x script.sh
+        crontab -u derek -e
+        # contents of crontab
         #####
         #27 16 * * * /home/derek/script.sh
         #####
-		crontab -u derek -l # confirm
+        crontab -u derek -l # confirm
         ```
 
     * Configure `time.nist.gov` as the only NTP Server:
         ```shell
-		vi /etc/chrony.conf
-		# replace lines at the top with server time.nist.gov
+        vi /etc/chrony.conf
+        # replace lines at the top with server time.nist.gov
         ```
 
     * Create an 800M swap partition on the `vdb` disk and use the UUID to ensure that it is persistent:
         ```shell
-		fdisk -l # note that we have one MBR partitions
-		fdisk /dev/vdb
-		# select n
-		# select p
-		# select default
-		# select default
-		# enter +800M
-		# select w
-		partprobe
-		lsblk # confirm creation
-		mkswap /dev/vdb1
-		vi /etc/fstab
-		# add line containing UUID and swap for the next 2 columns
-		swapon -a
-		swap # confirm swap is available
+        fdisk -l # note that we have one MBR partitions
+        fdisk /dev/vdb
+        # select n
+        # select p
+        # select default
+        # select default
+        # enter +800M
+        # select w
+        partprobe
+        lsblk # confirm creation
+        mkswap /dev/vdb1
+        vi /etc/fstab
+        # add line containing UUID and swap for the next 2 columns
+        swapon -a
+        swap # confirm swap is available
         ```
 
     * Create a new logical volume (LV-A) with a size of 30 extents that belongs to the volume group VG-A (with a PE size of 32M). After creating the volume, configure the server to mount it persistently on `/mnt`:
         ```shell
-		# observe through fdisk -l and df -h that /dev/vdc is available with no file system
-		yum provides pvcreate # lvm2 identified
-		yum install lvm2 -y
-		pvcreate /dev/vdc
-		vgcreate VG-A /dev/vdc -s 32M
-		lvcreate -n LV-A -l 30 VG-A
-		mkfs.xfs /dev/VG-A/LV-A
-		# note in directory /dev/mapper the name is VG--A-LV--A
-		# add an entry to /etc/fstab at /dev/mapper/VG--A-LV--A and /mnt (note that you can mount without the UUID here)
-		mount -a
-		df -h # verify that LV-A is mounted
+        # observe through fdisk -l and df -h that /dev/vdc is available with no file system
+        yum provides pvcreate # lvm2 identified
+        yum install lvm2 -y
+        pvcreate /dev/vdc
+        vgcreate VG-A /dev/vdc -s 32M
+        lvcreate -n LV-A -l 30 VG-A
+        mkfs.xfs /dev/VG-A/LV-A
+        # note in directory /dev/mapper the name is VG--A-LV--A
+        # add an entry to /etc/fstab at /dev/mapper/VG--A-LV--A and /mnt (note that you can mount without the UUID here)
+        mount -a
+        df -h # verify that LV-A is mounted
         ```
 
     * On the host, not the guest VM, utilise ldap.linuxacademy.com for SSO, and configure AutoFS to mount user's home directories on login. Make sure to use Kerberos:
         ```shell
-		# this objective is no longer required in RHCSA 8
+        # this objective is no longer required in RHCSA 8
         ```
 
     * Change the hostname of the guest to "RHCSA":
         ```shell
-		hostnamectl set-hostname rhcsa
+        hostnamectl set-hostname rhcsa
         ```
 
 1. Asghar Ghori - Exercise 3-1: Create Compressed Archives
 
-	* Create tar files compressed with gzip and bzip2 and extract them:
-	    ```shell
-		# gzip
-		tar -czf home.tar.gz /home
-		tar -tf /home.tar.gz # list files
-		tar -xf home.tar.gz
+    * Create tar files compressed with gzip and bzip2 and extract them:
+        ```shell
+        # gzip
+        tar -czf home.tar.gz /home
+        tar -tf /home.tar.gz # list files
+        tar -xf home.tar.gz
 
-		# bzip
-		tar -cjf home.tar.bz2 /home
-		tar -xf home.tar.bz2 -C /tmp
+        # bzip
+        tar -cjf home.tar.bz2 /home
+        tar -xf home.tar.bz2 -C /tmp
         ```
 
 1. Asghar Ghori - Exercise 3-2: Create and Manage Hard Links
 
-	* Create an empty file *hard1* under */tmp* and display its attributes. Create hard links *hard2* and *hard3*. Edit *hard2* and observe the attributes. Remove *hard1* and *hard3* and list the attributes again:
-	    ```shell
-		touch hard1
-		ln hard1 hard2
-		ln hard1 hard3
-		ll -i
-		# observe link count is 3 and same inode number
-		echo "hi" > hard2
-		# observe file size increased to the same value for all files
-		rm hard1
-		rm hard3
-		# observe link count is 1
+    * Create an empty file *hard1* under */tmp* and display its attributes. Create hard links *hard2* and *hard3*. Edit *hard2* and observe the attributes. Remove *hard1* and *hard3* and list the attributes again:
+        ```shell
+        touch hard1
+        ln hard1 hard2
+        ln hard1 hard3
+        ll -i
+        # observe link count is 3 and same inode number
+        echo "hi" > hard2
+        # observe file size increased to the same value for all files
+        rm hard1
+        rm hard3
+        # observe link count is 1
         ```
 
 1. Asghar Ghori - Exercise 3-3: Create and Manage Soft Links
 
-	* Create an empty file *soft1* under `/root` pointing to `/tmp/hard2`. Edit *soft1* and list the attributes after editing. Remove *hard2* and then list *soft1*:
-	    ```shell
-		ln -s /tmp/hard2 soft1
-		ll -i
-		# observe soft1 and hard2 have the same inode number
-		echo "hi" >> soft1
-		# observe file size increased
-		cd /root
-		ll -i 
-		# observe the soft link is now broken
+    * Create an empty file *soft1* under `/root` pointing to `/tmp/hard2`. Edit *soft1* and list the attributes after editing. Remove *hard2* and then list *soft1*:
+        ```shell
+        ln -s /tmp/hard2 soft1
+        ll -i
+        # observe soft1 and hard2 have the same inode number
+        echo "hi" >> soft1
+        # observe file size increased
+        cd /root
+        ll -i 
+        # observe the soft link is now broken
         ```
 
 1. Asghar Ghori - Exercise 4-1: Modify Permission Bits Using Symbolic Form
 
-	* Create a file *permfile1* with read permissions for owner, group and other. Add an execute bit for the owner and a write bit for group and public. Revoke the write bit from public and assign read, write, and execute bits to the three user categories at the same time. Revoke write from the owning group and write, and execute bits from public:
-	    ```shell
-		touch permfile1
-		chmod 444 permfile1
-		chmod -v u+x,g+w,o+w permfile1
-		chmod -v o-w,a=rwx permfile1
-		chmod -v g-w,o-wx permfile1
+    * Create a file *permfile1* with read permissions for owner, group and other. Add an execute bit for the owner and a write bit for group and public. Revoke the write bit from public and assign read, write, and execute bits to the three user categories at the same time. Revoke write from the owning group and write, and execute bits from public:
+        ```shell
+        touch permfile1
+        chmod 444 permfile1
+        chmod -v u+x,g+w,o+w permfile1
+        chmod -v o-w,a=rwx permfile1
+        chmod -v g-w,o-wx permfile1
         ```
 
 1. Asghar Ghori - Exercise 4-2: Modify Permission Bits Using Octal Form
 
-	* Create a file *permfile2* with read permissions for owner, group and other. Add an execute bit for the owner and a write bit for group and public. Revoke the write bit from public and assign read, write, and execute permissions to the three user categories at the same time:
-	    ```shell
-		touch permfile2
-		chmod 444 permfile2
-		chmod -v 566 permfile2
-		chmod -v 564 permfile2
-		chmod -v 777 permfile2
+    * Create a file *permfile2* with read permissions for owner, group and other. Add an execute bit for the owner and a write bit for group and public. Revoke the write bit from public and assign read, write, and execute permissions to the three user categories at the same time:
+        ```shell
+        touch permfile2
+        chmod 444 permfile2
+        chmod -v 566 permfile2
+        chmod -v 564 permfile2
+        chmod -v 777 permfile2
         ```
 
 1. Asghar Ghori - Exercise 4-3: Test the Effect of setuid Bit on Executable Files
 
-	* As root, remove the setuid bit from `/usr/bin/su`. Observe the behaviour for another user attempting to switch into root, and then add the setuid bit back:
-	    ```shell
-		chmod -v u-s /usr/bin/su
-		# users now receive authentication failure when attempting to switch
-		chmod -v u+s /usr/bin/su
+    * As root, remove the setuid bit from `/usr/bin/su`. Observe the behaviour for another user attempting to switch into root, and then add the setuid bit back:
+        ```shell
+        chmod -v u-s /usr/bin/su
+        # users now receive authentication failure when attempting to switch
+        chmod -v u+s /usr/bin/su
         ```
 
 1. Asghar Ghori - Exercise 4-4: Test the Effect of setgid Bit on Executable Files
 
-	* As root, remove the setgid bit from `/usr/bin/write`. Observe the behaviour when another user attempts to run this command, and then add the setgid bit back:
-	    ```shell
-		chmod -v g-s /usr/bin/write
-		# Other users can no longer write to root
-		chmod -v g+s /usr/bin/write
+    * As root, remove the setgid bit from `/usr/bin/write`. Observe the behaviour when another user attempts to run this command, and then add the setgid bit back:
+        ```shell
+        chmod -v g-s /usr/bin/write
+        # Other users can no longer write to root
+        chmod -v g+s /usr/bin/write
         ```
 
 1. Asghar Ghori - Exercise 4-5: Set up Shared Directory for Group Collaboration
 
-	* Create users *user100* and *user200*. Create a group *sgrp* with GID 9999 and add *user100* and *user200* to this group. Create a directory `/sdir` with ownership and owning groups belong to *root* and *sgrp*, and set the setgid bit on */sdir* and test:
-	    ```shell
-		groupadd sgrp -g 9999
-		useradd user100 -G sgrp 
-		useradd user200 -G sgrp 
-		mkdir /sdir
-		chown root:sgrp sdir
-		chmod g+s,g+w sdir
-		# as user100
-		cd /sdir
-		touch file
-		# owning group is sgrp and not user100 due to setgid bit
-		# as user200
-		vi file
-		# user200 can also read and write
+    * Create users *user100* and *user200*. Create a group *sgrp* with GID 9999 and add *user100* and *user200* to this group. Create a directory `/sdir` with ownership and owning groups belong to *root* and *sgrp*, and set the setgid bit on */sdir* and test:
+        ```shell
+        groupadd sgrp -g 9999
+        useradd user100 -G sgrp 
+        useradd user200 -G sgrp 
+        mkdir /sdir
+        chown root:sgrp sdir
+        chmod g+s,g+w sdir
+        # as user100
+        cd /sdir
+        touch file
+        # owning group is sgrp and not user100 due to setgid bit
+        # as user200
+        vi file
+        # user200 can also read and write
         ```
 
 1. Asghar Ghori - Exercise 4-6: Test the Effect of Sticky Bit
 
-	* Create a file under `/tmp` as *user100* and try to delete it as *user200*. Unset the sticky bit on `/tmp` and try to erase the file again. Restore the sticky bit on `/tmp`:
-	    ```shell
-		# as user100
-		touch /tmp/myfile
-		# as user200
-		rm /tmp/myfile
-		# cannot remove file: Operation not permitted
-		# as root
-		chmod -v o-t tmp
-		# as user200
-		rm /tmp/myfile
-		# file can now be removed
-		# as root
-		chmod -v o+t tmp
+    * Create a file under `/tmp` as *user100* and try to delete it as *user200*. Unset the sticky bit on `/tmp` and try to erase the file again. Restore the sticky bit on `/tmp`:
+        ```shell
+        # as user100
+        touch /tmp/myfile
+        # as user200
+        rm /tmp/myfile
+        # cannot remove file: Operation not permitted
+        # as root
+        chmod -v o-t tmp
+        # as user200
+        rm /tmp/myfile
+        # file can now be removed
+        # as root
+        chmod -v o+t tmp
         ```
 
 1. Asghar Ghori - Exercise 4-7: Identify, Apply, and Erase Access ACLs
 
-	* Create a file *acluser* as *user100* in `/tmp` and check if there are any ACL settings on the file. Apply access ACLs on the file for *user100* for read and write access. Add *user200* to the file for full permissions. Remove all access ACLs from the file:
-	    ```shell
-		# as user100
-		touch /tmp/acluser
-		cd /tmp
-		getfacl acluser
-		# no ACLs on the file
-		setfacl -m u:user100:rw,u:user200:rwx acluser
-		getfacl acluser
-		# ACLs have been added
-		setfacl -x user100,user200 acluser
-		getfacl acluser
-		# ACLs have been removed
+    * Create a file *acluser* as *user100* in `/tmp` and check if there are any ACL settings on the file. Apply access ACLs on the file for *user100* for read and write access. Add *user200* to the file for full permissions. Remove all access ACLs from the file:
+        ```shell
+        # as user100
+        touch /tmp/acluser
+        cd /tmp
+        getfacl acluser
+        # no ACLs on the file
+        setfacl -m u:user100:rw,u:user200:rwx acluser
+        getfacl acluser
+        # ACLs have been added
+        setfacl -x user100,user200 acluser
+        getfacl acluser
+        # ACLs have been removed
         ```
 
 1. Asghar Ghori - Exercise 4-8: Apply, Identify, and Erase Default ACLs
 
-	* Create a directory *projects* as *user100* under `/tmp`. Set the default ACLs on the directory for *user100* and *user200* to give them full permissions. Create a subdirectory *prjdir1* and a file *prjfile1* under *projects* and observe the effects of default ACLs on them. Delete the default entries:
-	    ```shell
-		# as user100
-		cd /tmp
-		mkdir projects
-		getfacl projects
-		# No default ACLs for user100 and user200
-		setfacl -dm u:user100:rwx,u:user200:rwx projects
-		getfacl projects
-		# Default ACLs added for user100 and user200
-		mkdir projects/prjdir1
-		getfacl prjdir1
-		# Default ACLs inherited
-		touch prjdir1/prjfile1
-		getfacl prjfile1
-		# Default ACLs inherited
-		setfacl -k projects
+    * Create a directory *projects* as *user100* under `/tmp`. Set the default ACLs on the directory for *user100* and *user200* to give them full permissions. Create a subdirectory *prjdir1* and a file *prjfile1* under *projects* and observe the effects of default ACLs on them. Delete the default entries:
+        ```shell
+        # as user100
+        cd /tmp
+        mkdir projects
+        getfacl projects
+        # No default ACLs for user100 and user200
+        setfacl -dm u:user100:rwx,u:user200:rwx projects
+        getfacl projects
+        # Default ACLs added for user100 and user200
+        mkdir projects/prjdir1
+        getfacl prjdir1
+        # Default ACLs inherited
+        touch prjdir1/prjfile1
+        getfacl prjfile1
+        # Default ACLs inherited
+        setfacl -k projects
         ```
 
 1. Asghar Ghori - Exercise 5-1: Create a User Account with Default Attributes
 
-	* Create *user300* with the default attributes in the *useradd* and *login.defs* files. Assign this user a password and show the line entries from all 4 authentication files:
-	    ```shell
-		useradd user300
-		passwd user300
-		grep user300 /etc/passwd /etc/shadow /etc/group /etc/gshadow
+    * Create *user300* with the default attributes in the *useradd* and *login.defs* files. Assign this user a password and show the line entries from all 4 authentication files:
+        ```shell
+        useradd user300
+        passwd user300
+        grep user300 /etc/passwd /etc/shadow /etc/group /etc/gshadow
         ```
 
 
 1. Asghar Ghori - Exercise 5-2: Create a User Account with Custom Values
 
-	* Create *user300* with the default attributes in the *useradd* and *login.defs* files. Assign this user a password and show the line entries from all 4 authentication files:
-	    ```shell
-		useradd user300
-		passwd user300
-		grep user300 /etc/passwd /etc/shadow /etc/group /etc/gshadow
+    * Create *user300* with the default attributes in the *useradd* and *login.defs* files. Assign this user a password and show the line entries from all 4 authentication files:
+        ```shell
+        useradd user300
+        passwd user300
+        grep user300 /etc/passwd /etc/shadow /etc/group /etc/gshadow
         ```
 
 1. Asghar Ghori - Exercise 5-3: Modify and Delete a User Account
 
-	* For *user200* change the login name to *user200new*, UID to 2000, home directory to `/home/user200new`, and login shell to `/sbin/nologin`. Display the line entry for *user2new* from the *passwd* for validation. Remove this user and confirm the deletion:
-	    ```shell
-		usermod -l user200new -m -d /home/user200new -s /sbin/nologin -u 2000 user200
-		grep user200new /etc/passwd # confirm updated values
-		userdel -r user200new
-		grep user200new /etc/passwd # confirm user200new deleted
+    * For *user200* change the login name to *user200new*, UID to 2000, home directory to `/home/user200new`, and login shell to `/sbin/nologin`. Display the line entry for *user2new* from the *passwd* for validation. Remove this user and confirm the deletion:
+        ```shell
+        usermod -l user200new -m -d /home/user200new -s /sbin/nologin -u 2000 user200
+        grep user200new /etc/passwd # confirm updated values
+        userdel -r user200new
+        grep user200new /etc/passwd # confirm user200new deleted
         ```
 
 1. Asghar Ghori - Exercise 5-4: Create a User Account with No-Login Access
 
-	* Create an account *user400* with default attributes but with a non-interactive shell. Assign this user the nologin shell to prevent them from signing in. Display the new line entry frmo the *passwd* file and test the account:
-	    ```shell
-		useradd user400 -s /sbin/nologin
-		passwd user400 # change password
-		grep user400 /etc/passwd
-		sudo -i -u user400 # This account is currently not available
+    * Create an account *user400* with default attributes but with a non-interactive shell. Assign this user the nologin shell to prevent them from signing in. Display the new line entry frmo the *passwd* file and test the account:
+        ```shell
+        useradd user400 -s /sbin/nologin
+        passwd user400 # change password
+        grep user400 /etc/passwd
+        sudo -i -u user400 # This account is currently not available
         ```
 
 1. Asghar Ghori - Exercise 6-1: Set and Confirm Password Aging with chage
 
-	* Configure password ageing for user100 using the *chage* command. Set the mindays to 7, maxdays to 28, and warndays to 5. Verify the new settings. Rerun the command and set account expiry to January 31, 2020:
-	    ```shell
-		chage -m 7 -M 28 -W 5 user100
-		chage -l user100
-		chage -E 2021-01-31 user100
-		chage -l
+    * Configure password ageing for user100 using the *chage* command. Set the mindays to 7, maxdays to 28, and warndays to 5. Verify the new settings. Rerun the command and set account expiry to January 31, 2020:
+        ```shell
+        chage -m 7 -M 28 -W 5 user100
+        chage -l user100
+        chage -E 2021-01-31 user100
+        chage -l
         ```
 
 1. Asghar Ghori - Exercise 6-2: Set and Confirm Password Aging with passwd
 
-	* Configure password aging for *user100* using the *passwd* command. Set the mindays to 10, maxdays to 90, and warndays to 14, and verify the new settings. Set the number of inactivity days to 5 and ensure that the user is forced to change their password upon next login:
-	    ```shell
-		passwd -n 10 -x 90 -w 14 user100
-		passwd -S user100 # view status
-		passwd -i 5 user100
-		passwd -e user100
-		passwd -S user100
+    * Configure password aging for *user100* using the *passwd* command. Set the mindays to 10, maxdays to 90, and warndays to 14, and verify the new settings. Set the number of inactivity days to 5 and ensure that the user is forced to change their password upon next login:
+        ```shell
+        passwd -n 10 -x 90 -w 14 user100
+        passwd -S user100 # view status
+        passwd -i 5 user100
+        passwd -e user100
+        passwd -S user100
         ```
 
 1. Asghar Ghori - Exercise 6-3: Lock and Unlock a User Account with usermod and passwd
 
-	* Disable the ability of user100 to log in using the *usermod* and *passwd* commands. Verify the change and then reverse it:
-	    ```shell
-		grep user100 /etc/shadow # confirm account not locked by absence of "!" in password
-		passwd -l user100 # usermod -L also works
-		grep user100 /etc/shadow
-		passwd -u user100 # usermod -U also works
+    * Disable the ability of user100 to log in using the *usermod* and *passwd* commands. Verify the change and then reverse it:
+        ```shell
+        grep user100 /etc/shadow # confirm account not locked by absence of "!" in password
+        passwd -l user100 # usermod -L also works
+        grep user100 /etc/shadow
+        passwd -u user100 # usermod -U also works
         ```
 
 1. Asghar Ghori - Exercise 6-4: Create a Group and Add Members
 
-	* Create a group called *linuxadm* with GID 5000 and another group called *dba* sharing the GID 5000. Add *user100* as a secondary member to group *linxadm*:
-	    ```shell
-		groupadd -g 5000 linuxadm
-		groupadd -o -g 5000 dba # note need -o to share GID
-		usermod -G linuxadm user100
-		grep user100 /etc/group # confirm user added to group
+    * Create a group called *linuxadm* with GID 5000 and another group called *dba* sharing the GID 5000. Add *user100* as a secondary member to group *linxadm*:
+        ```shell
+        groupadd -g 5000 linuxadm
+        groupadd -o -g 5000 dba # note need -o to share GID
+        usermod -G linuxadm user100
+        grep user100 /etc/group # confirm user added to group
         ```
 
 1. Asghar Ghori - Exercise 6-5: Modify and Delete a Group Account
 
-	* Change the *linuxadm* group name to *sysadm* and the GID to 6000. Modify the primary group for user100 to *sysadm*. Remove the *sysadm* group and confirm:
-	    ```shell
-		groupmod -n sysadm -g 6000 linuxadm
-		usermod -g sysadm user100
-		groupdel sysadm # can't remove while user100 has as primary group
+    * Change the *linuxadm* group name to *sysadm* and the GID to 6000. Modify the primary group for user100 to *sysadm*. Remove the *sysadm* group and confirm:
+        ```shell
+        groupmod -n sysadm -g 6000 linuxadm
+        usermod -g sysadm user100
+        groupdel sysadm # can't remove while user100 has as primary group
         ```
 
 1. Asghar Ghori - Exercise 6-6: Modify File Owner and Owning Group
 
-	* Create a file *file10* and a directory *dir10* as *user200* under `/tmp`, and then change the ownership for *file10* to *user100* and the owning group to *dba* in 2 separate transactions. Apply ownership on *file10* to *user200* and owning group to *user100* at the same time. Change the 2 attributes on the directory to *user200:dba* recursively:
-	    ```shell
-		# as user200
-		mkdir /tmp/dir10
-		touch /tmp/file10
-		sudo chown user100 /tmp/file10 		
-		sudo chgrp dba /tmp/file10
-		sudo chown user200:user100 /tmp/file10
-		sudo chown -R user200:user100 /tmp/dir10
+    * Create a file *file10* and a directory *dir10* as *user200* under `/tmp`, and then change the ownership for *file10* to *user100* and the owning group to *dba* in 2 separate transactions. Apply ownership on *file10* to *user200* and owning group to *user100* at the same time. Change the 2 attributes on the directory to *user200:dba* recursively:
+        ```shell
+        # as user200
+        mkdir /tmp/dir10
+        touch /tmp/file10
+        sudo chown user100 /tmp/file10         
+        sudo chgrp dba /tmp/file10
+        sudo chown user200:user100 /tmp/file10
+        sudo chown -R user200:user100 /tmp/dir10
         ```
 
 1. Asghar Ghori - Exercise 7-1: Modify Primary Command Prompt
 
-	* Customise the primary shell prompt to display the information enclosed within the quotes "\<username on hostname in pwd\>:" using variable and command substitution. Edit the `~/.profile`file for *user100* and define the new value in there for permanence:
-	    ```shell
-		export PS1="< $LOGNAME on $(hostname) in \$PWD>"
-		# add to ~/.profile for user100
+    * Customise the primary shell prompt to display the information enclosed within the quotes "\<username on hostname in pwd\>:" using variable and command substitution. Edit the `~/.profile`file for *user100* and define the new value in there for permanence:
+        ```shell
+        export PS1="< $LOGNAME on $(hostname) in \$PWD>"
+        # add to ~/.profile for user100
         ```
 
 1. Asghar Ghori - Exercise 8-1: Submit, View, List, and Remove an at Job
 
-	* Submit a job as *user100* to run the *date* command at 11:30pm on March 31, 2021, and have the output and any error messages generated redirected to `/tmp/date.out`. List the submitted job and then remove it:
-	    ```shell
-		# as user100
-		at 11:30pm 03/31/2021
-		# enter "date &> /tmp/date.out"
-		atq # view job in queue
-		at -c 1 # view job details
-		atrm 1 # remove job
+    * Submit a job as *user100* to run the *date* command at 11:30pm on March 31, 2021, and have the output and any error messages generated redirected to `/tmp/date.out`. List the submitted job and then remove it:
+        ```shell
+        # as user100
+        at 11:30pm 03/31/2021
+        # enter "date &> /tmp/date.out"
+        atq # view job in queue
+        at -c 1 # view job details
+        atrm 1 # remove job
         ```
 
 1. Asghar Ghori - Exercise 8-2: Add, List, and Remove a Cron Job
 
-	* Assume all users are currently denied access to cron. Submit a cron job as *user100* to echo "Hello, this is a cron test.". Schedule this command to execute at every fifth minute past the hour between 10:00 am and 11:00 am on the fifth and twentieth of every month. Have the output redirected to `/tmp/hello.out`. List the cron entry and then remove it:
-	    ```shell
-		# as root
-		echo "user100" > /etc/cron.allow
-		# ensure cron.deny is empty
-		# as user100
-		crontab
-		# */5 10,11 5,20 * * echo "Hello, this is a cron test." >> /tmp/hello.out
-		crontab -e # list
-		crontab -l # remove
+    * Assume all users are currently denied access to cron. Submit a cron job as *user100* to echo "Hello, this is a cron test.". Schedule this command to execute at every fifth minute past the hour between 10:00 am and 11:00 am on the fifth and twentieth of every month. Have the output redirected to `/tmp/hello.out`. List the cron entry and then remove it:
+        ```shell
+        # as root
+        echo "user100" > /etc/cron.allow
+        # ensure cron.deny is empty
+        # as user100
+        crontab
+        # */5 10,11 5,20 * * echo "Hello, this is a cron test." >> /tmp/hello.out
+        crontab -e # list
+        crontab -l # remove
         ```
 
 1. Asghar Ghori - Exercise 9-1: Perform Package Management Tasks Using rpm
 
-	* Verify the integrity and authenticity of a package called *dcraw* located in the `/mnt/AppStream/Packages` directory on the installation image and then install it. Display basic information about the package, show files it contains, list documentation files, verify the package attributes and remove the package: 
-	    ```shell
-		ls -l /mnt/AppStream/Packages/dcraw*
-		rpmkeys -K /mnt/AppStream/Packages/dcraw-9.27.0-9.e18.x86_64.rpm # check integrity
-		sudo rpm -ivh /mnt/AppStream/Packages/dcraw-9.27.0-9.e18.x86_64.rpm # -i is install, -v is verbose and -h is hash
-		rpm -qi dcraw # -q is query and -i is install
-		rpm -qd dcraw # -q is query and -d is docfiles
-		rpm -Vv dcraw # -V is verify and -v is verbose
-		sudo rpm -ve # -v is verbose and -e is erase
+    * Verify the integrity and authenticity of a package called *dcraw* located in the `/mnt/AppStream/Packages` directory on the installation image and then install it. Display basic information about the package, show files it contains, list documentation files, verify the package attributes and remove the package: 
+        ```shell
+        ls -l /mnt/AppStream/Packages/dcraw*
+        rpmkeys -K /mnt/AppStream/Packages/dcraw-9.27.0-9.e18.x86_64.rpm # check integrity
+        sudo rpm -ivh /mnt/AppStream/Packages/dcraw-9.27.0-9.e18.x86_64.rpm # -i is install, -v is verbose and -h is hash
+        rpm -qi dcraw # -q is query and -i is install
+        rpm -qd dcraw # -q is query and -d is docfiles
+        rpm -Vv dcraw # -V is verify and -v is verbose
+        sudo rpm -ve # -v is verbose and -e is erase
         ```
 
 1. Asghar Ghori - Exercise 10-1: Configure Access to Pre-Built ISO Repositories
 
-	* Access the repositories that are available on the RHEL 8 image. Create a definition file for the repositories and confirm:
-	    ```shell
-		df -h # after mounting optical drive in VirtualBox
-		vi /etc/yum.repos.d/centos.local
-		# contents of centos.local
+    * Access the repositories that are available on the RHEL 8 image. Create a definition file for the repositories and confirm:
+        ```shell
+        df -h # after mounting optical drive in VirtualBox
+        vi /etc/yum.repos.d/centos.local
+        # contents of centos.local
         #####
         #[BaseOS]
-		#name=BaseOS
-		#baseurl=file:///run/media/$name/BaseOS
-		#gpgcheck=0
-		#
+        #name=BaseOS
+        #baseurl=file:///run/media/$name/BaseOS
+        #gpgcheck=0
+        #
         #[AppStream]
-		#name=AppStream
-		#baseurl=file:///run/media/$name/AppStream
-		#gpgcheck=0
+        #name=AppStream
+        #baseurl=file:///run/media/$name/AppStream
+        #gpgcheck=0
         #####
-		dnf repolist # confirm new repos are added
+        dnf repolist # confirm new repos are added
         ```
 
 1. Asghar Ghori - Exercise 10-2: Manipulate Individual Packages
 
-	* Determine if the *cifs-utils* package is installed and if it is available for installation. Display its information before installing it. Install the package and display its information again. Remove the package along with its dependencies and confirm the removal:
-	    ```shell
-		dnf config-manager --disable AppStream
-		dnf config-manager --disable BaseOS
-		dnf list installed | greps cifs-utils # confirm not installed
-		dnf info cifs-utils # display information
-		dnf install cifs-utils -y
-		dnf info cifs-utils # Repository now says @System
-		dnf remove cifs-utils -y
+    * Determine if the *cifs-utils* package is installed and if it is available for installation. Display its information before installing it. Install the package and display its information again. Remove the package along with its dependencies and confirm the removal:
+        ```shell
+        dnf config-manager --disable AppStream
+        dnf config-manager --disable BaseOS
+        dnf list installed | greps cifs-utils # confirm not installed
+        dnf info cifs-utils # display information
+        dnf install cifs-utils -y
+        dnf info cifs-utils # Repository now says @System
+        dnf remove cifs-utils -y
         ```
 
 1. Asghar Ghori - Exercise 10-3: Manipulate Package Groups
 
-	* Perform management operations on a package group called *system tools*. Determine if this group is already installed and if it is available for installation. List the packages it contains and install it. Remove the group along with its dependencies and confirm the removal:
-	    ```shell
-		dnf group list # shows System Tools as an available group
-		dnf group info "System Tools"
-		dnf group install "System Tools" -y
-		dnf group list "System Tools" # shows installed
-		dnf group remove "System Tools" -y
+    * Perform management operations on a package group called *system tools*. Determine if this group is already installed and if it is available for installation. List the packages it contains and install it. Remove the group along with its dependencies and confirm the removal:
+        ```shell
+        dnf group list # shows System Tools as an available group
+        dnf group info "System Tools"
+        dnf group install "System Tools" -y
+        dnf group list "System Tools" # shows installed
+        dnf group remove "System Tools" -y
         ```
 
 1. Asghar Ghori - Exercise 10-4: Manipulate Modules
 
-	* Perform management operations on a module called *postgresql*. Determine if this module is already installed and if it is available for installation. Show its information and install the default profile for stream 10. Remove the module profile along with any dependencies and confirm its removal:
-	    ```shell
-		dnf module list "postgresql" # no [i] tag shown so not installed
-		dnf module info postgresql:10 # note there are multiple streams
-		sudo dnf module install --profile postgresql:10 -y
-		dnf module list "postgresql" # [i] tag shown so it's installed
-		sudo dnf module remove postgresql:10 -y
+    * Perform management operations on a module called *postgresql*. Determine if this module is already installed and if it is available for installation. Show its information and install the default profile for stream 10. Remove the module profile along with any dependencies and confirm its removal:
+        ```shell
+        dnf module list "postgresql" # no [i] tag shown so not installed
+        dnf module info postgresql:10 # note there are multiple streams
+        sudo dnf module install --profile postgresql:10 -y
+        dnf module list "postgresql" # [i] tag shown so it's installed
+        sudo dnf module remove postgresql:10 -y
         ```
 
 1. Asghar Ghori - Exercise 10-5: Install a Module from an Alternative Stream
 
-	* Downgrade a module to a lower version. Remove the stream *perl* 5.26 and confirm its removal. Manually enable the stream *perl* 5.24 and confirm its new status. Install the new version of the module and display its information:
-	    ```shell
-		dnf module list perl # 5.26 shown as installed
-		dnf module remove perl -y
-		dnf module reset perl # make no version enabled
-		dnf module install perl:5.26/minimal --allowerasing
-		dnf module list perl # confirm module installed
+    * Downgrade a module to a lower version. Remove the stream *perl* 5.26 and confirm its removal. Manually enable the stream *perl* 5.24 and confirm its new status. Install the new version of the module and display its information:
+        ```shell
+        dnf module list perl # 5.26 shown as installed
+        dnf module remove perl -y
+        dnf module reset perl # make no version enabled
+        dnf module install perl:5.26/minimal --allowerasing
+        dnf module list perl # confirm module installed
         ```
 
 1. Asghar Ghori - Exercise 11-1: Reset the root User Password
 
-	* Terminate the boot process at an early stage to access a debug shell to reset the root password:
-	    ```shell
-		# add rd.break affter "rhgb quiet" to reboot into debug shell
-		mount -o remount, rw /sysroot
-		chroot /sysroot
-		passwd # change password
-		touch /.autorelabel
+    * Terminate the boot process at an early stage to access a debug shell to reset the root password:
+        ```shell
+        # add rd.break affter "rhgb quiet" to reboot into debug shell
+        mount -o remount, rw /sysroot
+        chroot /sysroot
+        passwd # change password
+        touch /.autorelabel
         ```
 
 1. Asghar Ghori - Exercise 11-2: Download and Install a New Kernel
 
-	* Download the latest available kernel packages from the Red Hat Customer Portal and install them:
-	    ```shell
-		uname -r # view kernel version
-		rpm -qa | grep "kernel"
-		# find versions on access.redhat website, download and move to /tmp
-		sudo dnf install /tmp/kernel* -y
+    * Download the latest available kernel packages from the Red Hat Customer Portal and install them:
+        ```shell
+        uname -r # view kernel version
+        rpm -qa | grep "kernel"
+        # find versions on access.redhat website, download and move to /tmp
+        sudo dnf install /tmp/kernel* -y
         ```
 
 1. Asghar Ghori - Exercise 12-1: Manage Tuning Profiles
 
-	* Install the *tuned* service, start it and enable it for auto-restart upon reboot. Display all available profiles and the current active profile. Switch to one of the available profiles and confirm. Determine the recommended profile for the system and switch to it. Deactive tuning and reactivate it:
-	    ```shell
-		sudo systemctl status tuned-adm # already installed and enabled
-		sudo tuned-adm profile # active profile is virtual-guest
-		sudo tuned-adm profile desktop # switch to desktop profile
-		sudo tuned-adm profile recommend # virtual-guest is recommended
-		sudo tuned-adm off # turn off profile
+    * Install the *tuned* service, start it and enable it for auto-restart upon reboot. Display all available profiles and the current active profile. Switch to one of the available profiles and confirm. Determine the recommended profile for the system and switch to it. Deactive tuning and reactivate it:
+        ```shell
+        sudo systemctl status tuned-adm # already installed and enabled
+        sudo tuned-adm profile # active profile is virtual-guest
+        sudo tuned-adm profile desktop # switch to desktop profile
+        sudo tuned-adm profile recommend # virtual-guest is recommended
+        sudo tuned-adm off # turn off profile
         ```
 
 1. Asghar Ghori - Exercise 13-1: Add Required Storage to server2
 
-	* Add 4x250MB, 1x4GB, and 2x1GB disks:
-	    ```shell
-		# in virtual box add a VDI disk to the SATA controller
-		lsblk # added disks shown as sdb, sdc, sdd
+    * Add 4x250MB, 1x4GB, and 2x1GB disks:
+        ```shell
+        # in virtual box add a VDI disk to the SATA controller
+        lsblk # added disks shown as sdb, sdc, sdd
         ```
 
 1. Asghar Ghori - Exercise 13-2: Create an MBR Partition
 
-	* Assign partition type "msdos" to `/dev/sdb` for using it as an MBR disk. Create and confirm a 100MB primary partition on the disk:
-	    ```shell
-		parted /dev/sdb print # first line shows unrecognised disk label
-		parted /dev/sdb mklabel msdos
-		parted /dev/sdb mkpart primary 1m 101m
-		parted /dev/sdb print # confirm added partition
+    * Assign partition type "msdos" to `/dev/sdb` for using it as an MBR disk. Create and confirm a 100MB primary partition on the disk:
+        ```shell
+        parted /dev/sdb print # first line shows unrecognised disk label
+        parted /dev/sdb mklabel msdos
+        parted /dev/sdb mkpart primary 1m 101m
+        parted /dev/sdb print # confirm added partition
         ```
 
 1. Asghar Ghori - Exercise 13-3: Delete an MBR Partition
 
-	* Delete the *sdb1* partition that was created in Exercise 13-2 above:
-	    ```shell
-		parted /dev/sdb rm 1
-		parted /dev/sdb print # confirm deletion
+    * Delete the *sdb1* partition that was created in Exercise 13-2 above:
+        ```shell
+        parted /dev/sdb rm 1
+        parted /dev/sdb print # confirm deletion
         ```
 
 1. Asghar Ghori - Exercise 13-4: Create a GPT Partition
 
-	* Assign partition type "gpt" to `/dev/sdc` for using it as a GPT disk. Create and confirm a 200MB partition on the disk:
-	    ```shell
-		gdisk /dev/sdc
-		# enter n for new
-		# enter default partition number
-		# enter default first sector
-		# enter +200MB for last sector
-		# enter default file system type
-		# enter default hex code
-		# enter w to write
-		lsblk # can see sdc1 partition with 200M
+    * Assign partition type "gpt" to `/dev/sdc` for using it as a GPT disk. Create and confirm a 200MB partition on the disk:
+        ```shell
+        gdisk /dev/sdc
+        # enter n for new
+        # enter default partition number
+        # enter default first sector
+        # enter +200MB for last sector
+        # enter default file system type
+        # enter default hex code
+        # enter w to write
+        lsblk # can see sdc1 partition with 200M
         ```
 
 1. Asghar Ghori - Exercise 13-5: Delete a GPT Partition
 
-	* Delete the *sdc1* partition that was created in Exercise 13-4 above:
-	    ```shell
-		gdisk /dev/sdc
-		# enter d for delete
-		# enter w to write
-		lsblk # can see no partitions under sdc
+    * Delete the *sdc1* partition that was created in Exercise 13-4 above:
+        ```shell
+        gdisk /dev/sdc
+        # enter d for delete
+        # enter w to write
+        lsblk # can see no partitions under sdc
         ```
 
 1. Asghar Ghori - Exercise 13-6: Install Software and Activate VDO
 
-	* Install the VDO software packages, start the VDO services, and mark it for autostart on subsequent reboots:
-	    ```shell
-		dnf install vdo kmod-kvdo -y
-		systemctl start vdo.service & systemctl enable vdo.service
+    * Install the VDO software packages, start the VDO services, and mark it for autostart on subsequent reboots:
+        ```shell
+        dnf install vdo kmod-kvdo -y
+        systemctl start vdo.service & systemctl enable vdo.service
         ```
 
 1. Asghar Ghori - Exercise 13-7: Create a VDO Volume
 
-	* Create a volume called *vdo-vol1* of logical size 16GB on the `/dev/sdc` disk (the actual size of `/dev/sdc` is 4GB). List the volume and display its status information. Show the activation status of the compression and de-duplication features:
-	    ```shell
-		wipefs -a /dev/sdc # couldn't create without doing this first
-		vdo create --name vdo-vol1 --device /dev/sdc --vdoLogicalSize 16G --vdoSlabSize 128
-		# VDO instance 0 volume is ready at /dev/mapper/vdo-vol1
-		lsblk # confirm vdo-vol1 added below sdc
-		vdo list # returns vdo-vol1
-		vdo status --name vdo-vol1 # shows status
-		vdo status --name vdo-vol1 | grep -i "compression" # enabled
-		vdo status --name vdo-vol1 | grep -i "deduplication" # enabled
+    * Create a volume called *vdo-vol1* of logical size 16GB on the `/dev/sdc` disk (the actual size of `/dev/sdc` is 4GB). List the volume and display its status information. Show the activation status of the compression and de-duplication features:
+        ```shell
+        wipefs -a /dev/sdc # couldn't create without doing this first
+        vdo create --name vdo-vol1 --device /dev/sdc --vdoLogicalSize 16G --vdoSlabSize 128
+        # VDO instance 0 volume is ready at /dev/mapper/vdo-vol1
+        lsblk # confirm vdo-vol1 added below sdc
+        vdo list # returns vdo-vol1
+        vdo status --name vdo-vol1 # shows status
+        vdo status --name vdo-vol1 | grep -i "compression" # enabled
+        vdo status --name vdo-vol1 | grep -i "deduplication" # enabled
         ```
 
 1. Asghar Ghori - Exercise 13-8: Delete a VDO Volume
 
-	* Delete the *vdo-vol1* volume that was created in Exercise 13-7 above and confirm the removal:
-	    ```shell
-		vdo remove --name vdo-vol1
-		vdo list # confirm removal
+    * Delete the *vdo-vol1* volume that was created in Exercise 13-7 above and confirm the removal:
+        ```shell
+        vdo remove --name vdo-vol1
+        vdo list # confirm removal
         ```
 
 1. Asghar Ghori - Exercise 14-1: Create a Physical Volume and Volume Group
 
-	* Initialise one partition *sdd1* (90MB) and one disk *sdb* (250MB) for use in LVM. Create a volume group called *vgbook* and add both physical volumes to it. Use the PE size of 16MB and list and display the volume group and the physical volumes:
-	    ```shell
-		parted /dev/sdd mklabel msdos
-		parted /dev/sdd mkpart primary 1m 91m
-		parted /dev/sdd set 1 lvm on
-		pvcreate /dev/sdd1 /dev/sdb
-		vgcreate -vs 16 vgbook /dev/sdd1 /dev/sdb
-		vgs vgbook # list information about vgbook
-		vgdisplay -v vbook # list detailed information about vgbook
-		pvs # list information about pvs
+    * Initialise one partition *sdd1* (90MB) and one disk *sdb* (250MB) for use in LVM. Create a volume group called *vgbook* and add both physical volumes to it. Use the PE size of 16MB and list and display the volume group and the physical volumes:
+        ```shell
+        parted /dev/sdd mklabel msdos
+        parted /dev/sdd mkpart primary 1m 91m
+        parted /dev/sdd set 1 lvm on
+        pvcreate /dev/sdd1 /dev/sdb
+        vgcreate -vs 16 vgbook /dev/sdd1 /dev/sdb
+        vgs vgbook # list information about vgbook
+        vgdisplay -v vbook # list detailed information about vgbook
+        pvs # list information about pvs
         ```
 
 1. Asghar Ghori - Exercise 14-2: Create Logical Volumes
 
-	* Create two logical volumes, *lvol0* and *lvbook1*, in the *vgbook* volume group. Use 120MB for *lvol0* and 192MB for *lvbook1*. Display the details of the volume group and the logical volumes:
-	    ```shell
-		lvcreate -vL 120M vgbook
-		lvcreate -vL 192M -n lvbook1 vgbook
-		lvs # display information
-		vgdisplay -v vgbook # display detailed information about volume group
+    * Create two logical volumes, *lvol0* and *lvbook1*, in the *vgbook* volume group. Use 120MB for *lvol0* and 192MB for *lvbook1*. Display the details of the volume group and the logical volumes:
+        ```shell
+        lvcreate -vL 120M vgbook
+        lvcreate -vL 192M -n lvbook1 vgbook
+        lvs # display information
+        vgdisplay -v vgbook # display detailed information about volume group
         ```
 
 1. Asghar Ghori - Exercise 14-3: Extend a Volume Group and a Logical Volume
 
-	* Add another partition *sdd2* of size 158MB to *vgbook* to increase the pool of allocatable space. Initialise the new partition prior to adding it to the volume group. Increase the size of *lvbook1* to 336MB. Display the basic information for the physical volumes, volume group, and logical volume:
-	    ```shell
-		parted mkpart /dev/sdd primary 90 250
-		parted /dev/sdd set 2 lvm on
-		parted /dev/sdd print # confirm new partition added
-		vgextend vgbook /dev/sdd2
-		pvs # display information
-		vgs # display information
-		lvextend vgbook/lvbook1 -L +144M
-		lvs # display information
+    * Add another partition *sdd2* of size 158MB to *vgbook* to increase the pool of allocatable space. Initialise the new partition prior to adding it to the volume group. Increase the size of *lvbook1* to 336MB. Display the basic information for the physical volumes, volume group, and logical volume:
+        ```shell
+        parted mkpart /dev/sdd primary 90 250
+        parted /dev/sdd set 2 lvm on
+        parted /dev/sdd print # confirm new partition added
+        vgextend vgbook /dev/sdd2
+        pvs # display information
+        vgs # display information
+        lvextend vgbook/lvbook1 -L +144M
+        lvs # display information
         ```
 
 1. Asghar Ghori - Exercise 14-4: Rename, Reduce, Extend, and Remove Logical Volumes
 
-	* Rename *lvol0* to *lvbook2*. Decrease the size of *lvbook2* to 50MB using the *lvreduce* command and then add 32MB with the *lvresize* command. Remove both logical volumes. Display the summary for the volume groups, logical volumes, and physical volumes:
-	    ```shell
-		lvrename vgbook/lvol0 vgbook/lvbook2
-		lvreduce vgbook/lvbook2 -L 50M
-		lvextend vgbook/lvbook2 -L +32M
-		lvremove vgbook/lvbook1
-		lvremove vgbook/lvbook2
-		pvs # display information
-		vgs # display information
-		lvs # display information
+    * Rename *lvol0* to *lvbook2*. Decrease the size of *lvbook2* to 50MB using the *lvreduce* command and then add 32MB with the *lvresize* command. Remove both logical volumes. Display the summary for the volume groups, logical volumes, and physical volumes:
+        ```shell
+        lvrename vgbook/lvol0 vgbook/lvbook2
+        lvreduce vgbook/lvbook2 -L 50M
+        lvextend vgbook/lvbook2 -L +32M
+        lvremove vgbook/lvbook1
+        lvremove vgbook/lvbook2
+        pvs # display information
+        vgs # display information
+        lvs # display information
         ```
 
 1. Asghar Ghori - Exercise 14-5: Reduce and Remove a Volume Group
 
-	* Reduce *vgbook* by removing the *sdd1* and *sdd2* physical volumes from it, then remove the volume group. Confirm the deletion of the volume group and the logical volumes at the end:
-	    ```shell
-		vgreduce vgbook /dev/sdd1 /dev/sdd2
-		vgremove vgbook
-		vgs # confirm removals
-		pvs # can be used to show output of vgreduce
+    * Reduce *vgbook* by removing the *sdd1* and *sdd2* physical volumes from it, then remove the volume group. Confirm the deletion of the volume group and the logical volumes at the end:
+        ```shell
+        vgreduce vgbook /dev/sdd1 /dev/sdd2
+        vgremove vgbook
+        vgs # confirm removals
+        pvs # can be used to show output of vgreduce
         ```
 
 1. Asghar Ghori - Exercise 14-5: Reduce and Remove a Volume Group
 
-	* Reduce *vgbook* by removing the *sdd1* and *sdd2* physical volumes from it, then remove the volume group. Confirm the deletion of the volume group and the logical volumes at the end:
-	    ```shell
-		vgreduce vgbook /dev/sdd1 /dev/sdd2
-		vgremove vgbook
-		vgs # confirm removals
-		pvs # can be used to show output of vgreduce
+    * Reduce *vgbook* by removing the *sdd1* and *sdd2* physical volumes from it, then remove the volume group. Confirm the deletion of the volume group and the logical volumes at the end:
+        ```shell
+        vgreduce vgbook /dev/sdd1 /dev/sdd2
+        vgremove vgbook
+        vgs # confirm removals
+        pvs # can be used to show output of vgreduce
         ```
 
 1. Asghar Ghori - Exercise 14-6: Uninitialise Physical Volumes
 
-	* Uninitialise all three physical volumes - *sdd1*, *sdd2*, and *sdb* - by deleting the LVM structural information from them. Use the *pvs* command for confirmation. Remove the partitions from the *sdd* disk and verify that all disks are now in their original raw state:
-	    ```shell
-		pvremove /dev/sdd1 /dev/sdd2 /dev/sdb
-		pvs
-		parted /dev/sdd
-		# enter print to view partitions
-		# enter rm 1
-		# enter rm 2
+    * Uninitialise all three physical volumes - *sdd1*, *sdd2*, and *sdb* - by deleting the LVM structural information from them. Use the *pvs* command for confirmation. Remove the partitions from the *sdd* disk and verify that all disks are now in their original raw state:
+        ```shell
+        pvremove /dev/sdd1 /dev/sdd2 /dev/sdb
+        pvs
+        parted /dev/sdd
+        # enter print to view partitions
+        # enter rm 1
+        # enter rm 2
         ```
 
 1. Asghar Ghori - Exercise 14-7: Install Software and Activate Stratis
 
-	* Install the Stratis software packages, start the Stratis service, and mark it for autostart on subsequent system reboots:
-	    ```shell
-		dnf install stratis-cli -y
-		systemctl start stratisd.service & systemctl enable stratisd.service
+    * Install the Stratis software packages, start the Stratis service, and mark it for autostart on subsequent system reboots:
+        ```shell
+        dnf install stratis-cli -y
+        systemctl start stratisd.service & systemctl enable stratisd.service
         ```
 
 1. Asghar Ghori - Exercise 14-8: Create and Confirm a Pool and File System
 
-	* Create a Stratis pool and a file system in it. Display information about the pool, file system, and device used:
-	    ```shell
-		stratis pool create mypool /dev/sdd
-		stratis pool list # confirm stratis pool created
-		stratis filesystem create mypool myfs
-		stratis filesystem list # confirm filesystem created, get device path
-		mkdir /myfs1
-		mount /stratis/mypool/myfs /myfs1
+    * Create a Stratis pool and a file system in it. Display information about the pool, file system, and device used:
+        ```shell
+        stratis pool create mypool /dev/sdd
+        stratis pool list # confirm stratis pool created
+        stratis filesystem create mypool myfs
+        stratis filesystem list # confirm filesystem created, get device path
+        mkdir /myfs1
+        mount /stratis/mypool/myfs /myfs1
         ```
 
 1. Asghar Ghori - Exercise 14-9: Expand and Rename a Pool and File System
 
-	* Expand the Stratis pool *mypool* using the *sdd* disk. Rename the pool and the file system it contains:
-	    ```shell
-		stratis pool add-data mypool /dev/sdd
-		stratis pool rename mypool mynewpool
-		stratis pool list # confirm changes
+    * Expand the Stratis pool *mypool* using the *sdd* disk. Rename the pool and the file system it contains:
+        ```shell
+        stratis pool add-data mypool /dev/sdd
+        stratis pool rename mypool mynewpool
+        stratis pool list # confirm changes
         ```
 
 1. Asghar Ghori - Exercise 14-10: Destroy a File System and Pool
 
-	* Destroy the Stratis file system and the pool that was created, expanded, and renamed in the above exercises. Verify the deletion with appropriate commands:
-	    ```shell
-		umount /bookfs1
-		stratis filesystem destroy mynewpool myfs
-		stratis filesystem list # confirm deletion
-		stratis pool destroy mynewpool
-		stratis pool list # confirm deletion
+    * Destroy the Stratis file system and the pool that was created, expanded, and renamed in the above exercises. Verify the deletion with appropriate commands:
+        ```shell
+        umount /bookfs1
+        stratis filesystem destroy mynewpool myfs
+        stratis filesystem list # confirm deletion
+        stratis pool destroy mynewpool
+        stratis pool list # confirm deletion
         ```
 
 1. Asghar Ghori - Exercise 15-1: Create and Mount Ext4, VFAT, and XFS File Systems in Partitions
 
-	* Create 2x100MB partitions on the `/dev/sdb` disk, initialise them separately with the Ext4 and VFAT file system types, define them for persistence using their UUIDs, create mount points called `/ext4fs` and `/vfatfs1`, attach them to the directory structure, and verify their availability and usage. Use the disk `/dev/sdc` and repeat the above procedure to establish an XFS file system in it and mount it on `/xfsfs1`:
-	    ```shell
-		parted /dev/sdb
-		# enter mklabel 
-		# enter msdos 
-		# enter mkpart 
-		# enter primary
-		# enter ext4
-		# enter start as 0
-		# enter end as 100MB
-		# enter print to verify
-		parted /dev/sdb mkpart primary 101MB 201MB
-		# file system entered during partition created is different
-		lsblk # verify partitions
-		mkfs.ext4 /dev/sdb1
-		mkfs.vfat /dev/sdb2
-		parted /dev/sdc
-		# enter mklabel 
-		# enter msdos 
-		# enter mkpart
-		# enter primary
-		# enter xfs
-		# enter start as 0
-		# enter end as 100MB
-		mkfs.xfs /dev/sdc1
-		mkdir /ext4fs /vfatfs1 /xfsfs1
-		lsblk -f # get UUID for each file system
-		vi /etc/fstab
-		# add entries using UUIDs with defaults and file system name
-		df -hT # view file systems and mount points
+    * Create 2x100MB partitions on the `/dev/sdb` disk, initialise them separately with the Ext4 and VFAT file system types, define them for persistence using their UUIDs, create mount points called `/ext4fs` and `/vfatfs1`, attach them to the directory structure, and verify their availability and usage. Use the disk `/dev/sdc` and repeat the above procedure to establish an XFS file system in it and mount it on `/xfsfs1`:
+        ```shell
+        parted /dev/sdb
+        # enter mklabel 
+        # enter msdos 
+        # enter mkpart 
+        # enter primary
+        # enter ext4
+        # enter start as 0
+        # enter end as 100MB
+        # enter print to verify
+        parted /dev/sdb mkpart primary 101MB 201MB
+        # file system entered during partition created is different
+        lsblk # verify partitions
+        mkfs.ext4 /dev/sdb1
+        mkfs.vfat /dev/sdb2
+        parted /dev/sdc
+        # enter mklabel 
+        # enter msdos 
+        # enter mkpart
+        # enter primary
+        # enter xfs
+        # enter start as 0
+        # enter end as 100MB
+        mkfs.xfs /dev/sdc1
+        mkdir /ext4fs /vfatfs1 /xfsfs1
+        lsblk -f # get UUID for each file system
+        vi /etc/fstab
+        # add entries using UUIDs with defaults and file system name
+        df -hT # view file systems and mount points
         ```
 
 1. Asghar Ghori - Exercise 15-2: Create and Mount XFS File System in VDO Volume
 
-	* Create a VDO volume called *vdo1* of logical size 16GB on the *sdc* disk (actual size 4GB). Initialise the volume with the XFS file system type, define it for persistence using its device files, create a mount point called `/xfsvdo1`, attach it to the directory structure, and verify its availability and usage:
-	    ```shell
-		wipefs -a /dev/sdc
-		vdo create --device /dev/sdc --vdoLogicalSize 16G --name vdo1 --vdoSlabSize 128
-		vdo list # list the vdo
-		lsblk /dev/sdc # show information about disk
-		mkdir /xfsvdo1
-		vdo status # get vdo path
-		mkfs.xfs /dev/mapper/vdo1
-		vi /etc/fstab
-		# copy example from man vdo create
-		mount -a
-		df -hT # view file systems and mount points
+    * Create a VDO volume called *vdo1* of logical size 16GB on the *sdc* disk (actual size 4GB). Initialise the volume with the XFS file system type, define it for persistence using its device files, create a mount point called `/xfsvdo1`, attach it to the directory structure, and verify its availability and usage:
+        ```shell
+        wipefs -a /dev/sdc
+        vdo create --device /dev/sdc --vdoLogicalSize 16G --name vdo1 --vdoSlabSize 128
+        vdo list # list the vdo
+        lsblk /dev/sdc # show information about disk
+        mkdir /xfsvdo1
+        vdo status # get vdo path
+        mkfs.xfs /dev/mapper/vdo1
+        vi /etc/fstab
+        # copy example from man vdo create
+        mount -a
+        df -hT # view file systems and mount points
         ```
 
 1. Asghar Ghori - Exercise 15-3: Create and Mount Ext4 and XFS File Systems in LVM Logical Volumes
 
-	* Create a volume group called *vgfs* comprised of a 160MB physical volume created in a partition on the `/dev/sdd` disk. The PE size for the volume group should be set at 16MB. Create 2 logical volumes called *ext4vol* and *xfsvol* of sizes 80MB each and initialise them with the Ext4 and XFS file system types. Ensure that both file systems are persistently defined using their logical volume device filenames. Create mount points */ext4fs2* and */xfsfs2*, mount the file systems, and verify their availability and usage:
-	    ```shell
-		vgcreate vgfs /dev/sdd --physicalextentsize 16MB
-		lvcreate vgfs --name ext4vol -L 80MB
-		lvcreate vgfs --name xfsvol -L 80MB
-		mkfs.ext4 /dev/vgfs/ext4vol
-		mkfs.xfs /dev/vgfs/xfsvol
-		blkid # copy UUID for /dev/mapper/vgfs-ext4vol and /dev/mapper/vgfs-xfsvol
-		vi /etc/fstab
-		# add lines with copied UUID
-		mount -a
-		df -hT # confirm added
+    * Create a volume group called *vgfs* comprised of a 160MB physical volume created in a partition on the `/dev/sdd` disk. The PE size for the volume group should be set at 16MB. Create 2 logical volumes called *ext4vol* and *xfsvol* of sizes 80MB each and initialise them with the Ext4 and XFS file system types. Ensure that both file systems are persistently defined using their logical volume device filenames. Create mount points */ext4fs2* and */xfsfs2*, mount the file systems, and verify their availability and usage:
+        ```shell
+        vgcreate vgfs /dev/sdd --physicalextentsize 16MB
+        lvcreate vgfs --name ext4vol -L 80MB
+        lvcreate vgfs --name xfsvol -L 80MB
+        mkfs.ext4 /dev/vgfs/ext4vol
+        mkfs.xfs /dev/vgfs/xfsvol
+        blkid # copy UUID for /dev/mapper/vgfs-ext4vol and /dev/mapper/vgfs-xfsvol
+        vi /etc/fstab
+        # add lines with copied UUID
+        mount -a
+        df -hT # confirm added
         ```
 
 1. Asghar Ghori - Exercise 15-4: Resize Ext4 and XFS File Systems in LVM Logical Volumes
 
-	* Grow the size of the *vgfs* volume group that was created above by adding the whole *sdc* disk to it. Extend the *ext4vol* logical volume along with the file system it contains by 40MB using 2 separate commands. Extend the *xfsvol* logical volume along with the file system it contains by 40MB using a single command:
-	    ```shell
-		vdo remove --name vdo1 # need to use this disk
-		vgextend vgfs /dev/sdc
-		lvextend -L +80 /dev/vgfs/ext4vol
-		fsadm resize /dev/vgfs/ext4vol
-		lvextend -L +80 /dev/vgfs/xfsvol
-		fsadm resize /dev/vgfs/xfsvol
-		lvresize -r -L +40 /dev/vgfs/xfsvol # -r resizes file system
-		lvs # confirm resizing
+    * Grow the size of the *vgfs* volume group that was created above by adding the whole *sdc* disk to it. Extend the *ext4vol* logical volume along with the file system it contains by 40MB using 2 separate commands. Extend the *xfsvol* logical volume along with the file system it contains by 40MB using a single command:
+        ```shell
+        vdo remove --name vdo1 # need to use this disk
+        vgextend vgfs /dev/sdc
+        lvextend -L +80 /dev/vgfs/ext4vol
+        fsadm resize /dev/vgfs/ext4vol
+        lvextend -L +80 /dev/vgfs/xfsvol
+        fsadm resize /dev/vgfs/xfsvol
+        lvresize -r -L +40 /dev/vgfs/xfsvol # -r resizes file system
+        lvs # confirm resizing
         ```
 
 1. Asghar Ghori - Exercise 15-5: Create, Mount, and Expand XFS File System in Stratis Volume
 
-	* Create a Stratis pool called *strpool* and a file system *strfs2* by reusing the 1GB *sdc* disk. Display information about the pool, file system, and device used. Expand the pool to include another 1GB disk *sdh* and confirm:
-	    ```shell
-		stratis pool create strpool /dev/sdc
-		stratis filesystem create strpool strfs2
-		stratis pool list # view created stratis pool
-		stratis filesystem list # view created filesystem
-		stratis pool add-data strpool /dev/sdd
-		stratis blockdev list strpool # list block devices in pool
-		mkdir /strfs2
-		lsblk /stratis/strpool/strfs2 -o UUID
-		vi /etc/fstab
-		# add line
-		# UUID=2913810d-baed-4544-aced-a6a2c21191fe /strfs2 xfs x-systemd.requires=stratisd.service 0 0
+    * Create a Stratis pool called *strpool* and a file system *strfs2* by reusing the 1GB *sdc* disk. Display information about the pool, file system, and device used. Expand the pool to include another 1GB disk *sdh* and confirm:
+        ```shell
+        stratis pool create strpool /dev/sdc
+        stratis filesystem create strpool strfs2
+        stratis pool list # view created stratis pool
+        stratis filesystem list # view created filesystem
+        stratis pool add-data strpool /dev/sdd
+        stratis blockdev list strpool # list block devices in pool
+        mkdir /strfs2
+        lsblk /stratis/strpool/strfs2 -o UUID
+        vi /etc/fstab
+        # add line
+        # UUID=2913810d-baed-4544-aced-a6a2c21191fe /strfs2 xfs x-systemd.requires=stratisd.service 0 0
         ```
 
 
 1. Asghar Ghori - Exercise 15-6: Create and Activate Swap in Partition and Logical Volume
 
-	* Create 1 swap area in a new 40MB partition called *sdc3* using the *mkswap* command. Create another swap area in a 140MB logical volume called *swapvol* in *vgfs*. Add their entries to the `/etc/fstab` file for persistence. Use the UUID and priority 1 for the partition swap and the device file and priority 2 for the logical volume swap. Activate them and use appropriate tools to validate the activation:
-	    ```shell
-		parted /dev/sdc
-		# enter mklabel msdos
-		# enter mkpart primary 0 40
-		parted /dev/sdd
-		# enter mklabel msdos
-		# enter mkpart primary 0 140
-		mkswap -L sdc3 /dev/sdc 40
-		vgcreate vgfs /dev/sdd1
-		lvcreate vgfs --name swapvol -L 132
-		mkswap swapvol /dev/sdd1
-		mkswap /dev/vgfs/swapvol
-		lsblk -f # get UUID
-		vi /etc/fstab
-		# add 2 lines, e.g. first line
-		# UUID=WzDb5Y-QMtj-fYeo-iW0f-sj8I-ShRu-EWRIcp swap swap pri=2 0 0
-		mount -a
+    * Create 1 swap area in a new 40MB partition called *sdc3* using the *mkswap* command. Create another swap area in a 140MB logical volume called *swapvol* in *vgfs*. Add their entries to the `/etc/fstab` file for persistence. Use the UUID and priority 1 for the partition swap and the device file and priority 2 for the logical volume swap. Activate them and use appropriate tools to validate the activation:
+        ```shell
+        parted /dev/sdc
+        # enter mklabel msdos
+        # enter mkpart primary 0 40
+        parted /dev/sdd
+        # enter mklabel msdos
+        # enter mkpart primary 0 140
+        mkswap -L sdc3 /dev/sdc 40
+        vgcreate vgfs /dev/sdd1
+        lvcreate vgfs --name swapvol -L 132
+        mkswap swapvol /dev/sdd1
+        mkswap /dev/vgfs/swapvol
+        lsblk -f # get UUID
+        vi /etc/fstab
+        # add 2 lines, e.g. first line
+        # UUID=WzDb5Y-QMtj-fYeo-iW0f-sj8I-ShRu-EWRIcp swap swap pri=2 0 0
+        mount -a
         ```
 
 1. Asghar Ghori - Exercise 16-1: Export Share on NFS Server
 
-	* Create a directory called `/common` and export it to *server1* in read/write mode. Ensure that NFS traffic is allowed through the firewall. Confirm the export:
-	    ```shell
-		dnf install nfs-utils -y
-		mkdir /common
-		firewall-cmd --permanent --add-service=nfs
-		firewall-cmd --reload
-		systemctl start nfs-server.service & systemctl enable nfs-server.service
-		echo "/nfs *(rw)" >> /etc/exports
-		exportfs -av
+    * Create a directory called `/common` and export it to *server1* in read/write mode. Ensure that NFS traffic is allowed through the firewall. Confirm the export:
+        ```shell
+        dnf install nfs-utils -y
+        mkdir /common
+        firewall-cmd --permanent --add-service=nfs
+        firewall-cmd --reload
+        systemctl start nfs-server.service & systemctl enable nfs-server.service
+        echo "/nfs *(rw)" >> /etc/exports
+        exportfs -av
         ```
 
 1. Asghar Ghori - Exercise 16-2: Mount Share on NFS Client
 
-	* Mount the `/common` share exported above. Create a mount point called `/local`, mount the remote share manually, and confirm the mount. Add the remote share to the file system table for persistence. Remount the share and confirm the mount. Create a test file in the mount point and confirm the file creation on the NFS server:
-	    ```shell
-		dnf install cifs-utils -y
-		mkdir /local
-		chmod 755 local
-		mount 10.0.2.15:/common /local
-		vi /etc/fstab
-		# add line
-		# 10.0.2.15:/common /local nfs _netdev 0 0
-		mount -a
-		touch /local/test # confirm that it appears on server in common
+    * Mount the `/common` share exported above. Create a mount point called `/local`, mount the remote share manually, and confirm the mount. Add the remote share to the file system table for persistence. Remount the share and confirm the mount. Create a test file in the mount point and confirm the file creation on the NFS server:
+        ```shell
+        dnf install cifs-utils -y
+        mkdir /local
+        chmod 755 local
+        mount 10.0.2.15:/common /local
+        vi /etc/fstab
+        # add line
+        # 10.0.2.15:/common /local nfs _netdev 0 0
+        mount -a
+        touch /local/test # confirm that it appears on server in common
         ```
 
 1. Asghar Ghori - Exercise 16-3: Access NFS Share Using Direct Map
 
-	* Configure a direct map to automount the NFS share `/common` that is available from *server2*. Install the relevant software, create a local mount point `/autodir`, and set up AutoFS maps to support the automatic mounting. Note that `/common` is already mounted on the `/local` mount point on *server1* via *fstab*. Ensure there is no conflict in configuration or functionality between the 2:
-	    ```shell
-		dnf install autofs -y
-		mkdir /autodir
-		vi /etc/auto.master
-		# add line
-		#/- /etc/auto.master.d/auto.dir
-		vi /etc/auto.master.d/auto.dir
-		# add line
-		#/autodir 172.25.1.4:/common
-		systemctl restart autofs
+    * Configure a direct map to automount the NFS share `/common` that is available from *server2*. Install the relevant software, create a local mount point `/autodir`, and set up AutoFS maps to support the automatic mounting. Note that `/common` is already mounted on the `/local` mount point on *server1* via *fstab*. Ensure there is no conflict in configuration or functionality between the 2:
+        ```shell
+        dnf install autofs -y
+        mkdir /autodir
+        vi /etc/auto.master
+        # add line
+        #/- /etc/auto.master.d/auto.dir
+        vi /etc/auto.master.d/auto.dir
+        # add line
+        #/autodir 172.25.1.4:/common
+        systemctl restart autofs
         ```
 
 1. Asghar Ghori - Exercise 16-4: Access NFS Share Using Indirect Map
 
-	* Configure an indirect map to automount the NFS share `/common` that is available from *server2*. Install the relevant software and set up AutoFS maps to support the automatic mounting. Observe that the specified mount point "autoindir" is created automatically under `/misc`. Note that `/common` is already mounted on the `/local` mount point on *server1* via *fstab*. Ensure there is no conflict in configuration or functionality between the 2:
-	    ```shell
-		dnf install autofs -y
-		grep /misc /etc/auto.master # confirm entry is there
-		vi /etc/auto.misc
-		# add line
-		#autoindir 172.25.1.4:/common
-		systemctl restart autofs
+    * Configure an indirect map to automount the NFS share `/common` that is available from *server2*. Install the relevant software and set up AutoFS maps to support the automatic mounting. Observe that the specified mount point "autoindir" is created automatically under `/misc`. Note that `/common` is already mounted on the `/local` mount point on *server1* via *fstab*. Ensure there is no conflict in configuration or functionality between the 2:
+        ```shell
+        dnf install autofs -y
+        grep /misc /etc/auto.master # confirm entry is there
+        vi /etc/auto.misc
+        # add line
+        #autoindir 172.25.1.4:/common
+        systemctl restart autofs
         ```
 
 1. Asghar Ghori - Exercise 16-5: Automount User Home Directories Using Indirect Map
 
-	* On *server1* (NFS server), create a user account called *user30* with UID 3000. Add the `/home` directory to the list of NFS shares so that it becomes available for remote mount. On *server2* (NFS client), create a user account called *user30* with UID 3000, base directory `/nfshome`, and no user home directory. Create an umbrella mount point called `/nfshome` for mounting the user home directory from the NFS server. Install the relevent software and establish an indirect map to automount the remote home directory of *user30* under `/nfshome`. Observe that the home directory of *user30* is automounted under `/nfshome` when you sign in as *user30*:
-	    ```shell
-		# on server 1 (NFS server)
-		useradd -u 3000 user30
-		echo password1 | passwd --stdin user30
-		vi /etc/exports
-		# add line
-		#/home *(rw)
-		exportfs -avr
+    * On *server1* (NFS server), create a user account called *user30* with UID 3000. Add the `/home` directory to the list of NFS shares so that it becomes available for remote mount. On *server2* (NFS client), create a user account called *user30* with UID 3000, base directory `/nfshome`, and no user home directory. Create an umbrella mount point called `/nfshome` for mounting the user home directory from the NFS server. Install the relevent software and establish an indirect map to automount the remote home directory of *user30* under `/nfshome`. Observe that the home directory of *user30* is automounted under `/nfshome` when you sign in as *user30*:
+        ```shell
+        # on server 1 (NFS server)
+        useradd -u 3000 user30
+        echo password1 | passwd --stdin user30
+        vi /etc/exports
+        # add line
+        #/home *(rw)
+        exportfs -avr
 
-		# on server 2 (NFS client)
-		dnf install autofs -y		
-		useradd user30 -u 3000 -Mb /nfshome
-		echo password1 | passwd --stdin user30
-		mkdir /nfshome
-		vi /etc/auto.master
-		# add line
-		#/nfshome /etc/auto.master.d/auto.home
-		vi /etc/auto.master.d/auto.home
-		# add line
-		#* -rw &:/home&
-		systemctl enable autofs.service & systemctl start autofs.service
-		sudo su - user30
-		# confirm home directory is mounted
+        # on server 2 (NFS client)
+        dnf install autofs -y        
+        useradd user30 -u 3000 -Mb /nfshome
+        echo password1 | passwd --stdin user30
+        mkdir /nfshome
+        vi /etc/auto.master
+        # add line
+        #/nfshome /etc/auto.master.d/auto.home
+        vi /etc/auto.master.d/auto.home
+        # add line
+        #* -rw &:/home&
+        systemctl enable autofs.service & systemctl start autofs.service
+        sudo su - user30
+        # confirm home directory is mounted
         ```
 
 1. Asghar Ghori - Exercise 17.1: Change System Hostname
 
-	* Change the hostnames of *server1* to *server10.example.com* and *server2* to *server20.example.com* by editing a file and restarting the corresponding service daemon and using a command respectively:
-	    ```shell
-		# on server 1
-		vi /etc/hostname
-		# change line to server10.example.com
-		systemctl restart systemd-hostnamed
-		
-		# on server 2
-		hostnamectl set-hostname server20.example.com
+    * Change the hostnames of *server1* to *server10.example.com* and *server2* to *server20.example.com* by editing a file and restarting the corresponding service daemon and using a command respectively:
+        ```shell
+        # on server 1
+        vi /etc/hostname
+        # change line to server10.example.com
+        systemctl restart systemd-hostnamed
+        
+        # on server 2
+        hostnamectl set-hostname server20.example.com
         ```
 
 1. Asghar Ghori - Exercise 17.2: Add Network Devices to server10 and server20
 
-	* Add one network interface to *server10* and one to *server20* using VirtualBox:
-	    ```shell
-		# A NAT Network has already been created and attached to both servers in VirtualBox to allow them to have seperate IP addresses (note that the MAC addressed had to be changed)
-		# Add a second Internal Network adapter named intnet to each server
-		nmcli conn show # observe enp0s8 added as a connection
+    * Add one network interface to *server10* and one to *server20* using VirtualBox:
+        ```shell
+        # A NAT Network has already been created and attached to both servers in VirtualBox to allow them to have seperate IP addresses (note that the MAC addressed had to be changed)
+        # Add a second Internal Network adapter named intnet to each server
+        nmcli conn show # observe enp0s8 added as a connection
         ```
 
 1. Asghar Ghori - Exercise 17.3: Configure New Network Connection Manually
 
-	* Create a connection profile for the new network interface on *server10* using a text editing tool. Assign the IP 172.10.10.110/24 with gateway 172.10.10.1 and set it to autoactivate at system reboots. Deactivate and reactive this interface at the command prompt:
-	    ```shell
-		vi /etc/sysconfig/network-scripts/ifcfg-enp0s8
-		# add contents of file
-		#TYPE=Ethernet
-		#BOOTPROTO=static
-		#IPV4_FAILURE_FATAL=no
-		#IPV6INIT=no
-		#NAME=enp0s8
-		#DEVICE=enp0s8
-		#ONBOOT=yes
-		#IPADDR=172.10.10.110
-		#PREFIX=24
-		#GATEWAY=172.10.10.1
-		ifdown enp0s8
-		ifup enp0s8
-		ip a # verify activation
+    * Create a connection profile for the new network interface on *server10* using a text editing tool. Assign the IP 172.10.10.110/24 with gateway 172.10.10.1 and set it to autoactivate at system reboots. Deactivate and reactive this interface at the command prompt:
+        ```shell
+        vi /etc/sysconfig/network-scripts/ifcfg-enp0s8
+        # add contents of file
+        #TYPE=Ethernet
+        #BOOTPROTO=static
+        #IPV4_FAILURE_FATAL=no
+        #IPV6INIT=no
+        #NAME=enp0s8
+        #DEVICE=enp0s8
+        #ONBOOT=yes
+        #IPADDR=172.10.10.110
+        #PREFIX=24
+        #GATEWAY=172.10.10.1
+        ifdown enp0s8
+        ifup enp0s8
+        ip a # verify activation
         ```
 
 1. Asghar Ghori - Exercise 17.4: Configure New Network Connection Using nmcli
 
-	* Create a connection profile using the *nmcli* command for the new network interface enp0s8 that was added to *server20*. Assign the IP 172.10.10.120/24 with gateway 172.10.10.1, and set it to autoactivate at system reboot. Deactivate and reactivate this interface at the command prompt:
-	    ```shell
-		nmcli dev status # show devices with enp0s8 disconnected
-		nmcli con add type Ethernet ifname enp0s8 con-name enp0s8 ip4 172.10.10.120/24 gw4 172.10.10.1
-		nmcli conn show # verify connection added
-		nmcli con down enp0s8
-		nmcli con up enp0s8
-		ip a # confirm ip address is as specified
+    * Create a connection profile using the *nmcli* command for the new network interface enp0s8 that was added to *server20*. Assign the IP 172.10.10.120/24 with gateway 172.10.10.1, and set it to autoactivate at system reboot. Deactivate and reactivate this interface at the command prompt:
+        ```shell
+        nmcli dev status # show devices with enp0s8 disconnected
+        nmcli con add type Ethernet ifname enp0s8 con-name enp0s8 ip4 172.10.10.120/24 gw4 172.10.10.1
+        nmcli conn show # verify connection added
+        nmcli con down enp0s8
+        nmcli con up enp0s8
+        ip a # confirm ip address is as specified
         ```
 
 1. Asghar Ghori - Exercise 17.5: Update Hosts Table and Test Connectivity
 
-	* Update the `/etc/hosts` file on both *server10* and *server20*. Add the IP addresses assigned to both connections and map them to hostnames *server10*, *server10s8*, *server20*, and *server20s8* appropriately. Test connectivity from *server10* to *server20* to and from *server10s8* to *server20s8* using their IP addresses and then their hostnames:
-	    ```shell
-		## on server20
-		vi /etc/hosts
-		# add lines
-		#172.10.10.120 server20.example.com server20
-		#172.10.10.120 server20s8.example.com server20s8
-		#192.168.0.110 server10.example.com server10
-		#192.168.0.110 server10s8.example.com server10s8
+    * Update the `/etc/hosts` file on both *server10* and *server20*. Add the IP addresses assigned to both connections and map them to hostnames *server10*, *server10s8*, *server20*, and *server20s8* appropriately. Test connectivity from *server10* to *server20* to and from *server10s8* to *server20s8* using their IP addresses and then their hostnames:
+        ```shell
+        ## on server20
+        vi /etc/hosts
+        # add lines
+        #172.10.10.120 server20.example.com server20
+        #172.10.10.120 server20s8.example.com server20s8
+        #192.168.0.110 server10.example.com server10
+        #192.168.0.110 server10s8.example.com server10s8
 
-		## on server10
-		vi /etc/hosts
-		# add lines
-		#172.10.10.120 server20.example.com server20
-		#172.10.10.120 server20s8.example.com server20s8
-		#192.168.0.110 server10.example.com server10
-		#192.168.0.110 server10s8.example.com server10s8
-		ping server10 # confirm host name resolves
+        ## on server10
+        vi /etc/hosts
+        # add lines
+        #172.10.10.120 server20.example.com server20
+        #172.10.10.120 server20s8.example.com server20s8
+        #192.168.0.110 server10.example.com server10
+        #192.168.0.110 server10s8.example.com server10s8
+        ping server10 # confirm host name resolves
         ```
 
 1. Asghar Ghori - Exercise 18.1: Configure NTP Client
 
-	* Install the Chrony software package and activate the service without making any changes to the default configuration. Validate the binding and operation:
-	    ```shell
-		dnf install chrony -y
-		vi /etc/chrony.conf # view default configuration
-		systemctl start chronyd.service & systemctl enable chronyd.service
-		chronyc sources # view time sources
-		chronyc tracking # view clock performance
+    * Install the Chrony software package and activate the service without making any changes to the default configuration. Validate the binding and operation:
+        ```shell
+        dnf install chrony -y
+        vi /etc/chrony.conf # view default configuration
+        systemctl start chronyd.service & systemctl enable chronyd.service
+        chronyc sources # view time sources
+        chronyc tracking # view clock performance
         ```
 
 1. Asghar Ghori - Exercise 19.1: Access RHEL System from Another RHEL System
 
-	* Issue the *ssh* command as *user1* on *server10* to log in to *server20*. Run appropriate commands on *server20* for validation. Log off and return to the originating system:
-	    ```shell
-		# on server 10
-		ssh user1@server20
-		whoami
-		pwd
-		hostname # check some basic information
-		# ctrl + D to logout
+    * Issue the *ssh* command as *user1* on *server10* to log in to *server20*. Run appropriate commands on *server20* for validation. Log off and return to the originating system:
+        ```shell
+        # on server 10
+        ssh user1@server20
+        whoami
+        pwd
+        hostname # check some basic information
+        # ctrl + D to logout
         ```
 
 1. Asghar Ghori - Exercise 19.2: Access RHEL System from Windows
 
-	* Use a program called PuTTY to access *server20* using its IP address and as *user1*. Run appropriate commands on *server20* for validation. Log off to terminate the session:
-	    ```shell
-		# as above but using the server20 IP address in PuTTy
+    * Use a program called PuTTY to access *server20* using its IP address and as *user1*. Run appropriate commands on *server20* for validation. Log off to terminate the session:
+        ```shell
+        # as above but using the server20 IP address in PuTTy
         ```
 
 1. Asghar Ghori - Exercise 19.3: Generate, Distribute, and Use SSH Keys
 
-	* Generate a password-less ssh key pair using RSA for *user1* on *server10*. Display the private and public file contents. Distribute the public key to *server20* and attempt to log on to *server20* from *server10*. Show the log file message for the login attempt:
-	    ```shell
-		# on server10
-		ssh-keygen
-		# press enter to select default file names and no password
-		ssh-copy-id server20
-		ssh server20 # confirm you can login
+    * Generate a password-less ssh key pair using RSA for *user1* on *server10*. Display the private and public file contents. Distribute the public key to *server20* and attempt to log on to *server20* from *server10*. Show the log file message for the login attempt:
+        ```shell
+        # on server10
+        ssh-keygen
+        # press enter to select default file names and no password
+        ssh-copy-id server20
+        ssh server20 # confirm you can login
 
-		# on server20
-		vi /var/log/secure # view login event
+        # on server20
+        vi /var/log/secure # view login event
         ```
 
 1. Asghar Ghori - Exercise 20.1: Add Services and Ports, and Manage Zones
 
-	* Determine the current active zone. Add and activate a permanent rule to allow HTTP traffic on port 80, and then add a runtime rule for traffic intended for TCP port 443. Add a permanent rule to the *internal* zone for TCP port range 5901 to 5910. Confirm the changes and display the contents of the affected zone files. Switch the default zone to the *internal* zone and activate it:
-	    ```shell
-		# on server10
-		firewall-cmd --get-active-zones # returns public with enp0s8 interface
-		firewall-cmd --add-service=http --permanent
-		firewall-cmd --add-service=https
-		firewall-cmd --add-port=80/tcp --permanent
-		firewall-cmd --add-port=443/tcp
-		firewall-cmd --zone=internal --add-port=5901-5910/tcp --permanent
-		firewall-cmd --reload
-		firewall-cmd --list-services # confirm result
-		firewall-cmd --list-ports # confirm result
-		vi /etc/firewalld/zones/public.xml # view configuration
-		vi /etc/firewalld/zones/internal.xml # view configuration
-		firewall-cmd --set-default-zone=internal
-		firewall-cmd --reload
-		firewall-cmd --get-active-zones # returns internal with enp0s8 interface
+    * Determine the current active zone. Add and activate a permanent rule to allow HTTP traffic on port 80, and then add a runtime rule for traffic intended for TCP port 443. Add a permanent rule to the *internal* zone for TCP port range 5901 to 5910. Confirm the changes and display the contents of the affected zone files. Switch the default zone to the *internal* zone and activate it:
+        ```shell
+        # on server10
+        firewall-cmd --get-active-zones # returns public with enp0s8 interface
+        firewall-cmd --add-service=http --permanent
+        firewall-cmd --add-service=https
+        firewall-cmd --add-port=80/tcp --permanent
+        firewall-cmd --add-port=443/tcp
+        firewall-cmd --zone=internal --add-port=5901-5910/tcp --permanent
+        firewall-cmd --reload
+        firewall-cmd --list-services # confirm result
+        firewall-cmd --list-ports # confirm result
+        vi /etc/firewalld/zones/public.xml # view configuration
+        vi /etc/firewalld/zones/internal.xml # view configuration
+        firewall-cmd --set-default-zone=internal
+        firewall-cmd --reload
+        firewall-cmd --get-active-zones # returns internal with enp0s8 interface
         ```
 
 1. Asghar Ghori - Exercise 20.2: Remove Services and Ports, and Manage Zones
 
-	* Remove the 2 permanent rules added above. Switch back to the *public* zone as the default zone, and confirm the changes:
-	    ```shell
-		firewall-cmd --set-default-zone=public
-		firewall-cmd --remove-service=http --permanent
-		firewall-cmd --remove-port=80/tcp --permanent
-		firewall-cmd --reload
-		firewall-cmd --list-services # confirm result
-		firewall-cmd --list-ports # confirm result
+    * Remove the 2 permanent rules added above. Switch back to the *public* zone as the default zone, and confirm the changes:
+        ```shell
+        firewall-cmd --set-default-zone=public
+        firewall-cmd --remove-service=http --permanent
+        firewall-cmd --remove-port=80/tcp --permanent
+        firewall-cmd --reload
+        firewall-cmd --list-services # confirm result
+        firewall-cmd --list-ports # confirm result
         ```
 
 1. Asghar Ghori - Exercise 20.3: Test the Effect of Firewall Rule
 
-	* Remove the *sshd* service rule from the runtime configuration on *server10*, and try to access the server from *server20* using the *ssh* command:
-	    ```shell
-		# on server10
-		firewall-cmd --remove-service=ssh --permanent
-		firewall-cmd --reload
-		
-		# on server20
-		ssh user1@server10
-		# no route to host message displayed
+    * Remove the *sshd* service rule from the runtime configuration on *server10*, and try to access the server from *server20* using the *ssh* command:
+        ```shell
+        # on server10
+        firewall-cmd --remove-service=ssh --permanent
+        firewall-cmd --reload
+        
+        # on server20
+        ssh user1@server10
+        # no route to host message displayed
 
-		# on server10
-		firewall-cmd --add-service=ssh --permanent
-		firewall-cmd --reload
-		
-		# on server20
-		ssh user1@server10
-		# success
+        # on server10
+        firewall-cmd --add-service=ssh --permanent
+        firewall-cmd --reload
+        
+        # on server20
+        ssh user1@server10
+        # success
         ```
 
 1. Asghar Ghori - Exercise 21.1: Modify SELinux File Context
 
-	* Create a directory *sedir1* under `/tmp` and a file *sefile1* under *sedir1*. Check the context on the directory and file. Change the SELinux user and type to user_u and public_content_t on both and verify:
-	    ```shell
-		mkdir /tmp/sedir1
-		touch /tmp/sedir1/sefile1
-		cd /tmp/sedir1
-		ll -Z # unconfined_u:object_r:user_tmp_t:s0 shown
-		chcon -u user_u -R sedir1
-		chcon -t public_content_t -R sedir1
+    * Create a directory *sedir1* under `/tmp` and a file *sefile1* under *sedir1*. Check the context on the directory and file. Change the SELinux user and type to user_u and public_content_t on both and verify:
+        ```shell
+        mkdir /tmp/sedir1
+        touch /tmp/sedir1/sefile1
+        cd /tmp/sedir1
+        ll -Z # unconfined_u:object_r:user_tmp_t:s0 shown
+        chcon -u user_u -R sedir1
+        chcon -t public_content_t -R sedir1
         ```
 
 1. Asghar Ghori - Exercise 21.2: Add and Apply File Context
 
-	* Add the current context on *sedir1* to the SELinux policy database to ensure a relabeling will not reset it to its previous value. Next, you will change the context on the directory to some random values. Restore the default context from the policy database back to the directory recursively:
-	    ```shell
-		semanage fcontext -a -t public_content_t -s user_u '/tmp/sedir1(/.*)?'
-		cat /etc/selinux/targeted/contexts/files/file_contexts.local # view recently added policies
-		restorecon -Rv sedir1 # any chcon changes are reverted with this
+    * Add the current context on *sedir1* to the SELinux policy database to ensure a relabeling will not reset it to its previous value. Next, you will change the context on the directory to some random values. Restore the default context from the policy database back to the directory recursively:
+        ```shell
+        semanage fcontext -a -t public_content_t -s user_u '/tmp/sedir1(/.*)?'
+        cat /etc/selinux/targeted/contexts/files/file_contexts.local # view recently added policies
+        restorecon -Rv sedir1 # any chcon changes are reverted with this
         ```
 
 1. Asghar Ghori - Exercise 21.3: Add and Delete Network Ports
 
-	* Add a non-standard port 8010 to the SELinux policy database for the *httpd* service and confirm the addition. Remove the port from the policy and verify the deletion:
-	    ```shell
-		semanage port -a -t http_port_t -p tcp 8010
-		semanage port -l | grep http # list all port settings
-		semanage port -d -t http_port_t -p tcp 8010
-		semanage port -l | grep http
+    * Add a non-standard port 8010 to the SELinux policy database for the *httpd* service and confirm the addition. Remove the port from the policy and verify the deletion:
+        ```shell
+        semanage port -a -t http_port_t -p tcp 8010
+        semanage port -l | grep http # list all port settings
+        semanage port -d -t http_port_t -p tcp 8010
+        semanage port -l | grep http
         ```
 
 1. Asghar Ghori - Exercise 21.4: Copy Files with and without Context
 
-	* Create a file called *sefile2* under `/tmp` and display its context. Copy this file to the `/etc/default` directory, and observe the change in the context. Remove *sefile2* from `/etc/default`, and copy it again to the same destination, ensuring that the target file receives the source file's context:
-	    ```shell
-		cd /tmp
-		touch sefile2
-		ll -Zrt # sefile2 context is unconfined_u:object_r:user_tmp_t:s0
-		cp sefile2 /etc/default
-		cd /etc/default
-		ll -Zrt # sefile2 context is unconfined_u:object_r:etc_t:s0
-		rm /etc/default/sefile2
-		cp /tmp/sefile2 /etc/default/sefile2 --preserve=context
-		ll -Zrt # sefile2 context is unconfined_u:object_r:user_tmp_t:s0
+    * Create a file called *sefile2* under `/tmp` and display its context. Copy this file to the `/etc/default` directory, and observe the change in the context. Remove *sefile2* from `/etc/default`, and copy it again to the same destination, ensuring that the target file receives the source file's context:
+        ```shell
+        cd /tmp
+        touch sefile2
+        ll -Zrt # sefile2 context is unconfined_u:object_r:user_tmp_t:s0
+        cp sefile2 /etc/default
+        cd /etc/default
+        ll -Zrt # sefile2 context is unconfined_u:object_r:etc_t:s0
+        rm /etc/default/sefile2
+        cp /tmp/sefile2 /etc/default/sefile2 --preserve=context
+        ll -Zrt # sefile2 context is unconfined_u:object_r:user_tmp_t:s0
         ```
 
 1. Asghar Ghori - Exercise 21.5: View and Toggle SELinux Boolean Values
 
-	* Display the current state of the Boolean nfs_export_all_rw. Toggle its value temporarily, and reboot the system. Flip its value persistently after the system has been back up:
-	    ```shell
-		getsebool nfs_export_all_rw # nfs_export_all_rw --> on
-		sestatus -b | grep nfs_export_all_rw # also works
-		setsebool nfs_export_all_rw_off
-		reboot
-		setsebool nfs_export_all_rw_off -P
+    * Display the current state of the Boolean nfs_export_all_rw. Toggle its value temporarily, and reboot the system. Flip its value persistently after the system has been back up:
+        ```shell
+        getsebool nfs_export_all_rw # nfs_export_all_rw --> on
+        sestatus -b | grep nfs_export_all_rw # also works
+        setsebool nfs_export_all_rw_off
+        reboot
+        setsebool nfs_export_all_rw_off -P
         ```
 
 1. Prince Bajaj - Managing Containers
 
-	* Download the Apache web server container image (httpd 2.4) and inspect the container image. Check the exposed ports in the container image configuration:
-	    ```shell
-		# as root
-		usermod user1 -aG wheel
-		cat /etc/groups | grep wheel # confirm
-		
-		# as user1
-		podman search httpd # get connection refused
-		# this was because your VM was setup as an Internal Network and not a NAT network so it couldn't access the internet
-		# see result registry.access.redhat.com/rhscl/httpd-24-rhel7
-		skopeo inspect --creds name:password docker://registry.access.redhat.com/rhscl/httpd-24-rhel7
-		podman pull registry.access.redhat.com/rhscl/httpd-24-rhel7
-		podman inspect registry.access.redhat.com/rhscl/httpd-24-rhel7
-		# exposed ports shown as 8080 and 8443
+    * Download the Apache web server container image (httpd 2.4) and inspect the container image. Check the exposed ports in the container image configuration:
+        ```shell
+        # as root
+        usermod user1 -aG wheel
+        cat /etc/groups | grep wheel # confirm
+        
+        # as user1
+        podman search httpd # get connection refused
+        # this was because your VM was setup as an Internal Network and not a NAT network so it couldn't access the internet
+        # see result registry.access.redhat.com/rhscl/httpd-24-rhel7
+        skopeo inspect --creds name:password docker://registry.access.redhat.com/rhscl/httpd-24-rhel7
+        podman pull registry.access.redhat.com/rhscl/httpd-24-rhel7
+        podman inspect registry.access.redhat.com/rhscl/httpd-24-rhel7
+        # exposed ports shown as 8080 and 8443
         ```
 
-	* Run the httpd container in the background. Assign the name *myweb* to the container, verify that the container is running, stop the container and verify that it has stopped, and delete the container and the container image:
-	    ```shell
-		podman run --name myweb -d registry.access.redhat.com/rhscl/httpd-24-rhel7
-		podman ps # view running containers
-		podman stop myweb
-		podman ps # view running containers
-		podman rm myweb
-		podman rmi registry.access.redhat.com/rhscl/httpd-24-rhel7
+    * Run the httpd container in the background. Assign the name *myweb* to the container, verify that the container is running, stop the container and verify that it has stopped, and delete the container and the container image:
+        ```shell
+        podman run --name myweb -d registry.access.redhat.com/rhscl/httpd-24-rhel7
+        podman ps # view running containers
+        podman stop myweb
+        podman ps # view running containers
+        podman rm myweb
+        podman rmi registry.access.redhat.com/rhscl/httpd-24-rhel7
         ```
 
-	* Pull the Apache web server container image (httpd 2.4) and run the container with the name *webserver*. Configure *webserver* to display content "Welcome to container-based web server". Use port 3333 on the host machine to receive http requests. Start a bash shell in the container to verify the configuration:
-	    ```shell
-		# as root
-		dnf install httpd -y
-		vi /var/www/html/index.html
-		# add row "Welcome to container-based web server"
+    * Pull the Apache web server container image (httpd 2.4) and run the container with the name *webserver*. Configure *webserver* to display content "Welcome to container-based web server". Use port 3333 on the host machine to receive http requests. Start a bash shell in the container to verify the configuration:
+        ```shell
+        # as root
+        dnf install httpd -y
+        vi /var/www/html/index.html
+        # add row "Welcome to container-based web server"
 
-		# as user1
-		podman search httpd
-		podman pull registry.access.redhat.com/rhscl/httpd-24-rhel7
-		podman inspect registry.access.redhat.com/rhscl/httpd-24-rhel7 # shows 8080 in exposedPorts, and /opt/rh/httpd24/root/var/www is shown as HTTPD_DATA_ORIG_PATH 
-		podman run -d=true -p 3333:8080 --name=webserver -v /var/www/html:/opt/rh/httpd24/root/var/www/html registry.access.redhat.com/rhscl/httpd-24-rhel7
-		curl http://localhost:3333 # success!
-				
-		# to go into the container and (for e.g.) check the SELinux context
-		podman exec -it webserver /bin/bash
-		cd /opt/rh/httpd24/root/var/www/html
-		ls -ldZ
+        # as user1
+        podman search httpd
+        podman pull registry.access.redhat.com/rhscl/httpd-24-rhel7
+        podman inspect registry.access.redhat.com/rhscl/httpd-24-rhel7 # shows 8080 in exposedPorts, and /opt/rh/httpd24/root/var/www is shown as HTTPD_DATA_ORIG_PATH 
+        podman run -d=true -p 3333:8080 --name=webserver -v /var/www/html:/opt/rh/httpd24/root/var/www/html registry.access.redhat.com/rhscl/httpd-24-rhel7
+        curl http://localhost:3333 # success!
+                
+        # to go into the container and (for e.g.) check the SELinux context
+        podman exec -it webserver /bin/bash
+        cd /opt/rh/httpd24/root/var/www/html
+        ls -ldZ
 
-		# you can also just go to /var/www/html/index.html in the container and change it there
+        # you can also just go to /var/www/html/index.html in the container and change it there
         ```
 
-	* Configure the system to start the *webserver* container at boot as a systemd service. Start/enable the systemd service to make sure the container will start at book, and reboot the system to verify if the container is running as expected:
-	    ```shell
-		# as root
-		podman pull registry.access.redhat.com/rhscl/httpd-24-rhel7
-		vi /var/www/html/index
-		# add row "Welcome to container-based web server"
-		podman run -d=true -p 3333:8080/tcp --name=webserver -v /var/www/html:/opt/rh/httpd24/root/var/www/html registry.access.redhat.com/rhscl/httpd-24-rhel7
-		cd /etc/systemd/system
-		podman generate systemd webserver >> httpd-container.service
-		systemctl daemon-reload
-		systemctl enable httpd-container.service --now
-		reboot
-		systemctl status httpd-container.service
-		curl http://localhost:3333 # success
+    * Configure the system to start the *webserver* container at boot as a systemd service. Start/enable the systemd service to make sure the container will start at book, and reboot the system to verify if the container is running as expected:
+        ```shell
+        # as root
+        podman pull registry.access.redhat.com/rhscl/httpd-24-rhel7
+        vi /var/www/html/index
+        # add row "Welcome to container-based web server"
+        podman run -d=true -p 3333:8080/tcp --name=webserver -v /var/www/html:/opt/rh/httpd24/root/var/www/html registry.access.redhat.com/rhscl/httpd-24-rhel7
+        cd /etc/systemd/system
+        podman generate systemd webserver >> httpd-container.service
+        systemctl daemon-reload
+        systemctl enable httpd-container.service --now
+        reboot
+        systemctl status httpd-container.service
+        curl http://localhost:3333 # success
 
-		# this can also be done as a non-root user
-		podman pull registry.access.redhat.com/rhscl/httpd-24-rhel7
-		sudo vi /var/www/html/index.html
-		# add row "Welcome to container-based web server"
-		sudo setsebool -P container_manage_cgroup true
-		podman run -d=true -p 3333:8080/tcp --name=webserver -v /var/www/html:/opt/rh/httpd24/root/var/www/html registry.access.redhat.com/rhscl/httpd-24-rhel7
-		podman generate systemd webserver > /home/jr/.config/systemd/user/httpd-container.service
-		cd /home/jr/.config/systemd/user
-		sudo semanage fcontext -a -t systemd_unit_file_t httpd-container.service
-		sudo restorecon httpd-container.service
-		systemctl enable --user httpd-container.service --now
+        # this can also be done as a non-root user
+        podman pull registry.access.redhat.com/rhscl/httpd-24-rhel7
+        sudo vi /var/www/html/index.html
+        # add row "Welcome to container-based web server"
+        sudo setsebool -P container_manage_cgroup true
+        podman run -d=true -p 3333:8080/tcp --name=webserver -v /var/www/html:/opt/rh/httpd24/root/var/www/html registry.access.redhat.com/rhscl/httpd-24-rhel7
+        podman generate systemd webserver > /home/jr/.config/systemd/user/httpd-container.service
+        cd /home/jr/.config/systemd/user
+        sudo semanage fcontext -a -t systemd_unit_file_t httpd-container.service
+        sudo restorecon httpd-container.service
+        systemctl enable --user httpd-container.service --now
         ```
 
-	* Pull the *mariadb* image to your system and run it publishing the exposed port. Set the root password for the mariadb service as *mysql*. Verify if you can login as root from local host:
-	    ```shell
-		# as user1
-		sudo dnf install mysql -y
-		podman search mariadb
-		podman pull docker.io/library/mariadb
-		podman inspect docker.io/library/mariadb # ExposedPorts 3306 
-		podman run --name mariadb -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=mysql docker.io/library/mariadb
-		podman inspect mariadb # IPAddress is 10.88.0.22
-		mysql -h 10.88.0.22 -u root -p
+    * Pull the *mariadb* image to your system and run it publishing the exposed port. Set the root password for the mariadb service as *mysql*. Verify if you can login as root from local host:
+        ```shell
+        # as user1
+        sudo dnf install mysql -y
+        podman search mariadb
+        podman pull docker.io/library/mariadb
+        podman inspect docker.io/library/mariadb # ExposedPorts 3306 
+        podman run --name mariadb -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=mysql docker.io/library/mariadb
+        podman inspect mariadb # IPAddress is 10.88.0.22
+        mysql -h 10.88.0.22 -u root -p
         ```
 
 1. Linux Hint - Bash Script Examples
 
-	* Create a hello world script:
-	    ```shell
-		!#/bin/bash
-		echo "Hello World!"
-		exit
+    * Create a hello world script:
+        ```shell
+        !#/bin/bash
+        echo "Hello World!"
+        exit
         ```
 
-	* Create a script that uses a while loop to count to 5:
-	    ```shell
-		!#/bin/bash
-		count=0
-		while [ $count -le 5 ]
-		do
-			echo "$count"
-			count = $(($count + 1))
-		done
-		exit
+    * Create a script that uses a while loop to count to 5:
+        ```shell
+        !#/bin/bash
+        count=0
+        while [ $count -le 5 ]
+        do
+            echo "$count"
+            count = $(($count + 1))
+        done
+        exit
         ```
 
-	* Note the formatting requirements. For example, there can be no space between the equals and the variable names, there must be a space between the "]" and the condition, and there must be 2 sets of round brackets in the variable incrementation.
+    * Note the formatting requirements. For example, there can be no space between the equals and the variable names, there must be a space between the "]" and the condition, and there must be 2 sets of round brackets in the variable incrementation.
 
-	* Create a script that uses a for loop to count to 5:
-	    ```shell
-		!#/bin/bash
-		count=5
-		for ((i=1; i<=$count; i++))
-		do
-			echo "$i"
-		done
-		exit
+    * Create a script that uses a for loop to count to 5:
+        ```shell
+        !#/bin/bash
+        count=5
+        for ((i=1; i<=$count; i++))
+        do
+            echo "$i"
+        done
+        exit
         ```
 
-	* Create a script that uses a for loop to count to 5 printing whether the number is even or odd:
-	    ```shell
-		!#/bin/bash
-		count=5
-		for ((i=1; i<=$count; i++))
-		do
-			if [ $(($i%2)) -eq 0 ]
-			then
-				echo "$i is even"
-			else
-				echo "$i is odd"
-			fi
-		done
-		exit
+    * Create a script that uses a for loop to count to 5 printing whether the number is even or odd:
+        ```shell
+        !#/bin/bash
+        count=5
+        for ((i=1; i<=$count; i++))
+        do
+            if [ $(($i%2)) -eq 0 ]
+            then
+                echo "$i is even"
+            else
+                echo "$i is odd"
+            fi
+        done
+        exit
         ```
 
-	* Create a script that uses a for loop to count to a user defined number printing whether the number is even or odd:
-	    ```shell
-		!#/bin/bash
-		echo "Enter a number: "
-		read count
-		for ((i=1; i<=$count; i++))
-		do
-			if [ $(($i%2)) -eq 0 ]
-			then
-				echo "$i is even"
-			else
-				echo "$i is odd"
-			fi
-		done
-		exit
+    * Create a script that uses a for loop to count to a user defined number printing whether the number is even or odd:
+        ```shell
+        !#/bin/bash
+        echo "Enter a number: "
+        read count
+        for ((i=1; i<=$count; i++))
+        do
+            if [ $(($i%2)) -eq 0 ]
+            then
+                echo "$i is even"
+            else
+                echo "$i is odd"
+            fi
+        done
+        exit
         ```
 
-	* Create a script that uses a function to multiply 2 numbers together:
-	    ```shell
-		!#/bin/bash
-		Rectangle_Area() {
-			area=$(($1 * $2))
-			echo "Area is: $area"
-		}
-		
-		Rectangle_Area 10 20
-		exit
+    * Create a script that uses a function to multiply 2 numbers together:
+        ```shell
+        !#/bin/bash
+        Rectangle_Area() {
+            area=$(($1 * $2))
+            echo "Area is: $area"
+        }
+        
+        Rectangle_Area 10 20
+        exit
         ```
 
-	* Create a script that uses the output of another command to make a decision:
-	    ```shell
-		!#/bin/bash
-		ping -c 1 $1 > /dev/null 2>&1
-		if [ $? -eq 0 ]
-		then
-			echo "Connectivity to $1 established"
-		else
-			echo "Connectivity to $1 unavailable"
-		fi
-		exit
+    * Create a script that uses the output of another command to make a decision:
+        ```shell
+        !#/bin/bash
+        ping -c 1 $1 > /dev/null 2>&1
+        if [ $? -eq 0 ]
+        then
+            echo "Connectivity to $1 established"
+        else
+            echo "Connectivity to $1 unavailable"
+        fi
+        exit
         ```
 
 1. Asghar Ghori - Sample RHCSA Exam 1
 
-	* Setup a virtual machine RHEL 8 Server for GUI. Add a 10GB disk for the OS and use the default storage partitioning. Add 2 300MB disks. Add a network interface, but do not configure the hostname and network connection.
+    * Setup a virtual machine RHEL 8 Server for GUI. Add a 10GB disk for the OS and use the default storage partitioning. Add 2 300MB disks. Add a network interface, but do not configure the hostname and network connection.
 
-	* Assuming the root user password is lost, reboot the system and reset the root user password to root1234:
-	    ```shell
-		# ctrl + e after reboot
-		# add rd.break after Linux line
-		# ctrl + d
-		mount -o remount, rw /sysroot
-		chroot /sysroot
-		passwd
-		# change password to root12345
-		touch /.autorelabel
-		exit
-		reboot
+    * Assuming the root user password is lost, reboot the system and reset the root user password to root1234:
+        ```shell
+        # ctrl + e after reboot
+        # add rd.break after Linux line
+        # ctrl + d
+        mount -o remount, rw /sysroot
+        chroot /sysroot
+        passwd
+        # change password to root12345
+        touch /.autorelabel
+        exit
+        reboot
         ```
 
-	* Using a manual method (i.e. create/modify files by hand), configure a network connection on the primary network device with IP address 192.168.0.241/24, gateway 192.168.0.1, and nameserver 192.168.0.1:
-	    ```shell
-		vi /etc/sysconfig/network-scripts/ifcfg-enp0s3
-		systemctl restart NetworkManager.service
-		# add line IPADDR=192.168.0.241
-		# add line GATEWAY=192.168.0.1
-		# add line DNS=192.168.0.1
-		# add line PREFIX=24
-		# change BOOTPROTO from dhcp to none
-		ifup enp0s3
-		nmcli con show # validate
+    * Using a manual method (i.e. create/modify files by hand), configure a network connection on the primary network device with IP address 192.168.0.241/24, gateway 192.168.0.1, and nameserver 192.168.0.1:
+        ```shell
+        vi /etc/sysconfig/network-scripts/ifcfg-enp0s3
+        systemctl restart NetworkManager.service
+        # add line IPADDR=192.168.0.241
+        # add line GATEWAY=192.168.0.1
+        # add line DNS=192.168.0.1
+        # add line PREFIX=24
+        # change BOOTPROTO from dhcp to none
+        ifup enp0s3
+        nmcli con show # validate
         ```
 
-	* Using a manual method (modify file by hand), set the system hostname to rhcsa1.example.com and alias rhcsa1. Make sure the new hostname is reflected in the command prompt:
-	    ```shell
-		vi /etc/hostname
-		# replace line with rhcsa1.example.com
-		vi /etc/hosts
-		# add rhcsa1.example.com and rhcsa1 to first line
-		systemctl restart NetworkManager.service
-		vi ~/.bashrc
-		# add line export PS1 = <($hostname)>
+    * Using a manual method (modify file by hand), set the system hostname to rhcsa1.example.com and alias rhcsa1. Make sure the new hostname is reflected in the command prompt:
+        ```shell
+        vi /etc/hostname
+        # replace line with rhcsa1.example.com
+        vi /etc/hosts
+        # add rhcsa1.example.com and rhcsa1 to first line
+        systemctl restart NetworkManager.service
+        vi ~/.bashrc
+        # add line export PS1 = <($hostname)>
         ```
 
-	* Set the default boot target to multi-user:
-	    ```shell
-		systemctl set-default multi-user.target
+    * Set the default boot target to multi-user:
+        ```shell
+        systemctl set-default multi-user.target
         ```
 
-	* Set SELinux to permissive mode:
-	    ```shell
-		setenforce permissive
-		sestatus # confirm
-		vi /etc/selinux/config
-		# change line SELINUX=permissive for permanence
+    * Set SELinux to permissive mode:
+        ```shell
+        setenforce permissive
+        sestatus # confirm
+        vi /etc/selinux/config
+        # change line SELINUX=permissive for permanence
         ```
 
-	* Perform a case-insensitive search for all lines in the `/usr/share/dict/linux.words` file that begin with the pattern "essential". Redirect the output to `/tmp/pattern.txt`. Make sure that empty lines are omitted:
-	    ```shell
-		grep '^essential' /usr/share/dict/linux.words > /tmp/pattern.txt
+    * Perform a case-insensitive search for all lines in the `/usr/share/dict/linux.words` file that begin with the pattern "essential". Redirect the output to `/tmp/pattern.txt`. Make sure that empty lines are omitted:
+        ```shell
+        grep '^essential' /usr/share/dict/linux.words > /tmp/pattern.txt
         ```
 
-	* Change the primary command prompt for the root user to display the hostname, username, and current working directory information in that order. Update the per-user initialisation file for permanence:
-	    ```shell
-		vi /root/.bashrc
-		# add line export PS1 = '<$(whoami) on $(hostname) in $(pwd)>'$
+    * Change the primary command prompt for the root user to display the hostname, username, and current working directory information in that order. Update the per-user initialisation file for permanence:
+        ```shell
+        vi /root/.bashrc
+        # add line export PS1 = '<$(whoami) on $(hostname) in $(pwd)>'$
         ```
 
-	* Create user accounts called user10, user20, and user30. Set their passwords to Temp1234. Make accounts for user10 and user30 to expire on December 31, 2021:
-	    ```shell
-		useradd user10
-		useradd user20
-		useradd user30
-		passwd user10 # enter password
-		passwd user20 # enter password
-		passwd user30 # enter password
-		chage -E 2021-12-31 user10
-		chage -E 2021-12-31 user30
-		chage -l user10 # confirm
+    * Create user accounts called user10, user20, and user30. Set their passwords to Temp1234. Make accounts for user10 and user30 to expire on December 31, 2021:
+        ```shell
+        useradd user10
+        useradd user20
+        useradd user30
+        passwd user10 # enter password
+        passwd user20 # enter password
+        passwd user30 # enter password
+        chage -E 2021-12-31 user10
+        chage -E 2021-12-31 user30
+        chage -l user10 # confirm
         ```
 
-	* Create a group called group10 and add users user20 and user30 as secondary members:
-	    ```shell
-		groupadd group10
-		usermod -aG group10 user20
-		usermod -aG group10 user30
-		cat /etc/group | grep "group10" # confirm
+    * Create a group called group10 and add users user20 and user30 as secondary members:
+        ```shell
+        groupadd group10
+        usermod -aG group10 user20
+        usermod -aG group10 user30
+        cat /etc/group | grep "group10" # confirm
         ```
 
-	* Create a user account called user40 with UID 2929. Set the password to user1234:
-	    ```shell
-		useradd -u 2929 user40
-		passwd user40 # enter password
+    * Create a user account called user40 with UID 2929. Set the password to user1234:
+        ```shell
+        useradd -u 2929 user40
+        passwd user40 # enter password
         ```
 
-	* Create a directory called dir1 under `/tmp` with ownership and owning groups set to root. Configure default ACLs on the directory and give user user10 read, write, and execute permissions:
-	    ```shell
-		mkdir /tmp/dir1
-		cd /tmp
-		# tmp already has ownership with root
-		setfacl -m u:user10:rwx dir1
+    * Create a directory called dir1 under `/tmp` with ownership and owning groups set to root. Configure default ACLs on the directory and give user user10 read, write, and execute permissions:
+        ```shell
+        mkdir /tmp/dir1
+        cd /tmp
+        # tmp already has ownership with root
+        setfacl -m u:user10:rwx dir1
         ```
 
-	* Attach the RHEL 8 ISO image to the VM and mount it persistently to `/mnt/cdrom`. Define access to both repositories and confirm:
-	    ```shell
-		# add ISO to the virtualbox optical drive
-		mkdir /mnt/cdrom
-		mount /dev/sr0 /mnt/cdrom
-		vi /etc/yum.repos.d/image.repo
-		blkid /dev/sr0 >> /etc/fstab
-		vi /etc/fstab
-		# format line with UUID /mnt/cdrom iso9660 defaults 0 0
-		# contents of image.repo
-		#####
-        #[BaseOS]
-		#name=BaseOS
-		#baseurl=file:///mnt/cdrom/BaseOS
-		#enabled=1
-		#gpgenabled=1
-		#gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
-		#
-        #[AppStream]
-		#name=AppStream
-		#baseurl=file:///mnt/cdrom/AppStream
-		#enabled=1
-		#gpgenabled=1
-		#gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+    * Attach the RHEL 8 ISO image to the VM and mount it persistently to `/mnt/cdrom`. Define access to both repositories and confirm:
+        ```shell
+        # add ISO to the virtualbox optical drive
+        mkdir /mnt/cdrom
+        mount /dev/sr0 /mnt/cdrom
+        vi /etc/yum.repos.d/image.repo
+        blkid /dev/sr0 >> /etc/fstab
+        vi /etc/fstab
+        # format line with UUID /mnt/cdrom iso9660 defaults 0 0
+        # contents of image.repo
         #####
-		yum repolist # confirm
+        #[BaseOS]
+        #name=BaseOS
+        #baseurl=file:///mnt/cdrom/BaseOS
+        #enabled=1
+        #gpgenabled=1
+        #gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+        #
+        #[AppStream]
+        #name=AppStream
+        #baseurl=file:///mnt/cdrom/AppStream
+        #enabled=1
+        #gpgenabled=1
+        #gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+        #####
+        yum repolist # confirm
         ```
 
-	* Create a logical volume called lvol1 of size 300MB in vgtest volume group. Mount the Ext4 file system persistently to `/mnt/mnt1`:
-	    ```shell
-		mkdir /mnt/mnt1
-		# /dev/sdb is already 300MB so don't need to worry about partitioning
-		vgcreate vgtest /dev/sdb
-		lvcreate --name lvol1 -L 296MB vgtest
-		lsblk # confirm
-		mkfs.ext4 /dev/mapper/vgtest-lvol1
-		vi /etc/fstab
-		# add line
-		# /dev/mapper/vgtest-lvol1 /mnt/mnt1 ext4 defaults 0 0
-		mount -a
-		lsblk # confirm
+    * Create a logical volume called lvol1 of size 300MB in vgtest volume group. Mount the Ext4 file system persistently to `/mnt/mnt1`:
+        ```shell
+        mkdir /mnt/mnt1
+        # /dev/sdb is already 300MB so don't need to worry about partitioning
+        vgcreate vgtest /dev/sdb
+        lvcreate --name lvol1 -L 296MB vgtest
+        lsblk # confirm
+        mkfs.ext4 /dev/mapper/vgtest-lvol1
+        vi /etc/fstab
+        # add line
+        # /dev/mapper/vgtest-lvol1 /mnt/mnt1 ext4 defaults 0 0
+        mount -a
+        lsblk # confirm
         ```
 
-	* Change group membership on `/mnt/mnt1` to group10. Set read/write/execute permissions on `/mnt/mnt1` for group members, and revoke all permissions for public:
-	    ```shell
-		chgrp group10 /mnt/mnt1
-		chmod 770 /mnt/mnt1
+    * Change group membership on `/mnt/mnt1` to group10. Set read/write/execute permissions on `/mnt/mnt1` for group members, and revoke all permissions for public:
+        ```shell
+        chgrp group10 /mnt/mnt1
+        chmod 770 /mnt/mnt1
         ```
 
-	* Create a logical volume called lvswap of size 300MB in the vgtest volume group. Initialise the logical volume for swap use. Use the UUID and place an entry for persistence:
-	    ```shell
-		# /dev/sdc is already 300MB so don't need to worry about partitioning
-		vgcreate vgswap /dev/sdc
-		lvcreate --name lvswap -L 296MB vgswap /dev/sdc
-		mkswap /dev/mapper-vgswap-lvswap # UUID returned
-		blkid /dev/sdc >> /etc/fstab
-		# organise new line so that it has UUID= swp swap defaults 0 0
-		swapon -a
-		lsblk # confirm
+    * Create a logical volume called lvswap of size 300MB in the vgtest volume group. Initialise the logical volume for swap use. Use the UUID and place an entry for persistence:
+        ```shell
+        # /dev/sdc is already 300MB so don't need to worry about partitioning
+        vgcreate vgswap /dev/sdc
+        lvcreate --name lvswap -L 296MB vgswap /dev/sdc
+        mkswap /dev/mapper-vgswap-lvswap # UUID returned
+        blkid /dev/sdc >> /etc/fstab
+        # organise new line so that it has UUID= swp swap defaults 0 0
+        swapon -a
+        lsblk # confirm
         ```
 
-	* Use tar and bzip2 to create a compressed archive of the `/etc/sysconfig` directory. Store the archive under `/tmp` as etc.tar.bz2:
-	    ```shell
-		tar -cvzf /tmp/etc.tar.bz2 /etc/sysconfig
+    * Use tar and bzip2 to create a compressed archive of the `/etc/sysconfig` directory. Store the archive under `/tmp` as etc.tar.bz2:
+        ```shell
+        tar -cvzf /tmp/etc.tar.bz2 /etc/sysconfig
         ```
 
-	* Create a directory hierarchy `/dir1/dir2/dir3/dir4`, and apply SELinux contexts for `/etc` on it recursively:
-	    ```shell
-		mkdir -p /dir1/dir2/dir3/dir4
-		ll -Z 
-		# etc shown as system_u:object_r:etc_t:s0
-		# dir1 shown as unconfined_u:object_r:default_t:s0
-		semanage fcontext -a -t etc_t "/dir1(/.*)?"
-		restorecon -R -v /dir1
-		ll -Z # confirm
+    * Create a directory hierarchy `/dir1/dir2/dir3/dir4`, and apply SELinux contexts for `/etc` on it recursively:
+        ```shell
+        mkdir -p /dir1/dir2/dir3/dir4
+        ll -Z 
+        # etc shown as system_u:object_r:etc_t:s0
+        # dir1 shown as unconfined_u:object_r:default_t:s0
+        semanage fcontext -a -t etc_t "/dir1(/.*)?"
+        restorecon -R -v /dir1
+        ll -Z # confirm
         ```
 
-	* Enable access to the atd service for user20 and deny for user30:
-	    ```shell
-		echo "user30" >> /etc/at.deny
-		# just don't create at.allow
+    * Enable access to the atd service for user20 and deny for user30:
+        ```shell
+        echo "user30" >> /etc/at.deny
+        # just don't create at.allow
         ```
 
-	* Add a custom message "This is the RHCSA sample exam on $(date) by $LOGNAME" to the `/var/log/messages` file as the root user. Use regular expression to confirm the message entry to the log file:
-	    ```shell
-		logger "This is the RHCSA sample exam on $(date) by $LOGNAME"
-		grep "This is the" /var/log/messages
+    * Add a custom message "This is the RHCSA sample exam on $(date) by $LOGNAME" to the `/var/log/messages` file as the root user. Use regular expression to confirm the message entry to the log file:
+        ```shell
+        logger "This is the RHCSA sample exam on $(date) by $LOGNAME"
+        grep "This is the" /var/log/messages
         ```
 
-	* Allow user20 to use sudo without being prompted for their password:
-	    ```shell
-		usermod -aG wheel user20
-		# still prompts for password, could change the wheel group behaviour or add new line to sudoers
-		visudo
-		# add line at end user20 ALL=(ALL) NOPASSWD: ALL
+    * Allow user20 to use sudo without being prompted for their password:
+        ```shell
+        usermod -aG wheel user20
+        # still prompts for password, could change the wheel group behaviour or add new line to sudoers
+        visudo
+        # add line at end user20 ALL=(ALL) NOPASSWD: ALL
         ```
 
 1. Asghar Ghori - Sample RHCSA Exam 2
 
-	* Setup a virtual machine RHEL 8 Server for GUI. Add a 10GB disk for the OS and use the default storage partitioning. Add 1 400MB disk. Add a network interface, but do not configure the hostname and network connection.
+    * Setup a virtual machine RHEL 8 Server for GUI. Add a 10GB disk for the OS and use the default storage partitioning. Add 1 400MB disk. Add a network interface, but do not configure the hostname and network connection.
 
-	* Using the nmcli command, configure a network connection on the primary network device with IP address 192.168.0.242/24, gateway 192.168.0.1, and nameserver 192.168.0.1:
-	    ```shell
-		nmcli con add ifname enp0s3 con-name mycon type ethernet ip4 192.168.0.242/24 gw4 192.168.0.1 ipv4.dns "192.168.0.1"
-		# man nmcli-examples can be referred to if you forget format
-		nmcli con show mycon | grep ipv4 # confirm
+    * Using the nmcli command, configure a network connection on the primary network device with IP address 192.168.0.242/24, gateway 192.168.0.1, and nameserver 192.168.0.1:
+        ```shell
+        nmcli con add ifname enp0s3 con-name mycon type ethernet ip4 192.168.0.242/24 gw4 192.168.0.1 ipv4.dns "192.168.0.1"
+        # man nmcli-examples can be referred to if you forget format
+        nmcli con show mycon | grep ipv4 # confirm
         ```
-	
-	* Using the hostnamectl command, set the system hostname to rhcsa2.example.com and alias rhcsa2. Make sure that the new hostname is reflected in the command prompt:
-	    ```shell
-		hostnamectl set-hostname rhcsa2.example.com
-		hostnamectl set-hostname --static rhcsa2 # not necessary due to format of FQDN
-		# the hostname already appears in the command prompt
-        ```
-
-	* Create a user account called user70 with UID 7000 and comments "I am user70". Set the maximum allowable inactivity for this user to 30 days:
-	    ```shell
-		useradd -u 7000 -c "I am user70" user70
-		chage -I 30 user70
+    
+    * Using the hostnamectl command, set the system hostname to rhcsa2.example.com and alias rhcsa2. Make sure that the new hostname is reflected in the command prompt:
+        ```shell
+        hostnamectl set-hostname rhcsa2.example.com
+        hostnamectl set-hostname --static rhcsa2 # not necessary due to format of FQDN
+        # the hostname already appears in the command prompt
         ```
 
-	* Create a user account called user50 with a non-interactive shell:
-	    ```shell
-		useradd user50 -s /sbin/nologin
+    * Create a user account called user70 with UID 7000 and comments "I am user70". Set the maximum allowable inactivity for this user to 30 days:
+        ```shell
+        useradd -u 7000 -c "I am user70" user70
+        chage -I 30 user70
         ```
 
-	* Create a file called testfile1 under `/tmp` with ownership and owning group set to root. Configure access ACLs on the file and give user10 read and write access. Test access by logging in as user10 and editing the file:
-	    ```shell
-		useradd user10
-		passwd user10 # set password
-		touch /tmp/testfile1
-		cd /tmp
-		setfacl -m u:user10:rw testfile1
-		sudo su user10
-		vi /tmp/testfile1 # can edit the file
+    * Create a user account called user50 with a non-interactive shell:
+        ```shell
+        useradd user50 -s /sbin/nologin
         ```
 
-	* Attach the RHEL 8 ISO image to the VM and mount it persistently to `/mnt/dvdrom`. Define access to both repositories and confirm:
-	    ```shell
-		mkdir /mnt/dvdrom
-		lsblk # rom is at /dev/sr0
-		mount /dev/sr0 /mnt/dvdrom
-		blkid /dev/sr0 >> /etc/fstab
-		vi /etc/fstab
-		# format line with UUID /mnt/dvdrom iso9660 defaults 0 0
-		vi /etc/yum.repos.d/image.repo
-		# contents of image.repo
-		#####
-        #[BaseOS]
-		#name=BaseOS
-		#baseurl=file:///mnt/dvdrom/BaseOS
-		#enabled=1
-		#gpgenabled=1
-		#gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
-		#
-        #[AppStream]
-		#name=AppStream
-		#baseurl=file:///mnt/dvdrom/AppStream
-		#enabled=1
-		#gpgenabled=1
-		#gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+    * Create a file called testfile1 under `/tmp` with ownership and owning group set to root. Configure access ACLs on the file and give user10 read and write access. Test access by logging in as user10 and editing the file:
+        ```shell
+        useradd user10
+        passwd user10 # set password
+        touch /tmp/testfile1
+        cd /tmp
+        setfacl -m u:user10:rw testfile1
+        sudo su user10
+        vi /tmp/testfile1 # can edit the file
+        ```
+
+    * Attach the RHEL 8 ISO image to the VM and mount it persistently to `/mnt/dvdrom`. Define access to both repositories and confirm:
+        ```shell
+        mkdir /mnt/dvdrom
+        lsblk # rom is at /dev/sr0
+        mount /dev/sr0 /mnt/dvdrom
+        blkid /dev/sr0 >> /etc/fstab
+        vi /etc/fstab
+        # format line with UUID /mnt/dvdrom iso9660 defaults 0 0
+        vi /etc/yum.repos.d/image.repo
+        # contents of image.repo
         #####
-		yum repolist # confirm
+        #[BaseOS]
+        #name=BaseOS
+        #baseurl=file:///mnt/dvdrom/BaseOS
+        #enabled=1
+        #gpgenabled=1
+        #gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+        #
+        #[AppStream]
+        #name=AppStream
+        #baseurl=file:///mnt/dvdrom/AppStream
+        #enabled=1
+        #gpgenabled=1
+        #gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+        #####
+        yum repolist # confirm
         ```
 
-	* Create a logical volume called lv1 of size equal to 10 LEs in vg1 volume group (create vg1 with PE size 8MB in a partition on the 400MB disk). Initialise the logical volume with XFS file system type and mount it on `/mnt/lvfs1`. Create a file called lv1file1 in the mount point. Set the file system to automatically mount at each system reboot:
-	    ```shell
-		parted /dev/sdb
-		mklabel msdos
-		mkpart
-		# enter primary
-		# enter xfs
-		# enter 0
-		# enter 100MB
-		vgcreate vg1 -s 8MB /dev/sdb1
-		lvcreate --name lv1 -l 10 vg1 /dev/sdb1
-		mkfs.xfs /dev/mapper/vg1-lv1
-		mkdir /mnt/lvfs1
-		vi /etc/fstab
-		# add line for /dev/mapper/vg1-lv1 /mnt/lvfs1 xfs defaults 0 0
-		mount -a
-		df -h  # confirm
-		touch /mnt/lvfs1/hi
+    * Create a logical volume called lv1 of size equal to 10 LEs in vg1 volume group (create vg1 with PE size 8MB in a partition on the 400MB disk). Initialise the logical volume with XFS file system type and mount it on `/mnt/lvfs1`. Create a file called lv1file1 in the mount point. Set the file system to automatically mount at each system reboot:
+        ```shell
+        parted /dev/sdb
+        mklabel msdos
+        mkpart
+        # enter primary
+        # enter xfs
+        # enter 0
+        # enter 100MB
+        vgcreate vg1 -s 8MB /dev/sdb1
+        lvcreate --name lv1 -l 10 vg1 /dev/sdb1
+        mkfs.xfs /dev/mapper/vg1-lv1
+        mkdir /mnt/lvfs1
+        vi /etc/fstab
+        # add line for /dev/mapper/vg1-lv1 /mnt/lvfs1 xfs defaults 0 0
+        mount -a
+        df -h  # confirm
+        touch /mnt/lvfs1/hi
         ```
 
-	* Add a group called group20 and change group membership on `/mnt/lvfs1` to group20. Set read/write/execute permissions on `/mnt/lvfs1` for the owner and group members, and no permissions for others:
-	    ```shell
-		groupadd group20
-		chgrp group20 -R /mnt/lvfs1
-		chmod 770 -R /mnt/lvfs1
+    * Add a group called group20 and change group membership on `/mnt/lvfs1` to group20. Set read/write/execute permissions on `/mnt/lvfs1` for the owner and group members, and no permissions for others:
+        ```shell
+        groupadd group20
+        chgrp group20 -R /mnt/lvfs1
+        chmod 770 -R /mnt/lvfs1
         ```
 
-	* Extend the file system in the logical volume lv1 by 64MB without unmounting it and without losing any data:
-	    ```shell
-		lvextend -L +64MB vg1/lv1 /dev/sdb1
-		# realised that the partition of 100MB isn't enough
-		parted /dev/sdb
-		resizepart
-		# expand partition 1 to 200MB
-		pvresize /dev/sdb1
-		lvextend -L +64MB vg1/lv1 /dev/sdb1
+    * Extend the file system in the logical volume lv1 by 64MB without unmounting it and without losing any data:
+        ```shell
+        lvextend -L +64MB vg1/lv1 /dev/sdb1
+        # realised that the partition of 100MB isn't enough
+        parted /dev/sdb
+        resizepart
+        # expand partition 1 to 200MB
+        pvresize /dev/sdb1
+        lvextend -L +64MB vg1/lv1 /dev/sdb1
         ```
 
-	* Create a swap partition of size 85MB on the 400MB disk. Use its UUID and ensure it is activated after every system reboot:
-	    ```shell
-		parted /dev/sdb
-		mkpart
-		# enter primary
-		# enter linux-swap
-		# enter 200MB
-		# enter 285MB
-		mkswap /dev/sdb2
-		vi /etc/fstab
-		# add line for UUID swap swap defaults 0 0
-		swapon -a
+    * Create a swap partition of size 85MB on the 400MB disk. Use its UUID and ensure it is activated after every system reboot:
+        ```shell
+        parted /dev/sdb
+        mkpart
+        # enter primary
+        # enter linux-swap
+        # enter 200MB
+        # enter 285MB
+        mkswap /dev/sdb2
+        vi /etc/fstab
+        # add line for UUID swap swap defaults 0 0
+        swapon -a
         ```
 
-	* Create a disk partition of size 100MB on the 400MB disk and format it with Ext4 file system structures. Assign label stdlabel to the file system. Mount the file system on `/mnt/stdfs1` persistently using the label. Create file stdfile1 in the mount point:
-	    ```shell
-		parted /dev/sdb
-		mkpart
-		# enter primary
-		# enter ext4
-		# enter 290MB
-		# enter 390MB
-		mkfs.ext4 -L stdlabel /dev/sdb3
-		mkdir /mnt/stdfs1
-		vi /etc/fstab
-		# add line for UUID /mnt/stdfs1 ext4 defaults 0 0
-		touch /mnt/stdfs1/hi
+    * Create a disk partition of size 100MB on the 400MB disk and format it with Ext4 file system structures. Assign label stdlabel to the file system. Mount the file system on `/mnt/stdfs1` persistently using the label. Create file stdfile1 in the mount point:
+        ```shell
+        parted /dev/sdb
+        mkpart
+        # enter primary
+        # enter ext4
+        # enter 290MB
+        # enter 390MB
+        mkfs.ext4 -L stdlabel /dev/sdb3
+        mkdir /mnt/stdfs1
+        vi /etc/fstab
+        # add line for UUID /mnt/stdfs1 ext4 defaults 0 0
+        touch /mnt/stdfs1/hi
         ```
 
-	* Use tar and gzip to create a compressed archive of the `/usr/local` directory. Store the archive under `/tmp` using a filename of your choice:
-	    ```shell
-		tar -czvf /tmp/local.tar.gz /usr/local
+    * Use tar and gzip to create a compressed archive of the `/usr/local` directory. Store the archive under `/tmp` using a filename of your choice:
+        ```shell
+        tar -czvf /tmp/local.tar.gz /usr/local
         ```
 
-	* Create a directory `/direct01` and apply SELinux contexts for `/root`:
-	    ```shell
-		mkdir /direct01
-		ll -Z
-		# direct01 has unconfined_u:object_r:default_t:s0
-		# root has system_u:object_r:admin_home_t:s0
-		semanage fcontext -a -t admin_home_t -s system_u "/direct01(/.*)?" 
-		restorecon -R -v /direct01
-		ll -Zrt # confirm
+    * Create a directory `/direct01` and apply SELinux contexts for `/root`:
+        ```shell
+        mkdir /direct01
+        ll -Z
+        # direct01 has unconfined_u:object_r:default_t:s0
+        # root has system_u:object_r:admin_home_t:s0
+        semanage fcontext -a -t admin_home_t -s system_u "/direct01(/.*)?" 
+        restorecon -R -v /direct01
+        ll -Zrt # confirm
         ```
 
-	* Set up a cron job for user70 to search for core files in the `/var` directory and copy them to the directory `/tmp/coredir1`. This job should run every Monday at 1:20 a.m:
-	    ```shell
-		mkdir /tmp/coredir1
-		crontab -u user70 -e
-		20 1 * * Mon find /var -name core -type f exec cp '{}' /tmp/coredir1 \;
-		crontab -u user70 -l # confirm
+    * Set up a cron job for user70 to search for core files in the `/var` directory and copy them to the directory `/tmp/coredir1`. This job should run every Monday at 1:20 a.m:
+        ```shell
+        mkdir /tmp/coredir1
+        crontab -u user70 -e
+        20 1 * * Mon find /var -name core -type f exec cp '{}' /tmp/coredir1 \;
+        crontab -u user70 -l # confirm
         ```
 
-	* Search for all files in the entire directory structure that have been modified in the past 30 days and save the file listing in the `/var/tmp/modfiles.txt` file:
-	    ```shell
-		find / -mtime -30 >> /var/tmp/modfiles.txt
+    * Search for all files in the entire directory structure that have been modified in the past 30 days and save the file listing in the `/var/tmp/modfiles.txt` file:
+        ```shell
+        find / -mtime -30 >> /var/tmp/modfiles.txt
         ```
 
-	* Modify the bootloader program and set the default autoboot timer value to 2 seconds:
-	    ```shell
-		vi /etc/default/grub
-		# set GRUB_TIMEOUT=2
-		grub2-mkconfig -o /boot/grub2/grub.cfg
+    * Modify the bootloader program and set the default autoboot timer value to 2 seconds:
+        ```shell
+        vi /etc/default/grub
+        # set GRUB_TIMEOUT=2
+        grub2-mkconfig -o /boot/grub2/grub.cfg
         ```
 
-	* Determine the recommended tuning profile for the system and apply it:
-	    ```shell
-		tuned-adm recommend
-		# virtual-guest is returned
-		tuned-adm active
-		# virtual-guest is returned
-		# no change required
+    * Determine the recommended tuning profile for the system and apply it:
+        ```shell
+        tuned-adm recommend
+        # virtual-guest is returned
+        tuned-adm active
+        # virtual-guest is returned
+        # no change required
         ```
 
-	* Configure Chrony to synchronise system time with the hardware clock:
-	    ```shell
-		systemctl status chronyd.service
-		vi /etc/chrony.conf
-		# everything looks alright
+    * Configure Chrony to synchronise system time with the hardware clock:
+        ```shell
+        systemctl status chronyd.service
+        vi /etc/chrony.conf
+        # everything looks alright
         ```
 
-	* Install package group called "Development Tools", and capture its information in `/tmp/systemtools.out` file:
-	    ```shell
-		yum grouplist # view available groups
-		yum groupinstall "Development Tools" -y >> /tmp/systemtools.out
+    * Install package group called "Development Tools", and capture its information in `/tmp/systemtools.out` file:
+        ```shell
+        yum grouplist # view available groups
+        yum groupinstall "Development Tools" -y >> /tmp/systemtools.out
         ```
 
-	* Lock user account user70. Use regular expressions to capture the line that shows the lock and store the output in file `/tmp/user70.lock`:
-	    ```shell
-		usermod -L user70
-		grep user70 /etc/shadow >> /tmp/user70.lock # observe !
+    * Lock user account user70. Use regular expressions to capture the line that shows the lock and store the output in file `/tmp/user70.lock`:
+        ```shell
+        usermod -L user70
+        grep user70 /etc/shadow >> /tmp/user70.lock # observe !
         ```
 
 1. Asghar Ghori - Sample RHCSA Exam 3
 
-	* Build 2 virtual machines with RHEL 8 Server for GUI. Add a 10GB disk for the OS and use the default storage partitioning. Add 1 4GB disk to VM1 and 2 1GB disks to VM2. Assign a network interface, but do not configure the hostname and network connection.
+    * Build 2 virtual machines with RHEL 8 Server for GUI. Add a 10GB disk for the OS and use the default storage partitioning. Add 1 4GB disk to VM1 and 2 1GB disks to VM2. Assign a network interface, but do not configure the hostname and network connection.
 
-	* The VirtualBox Network CIDR for the NAT network is 192.168.0.0/24.
+    * The VirtualBox Network CIDR for the NAT network is 192.168.0.0/24.
 
-	* On VM1, set the system hostname to rhcsa3.example.com and alias rhcsa3 using the hostnamectl command. Make sure that the new hostname is reflected in the command prompt:
-	    ```shell
-		hostnamectl set-hostname rhcsa3.example.com
+    * On VM1, set the system hostname to rhcsa3.example.com and alias rhcsa3 using the hostnamectl command. Make sure that the new hostname is reflected in the command prompt:
+        ```shell
+        hostnamectl set-hostname rhcsa3.example.com
         ```
 
-	* On rhcsa3, configure a network connection on the primary network device with IP address 192.168.0.243/24, gateway 192.168.0.1, and nameserver 192.168.0.1 using the nmcli command:
-	    ```shell
-		nmcli con add type ethernet ifname enp0s3 con-name mycon ip4 192.168.0.243/24 gw4 192.168.0.1 ipv4.dns 192.168.0.1
+    * On rhcsa3, configure a network connection on the primary network device with IP address 192.168.0.243/24, gateway 192.168.0.1, and nameserver 192.168.0.1 using the nmcli command:
+        ```shell
+        nmcli con add type ethernet ifname enp0s3 con-name mycon ip4 192.168.0.243/24 gw4 192.168.0.1 ipv4.dns 192.168.0.1
         ```
 
-	* On VM2, set the system hostname to rhcsa4.example.com and alias rhcsa4 using a manual method (modify file by hand). Make sure that the new hostname is reflected in the command prompt:
-	    ```shell
-		vi /etc/hostname
-		# change to rhcsa4.example.com
+    * On VM2, set the system hostname to rhcsa4.example.com and alias rhcsa4 using a manual method (modify file by hand). Make sure that the new hostname is reflected in the command prompt:
+        ```shell
+        vi /etc/hostname
+        # change to rhcsa4.example.com
         ```
 
-	* On rhcsa4, configure a network connection on the primary network device with IP address 192.168.0.244/24, gateway 192.168.0.1, and nameserver 192.168.0.1 using a manual method (create/modify files by hand):
-	    ```shell
-		vi /etc/sysconfig/network-scripts/ifcfg-enp0s3
-		#TYPE=Ethernet
-		#BOOTPROTO=static
-		#DEFROUTE=yes
-		#IPV4_FAILURE_FATAL=no
-		#IPV4INIT=no
-		#NAME=mycon
-		#DEVICE=enp0s3
-		#ONBOOT=yes
-		#IPADDR=192.168.0.243
-		#PREFIX=24
-		#GATEWAY=192.168.0.1
-		#DNS1=192.168.0.1
-		ifup enp0s3
-		nmcli con edit enp0s3 # play around with print ipv4 etc. to confirm settings
+    * On rhcsa4, configure a network connection on the primary network device with IP address 192.168.0.244/24, gateway 192.168.0.1, and nameserver 192.168.0.1 using a manual method (create/modify files by hand):
+        ```shell
+        vi /etc/sysconfig/network-scripts/ifcfg-enp0s3
+        #TYPE=Ethernet
+        #BOOTPROTO=static
+        #DEFROUTE=yes
+        #IPV4_FAILURE_FATAL=no
+        #IPV4INIT=no
+        #NAME=mycon
+        #DEVICE=enp0s3
+        #ONBOOT=yes
+        #IPADDR=192.168.0.243
+        #PREFIX=24
+        #GATEWAY=192.168.0.1
+        #DNS1=192.168.0.1
+        ifup enp0s3
+        nmcli con edit enp0s3 # play around with print ipv4 etc. to confirm settings
         ```
 
-	* Run "ping -c2 rhcsa4" on rhcsa3. Run "ping -c2 rhcsa3" on rhcsa4. You should see 0% loss in both outputs:
-	    ```shell
-		# on rhcsa3
-		vi /etc/hosts
-		# add line 192.168.0.244 rhcsa4
-		ping rhcsa3 # confirm
-		
-		# on rhcsa4
-		vi /etc/hosts
-		# add line 192.168.0.243 rhcsa3
-		ping rhcsa4 # confirm
+    * Run "ping -c2 rhcsa4" on rhcsa3. Run "ping -c2 rhcsa3" on rhcsa4. You should see 0% loss in both outputs:
+        ```shell
+        # on rhcsa3
+        vi /etc/hosts
+        # add line 192.168.0.244 rhcsa4
+        ping rhcsa3 # confirm
+        
+        # on rhcsa4
+        vi /etc/hosts
+        # add line 192.168.0.243 rhcsa3
+        ping rhcsa4 # confirm
         ```
 
-	* On rhcsa3 and rhcsa4, attach the RHEL 8 ISO image to the VM and mount it persistently to `/mnt/cdrom`. Define access to both repositories and confirm:
-	    ```shell
-		# attach disks in VirtualBox
-		# on rhcsa3 and rhcsa4
-		mkdir /mnt/cdrom
-		mount /dev/sr0 /mnt/cdrom
-		blkid # get UUID
-		vi /etc/fstab
-		# add line with UUID /mnt/cdrom iso9660 defaults 0 0
-		mount -a # confirm
-		vi /etc/yum.repos.d/image.repo
-		#####
-        #[BaseOS]
-		#name=BaseOS
-		#baseurl=file:///mnt/cdrom/BaseOS
-		#enabled=1
-		#gpgenabled=1
-		#gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
-		#
-        #[AppStream]
-		#name=AppStream
-		#baseurl=file:///mnt/cdrom/AppStream
-		#enabled=1
-		#gpgenabled=1
-		#gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+    * On rhcsa3 and rhcsa4, attach the RHEL 8 ISO image to the VM and mount it persistently to `/mnt/cdrom`. Define access to both repositories and confirm:
+        ```shell
+        # attach disks in VirtualBox
+        # on rhcsa3 and rhcsa4
+        mkdir /mnt/cdrom
+        mount /dev/sr0 /mnt/cdrom
+        blkid # get UUID
+        vi /etc/fstab
+        # add line with UUID /mnt/cdrom iso9660 defaults 0 0
+        mount -a # confirm
+        vi /etc/yum.repos.d/image.repo
         #####
-		yum repolist # confirm
+        #[BaseOS]
+        #name=BaseOS
+        #baseurl=file:///mnt/cdrom/BaseOS
+        #enabled=1
+        #gpgenabled=1
+        #gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+        #
+        #[AppStream]
+        #name=AppStream
+        #baseurl=file:///mnt/cdrom/AppStream
+        #enabled=1
+        #gpgenabled=1
+        #gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+        #####
+        yum repolist # confirm
         ```
 
-	* On rhcsa3, add HTTP port 8300/tcp to the SELinux policy database:
-	    ```shell
-		semange port -l | grep http # 8300 not in list for http_port_t
-		semanage port -a -t http_port_t -p tcp 8300
+    * On rhcsa3, add HTTP port 8300/tcp to the SELinux policy database:
+        ```shell
+        semange port -l | grep http # 8300 not in list for http_port_t
+        semanage port -a -t http_port_t -p tcp 8300
         ```
 
-	* On rhcsa3, create VDO volume vdo1 on the 4GB disk with logical size 16GB and mounted with Ext4 structures on `/mnt/vdo1`:
-	    ```shell
-		TBC
+    * On rhcsa3, create VDO volume vdo1 on the 4GB disk with logical size 16GB and mounted with Ext4 structures on `/mnt/vdo1`:
+        ```shell
+        TBC
         ```
 
-	* Configure NFS service on rhcsa3 and share `/rh_share3` with rhcsa4. Configure AutoFS direct map on rhcsa4 to mount `/rh_share3` on `/mnt/rh_share4`. User user80 (create on both systems) should be able to create files under the share on the NFS server and under the mount point on the NFS client:
-	    ```shell
-		# on rhcsa3
-		mkdir /rh_share3
-		chmod 777 rh_share3
-		useradd user80
-		passwd user80
-		# enter Temp1234
-		dnf install cifs-utils -y
-		systemctl enable nfs-server.service --now
-		firewall-cmd --add-service=nfs --permanent
-		firewall-cmd --reload
-		vi /etc/exports
-		# add line rh_share3 rhcsa4(rw)
-		exportfs -av
-		
-		# on rhcsa4
-		useradd user80
-		passwd user80
-		# enter Temp1234
-		mkdir /mnt/rh_share4
-		chmod 777 rh_share4
-		# mount rhcsa3:/rh_share3 /mnt/nfs
-		# mount | grep nfs # get details for /etc/fstab
-		# vi /etc/fstab
-		# add line rhcsa3:/rh_share3 /mnt/rh_share4 nfs4 _netdev 0 0
-		# above not required with AutoFS
-		dnf install autofs -y
-		vi /etc/auto.master
-		# add line /mnt/rh_rhcsa3 /etc/auto.master.d/auto.home
-		vi /etc/auto.master.d/auto.home
-		# add line * -rw rhcsa3:/rh_share3
+    * Configure NFS service on rhcsa3 and share `/rh_share3` with rhcsa4. Configure AutoFS direct map on rhcsa4 to mount `/rh_share3` on `/mnt/rh_share4`. User user80 (create on both systems) should be able to create files under the share on the NFS server and under the mount point on the NFS client:
+        ```shell
+        # on rhcsa3
+        mkdir /rh_share3
+        chmod 777 rh_share3
+        useradd user80
+        passwd user80
+        # enter Temp1234
+        dnf install cifs-utils -y
+        systemctl enable nfs-server.service --now
+        firewall-cmd --add-service=nfs --permanent
+        firewall-cmd --reload
+        vi /etc/exports
+        # add line rh_share3 rhcsa4(rw)
+        exportfs -av
+        
+        # on rhcsa4
+        useradd user80
+        passwd user80
+        # enter Temp1234
+        mkdir /mnt/rh_share4
+        chmod 777 rh_share4
+        # mount rhcsa3:/rh_share3 /mnt/nfs
+        # mount | grep nfs # get details for /etc/fstab
+        # vi /etc/fstab
+        # add line rhcsa3:/rh_share3 /mnt/rh_share4 nfs4 _netdev 0 0
+        # above not required with AutoFS
+        dnf install autofs -y
+        vi /etc/auto.master
+        # add line /mnt/rh_rhcsa3 /etc/auto.master.d/auto.home
+        vi /etc/auto.master.d/auto.home
+        # add line * -rw rhcsa3:/rh_share3
         ```
 
-	* Configure NFS service on rhcsa4 and share the home directory for user user60 (create on both systems) with rhcsa3. Configure AutoFS indirect map on rhcsa3 to automatically mount the home directory under `/nfsdir` when user60 logs on to rhcsa3:
-	    ```shell
-		# on rhcsa3
-		useradd user60
-		passwd user60
-		# enter Temp1234
-		dnf install autofs -y
-		mkdir /nfsdir
-		vi /etc/auto.master
-		# add line for /nfsdir /etc/auto.master.d/auto.home
-		vi /etc/auto.master.d/auto.home
-		# add line for * -rw rhcsa4:/home/user60
-		systemctl enable autofs.service --now
+    * Configure NFS service on rhcsa4 and share the home directory for user user60 (create on both systems) with rhcsa3. Configure AutoFS indirect map on rhcsa3 to automatically mount the home directory under `/nfsdir` when user60 logs on to rhcsa3:
+        ```shell
+        # on rhcsa3
+        useradd user60
+        passwd user60
+        # enter Temp1234
+        dnf install autofs -y
+        mkdir /nfsdir
+        vi /etc/auto.master
+        # add line for /nfsdir /etc/auto.master.d/auto.home
+        vi /etc/auto.master.d/auto.home
+        # add line for * -rw rhcsa4:/home/user60
+        systemctl enable autofs.service --now
 
-		# on rhcsa4
-		useradd user60
-		passwd user60
-		# enter Temp1234
-		vi /etc/exports
-		# add line for /home rhcsa3(rw)
-		exportfs -va	
+        # on rhcsa4
+        useradd user60
+        passwd user60
+        # enter Temp1234
+        vi /etc/exports
+        # add line for /home rhcsa3(rw)
+        exportfs -va    
         ```
 
-	* On rhcsa4, create Stratis pool pool1 and volume str1 on a 1GB disk, and mount it to `/mnt/str1`:
-	    ```shell
-		dnf provides stratis
-		dnf install stratis-cli -y
-		systemctl enable stratisd.service --now
-		stratis pool create pool1 /dev/sdc
-		stratis filesystem create pool1 vol1
-		mkdir /mnt/str1
-		mount /stratis/pool1/vol1 /mnt/str1
-		blkid # get information for /etc/fstab
-		vi /etc/fstab
-		# add line for UUID /mnt/str1 xfs defaults 0 0	
+    * On rhcsa4, create Stratis pool pool1 and volume str1 on a 1GB disk, and mount it to `/mnt/str1`:
+        ```shell
+        dnf provides stratis
+        dnf install stratis-cli -y
+        systemctl enable stratisd.service --now
+        stratis pool create pool1 /dev/sdc
+        stratis filesystem create pool1 vol1
+        mkdir /mnt/str1
+        mount /stratis/pool1/vol1 /mnt/str1
+        blkid # get information for /etc/fstab
+        vi /etc/fstab
+        # add line for UUID /mnt/str1 xfs defaults 0 0    
         ```
 
-	* On rhcsa4, expand Stratis pool pool1 using the other 1GB disk. Confirm that `/mnt/str1` sees the storage expansion:
-	    ```shell
-		stratis pool add-data pool1 /dev/sdb
-		stratis blockdev # extra disk visible
+    * On rhcsa4, expand Stratis pool pool1 using the other 1GB disk. Confirm that `/mnt/str1` sees the storage expansion:
+        ```shell
+        stratis pool add-data pool1 /dev/sdb
+        stratis blockdev # extra disk visible
         ```
 
-	* On rhcsa3, create a group called group30 with GID 3000, and add user60 and user80 to this group. Create a directory called `/sdata`, enable setgid bit on it, and add write permission bit for the group. Set ownership and owning group to root and group30. Create a file called file1 under `/sdata` as user user60 and modify the file as user80 successfully:
-	    ```shell
-		TBC
+    * On rhcsa3, create a group called group30 with GID 3000, and add user60 and user80 to this group. Create a directory called `/sdata`, enable setgid bit on it, and add write permission bit for the group. Set ownership and owning group to root and group30. Create a file called file1 under `/sdata` as user user60 and modify the file as user80 successfully:
+        ```shell
+        TBC
         ```
 
-	* On rhcsa3, create directory `/dir1` with full permissions for everyone. Disallow non-owners to remove files. Test by creating file `/tmp/dir1/stkfile1` as user60 and removing it as user80:
-	    ```shell
-		TBC
+    * On rhcsa3, create directory `/dir1` with full permissions for everyone. Disallow non-owners to remove files. Test by creating file `/tmp/dir1/stkfile1` as user60 and removing it as user80:
+        ```shell
+        TBC
         ```
 
-	* On rhcsa3, search for all manual pages for the description containing the keyword "password" and redirect the output to file `/tmp/man.out`:
-	    ```shell
-		man -k password >> /tmp.man.out
-		# or potentially man -wK "password" if relying on the description is not enough
+    * On rhcsa3, search for all manual pages for the description containing the keyword "password" and redirect the output to file `/tmp/man.out`:
+        ```shell
+        man -k password >> /tmp.man.out
+        # or potentially man -wK "password" if relying on the description is not enough
         ```
 
-	* On rhcsa3, create file lnfile1 under `/tmp` and create one hard link `/tmp/lnfile2` and one soft link `/boot/file1`. Edit lnfile1 using the links and confirm:
-	    ```shell
-		cd /tmp
-		touch lnfile1
-		ln lnfile1 lnfile2
-		ln -s /boot/file1 lnfile1
+    * On rhcsa3, create file lnfile1 under `/tmp` and create one hard link `/tmp/lnfile2` and one soft link `/boot/file1`. Edit lnfile1 using the links and confirm:
+        ```shell
+        cd /tmp
+        touch lnfile1
+        ln lnfile1 lnfile2
+        ln -s /boot/file1 lnfile1
         ```
 
-	* On rhcsa3, install module postgresql version 9.6:
-	    ```shell
-		dnf module list postgresql # stream 10 shown as default
-		dnf module install postgresql:9.6
-		dnf module list # stream 9.6 shown as installed
+    * On rhcsa3, install module postgresql version 9.6:
+        ```shell
+        dnf module list postgresql # stream 10 shown as default
+        dnf module install postgresql:9.6
+        dnf module list # stream 9.6 shown as installed
         ```
 
-	* On rhcsa3, add the http service to the "external" firewalld zone persistently:
-	    ```shell
-		firewall-cmd --zone=external --add-service=http --permanent
+    * On rhcsa3, add the http service to the "external" firewalld zone persistently:
+        ```shell
+        firewall-cmd --zone=external --add-service=http --permanent
         ```
 
-	* On rhcsa3, set SELinux type shadow_t on a new file testfile1 in `/usr` and ensure that the context is not affected by a SELinux relabelling:
-	    ```shell
-		cd /usr
-		touch /usr/testfile1
-		ll -Zrt # type shown as unconfined_u:object_r:usr_t:s0
-		semange fcontext -a -t /usr/testfile1
-		restorecon -R -v /usr/testfile1
+    * On rhcsa3, set SELinux type shadow_t on a new file testfile1 in `/usr` and ensure that the context is not affected by a SELinux relabelling:
+        ```shell
+        cd /usr
+        touch /usr/testfile1
+        ll -Zrt # type shown as unconfined_u:object_r:usr_t:s0
+        semange fcontext -a -t /usr/testfile1
+        restorecon -R -v /usr/testfile1
         ```
 
-	* Configure password-less ssh access for user60 from rhcsa3 to rhcsa4:
-	    ```shell
-		sudo su - user60
-		ssh-keygen # do not provide a password
-		ssh-copy-id rhcsa4 # enter user60 pasword on rhcsa4
+    * Configure password-less ssh access for user60 from rhcsa3 to rhcsa4:
+        ```shell
+        sudo su - user60
+        ssh-keygen # do not provide a password
+        ssh-copy-id rhcsa4 # enter user60 pasword on rhcsa4
         ```
 
 1. RHCSA 8 Practise Exam
 
-	* Interrupt the boot process and reset the root password:
-	    ```shell
-		# interrupt boot process and add rd.break at end of linux line
-		mount -o remount, rw /sysroot
-		chroot /sysroot
-		passwd 
-		# enter new passwd
-		touch /.autorelabel
-		# you could also add enforcing=0 to the end of the Linux line to avoid having to do this
-		# ctrl + D
-		reboot
+    * Interrupt the boot process and reset the root password:
+        ```shell
+        # interrupt boot process and add rd.break at end of linux line
+        mount -o remount, rw /sysroot
+        chroot /sysroot
+        passwd 
+        # enter new passwd
+        touch /.autorelabel
+        # you could also add enforcing=0 to the end of the Linux line to avoid having to do this
+        # ctrl + D
+        reboot
         ```
 
-	* Repos are available from the repo server at http://repo.eight.example.com/BaseOS and http://repo.eight.example.com/AppStream for you to use during the exam. Setup these repos:
-	    ```shell
-		vi /etc/yum.repos.d/localrepo.repo
-		#[BaseOS]
-		#name=BaseOS
-		#baseurl=http://repo.eight.example.com/BaseOS
-		#enabled=1
-		#
-		#[AppStream]
-		#name=AppStream
-		#baseurl=http://repo.eight.example.com/AppStream
-		#enabled=1
-		dnf repolist # confirm
-		# you could also use dnf config-manager --add-repo
+    * Repos are available from the repo server at http://repo.eight.example.com/BaseOS and http://repo.eight.example.com/AppStream for you to use during the exam. Setup these repos:
+        ```shell
+        vi /etc/yum.repos.d/localrepo.repo
+        #[BaseOS]
+        #name=BaseOS
+        #baseurl=http://repo.eight.example.com/BaseOS
+        #enabled=1
+        #
+        #[AppStream]
+        #name=AppStream
+        #baseurl=http://repo.eight.example.com/AppStream
+        #enabled=1
+        dnf repolist # confirm
+        # you could also use dnf config-manager --add-repo
         ```
 
-	* The system time should be set to your (or nearest to you) timezone and ensure NTP sync is configured:
-	    ```shell
-		timedatectl set-timezone Australia/Sydney
-		timedatectl set-ntp true
-		timedatectl status # confirm status
+    * The system time should be set to your (or nearest to you) timezone and ensure NTP sync is configured:
+        ```shell
+        timedatectl set-timezone Australia/Sydney
+        timedatectl set-ntp true
+        timedatectl status # confirm status
         ```
 
-	* Add the following secondary IP addresses statically to your current running interface. Do this in a way that doesn’t compromise your existing settings:
-	    ```shell
-		# IPV4 - 10.0.0.5/24
-		# IPV6 - fd01::100/64
-		nmcli con edit System\ eth0
-		goto ipv4.addresses 
-		add 10.0.0.5/24
-		goto ipv6.addresses 
-		add fd01::100/64
-		back
-		save
-		nmcli con edit System\ eth1
-		goto ipv4.addresses 
-		add 10.0.0.5/24
-		goto ipv6.addresses 
-		add fd01::100/64
-		back
-		save
-		nmcli con reload
-		# enter yes when asked if you want to set to manual
+    * Add the following secondary IP addresses statically to your current running interface. Do this in a way that doesn’t compromise your existing settings:
+        ```shell
+        # IPV4 - 10.0.0.5/24
+        # IPV6 - fd01::100/64
+        nmcli con edit System\ eth0
+        goto ipv4.addresses 
+        add 10.0.0.5/24
+        goto ipv6.addresses 
+        add fd01::100/64
+        back
+        save
+        nmcli con edit System\ eth1
+        goto ipv4.addresses 
+        add 10.0.0.5/24
+        goto ipv6.addresses 
+        add fd01::100/64
+        back
+        save
+        nmcli con reload
+        # enter yes when asked if you want to set to manual
         ```
 
-	* Enable packet forwarding on system1. This should persist after reboot:
-	    ```shell
-		vi /etc/sysctl.conf
-		# add line for net.ipv4.port_forward=1
+    * Enable packet forwarding on system1. This should persist after reboot:
+        ```shell
+        vi /etc/sysctl.conf
+        # add line for net.ipv4.port_forward=1
         ```
 
-	* System1 should boot into the multiuser target by default and boot messages should be present (not silenced):
-	    ```shell
-		systemctl set-default multi-user.target
-		vi /etc/default/grub
-		# remove rhgb quiet from GRUB_CMDLINE_LINUX
-		grub2-mkconfig -o /boot/grub2/grub.cfg
-		reboot
+    * System1 should boot into the multiuser target by default and boot messages should be present (not silenced):
+        ```shell
+        systemctl set-default multi-user.target
+        vi /etc/default/grub
+        # remove rhgb quiet from GRUB_CMDLINE_LINUX
+        grub2-mkconfig -o /boot/grub2/grub.cfg
+        reboot
         ```
 
-	* Create a new 2GB volume group named “vgprac”:
-	    ```shell
-		lsblk
-		# /dev/sdb is available with 8GB
-		# the file system already has ~36MB in use and is mounted to /extradisk1
-		umount /dev/sdb
-		parted /dev/sdb
-		mklabel
-		# enter msdos
-		mkpart
-		# enter primary
-		# enter xfs
-		# enter 0
-		# enter 2.1GB
-		set
-		# enter 1
-		# enter lvm
-		# enter on
-		vgcreate vgprac /dev/sdb1
-		# enter y to wipe	
+    * Create a new 2GB volume group named “vgprac”:
+        ```shell
+        lsblk
+        # /dev/sdb is available with 8GB
+        # the file system already has ~36MB in use and is mounted to /extradisk1
+        umount /dev/sdb
+        parted /dev/sdb
+        mklabel
+        # enter msdos
+        mkpart
+        # enter primary
+        # enter xfs
+        # enter 0
+        # enter 2.1GB
+        set
+        # enter 1
+        # enter lvm
+        # enter on
+        vgcreate vgprac /dev/sdb1
+        # enter y to wipe    
         ```
 
-	* Create a 500MB logical volume named “lvprac” inside the “vgprac” volume group:
-	    ```shell
-		lvcreate --name lvprac -L 500MB vgprac
+    * Create a 500MB logical volume named “lvprac” inside the “vgprac” volume group:
+        ```shell
+        lvcreate --name lvprac -L 500MB vgprac
         ```
 
-	* The “lvprac” logical volume should be formatted with the xfs filesystem and mount persistently on the `/mnt/lvprac` directory:
-	    ```shell
-		mkdir /mnt/lvprac
-		mkfs.xfs /dev/mapper/vgprac-lvprac
-		vi /etc/fstab
-		# comment out line for old /dev/sdb
-		# add line for /dev/mapper/vgprac-lvprac
-		mount -a
-		df -h # confirm mounted
+    * The “lvprac” logical volume should be formatted with the xfs filesystem and mount persistently on the `/mnt/lvprac` directory:
+        ```shell
+        mkdir /mnt/lvprac
+        mkfs.xfs /dev/mapper/vgprac-lvprac
+        vi /etc/fstab
+        # comment out line for old /dev/sdb
+        # add line for /dev/mapper/vgprac-lvprac
+        mount -a
+        df -h # confirm mounted
         ```
 
-	* Extend the xfs filesystem on “lvprac” by 500MB:
-	    ```shell
-		lvextend -r -L +500MB /dev/vgprac/lvprac
+    * Extend the xfs filesystem on “lvprac” by 500MB:
+        ```shell
+        lvextend -r -L +500MB /dev/vgprac/lvprac
         ```
 
-	* Use the appropriate utility to create a 5TiB thin provisioned volume:
-	    ```shell
-		lsblk
-		# /dev/sdc is available with 8GB
-		dnf install vdo kmod-vdo -y
-		umount /extradisk2
-		vdo create --name=myvolume --device=/dev/sdc --vdoLogicalSize=5T --force
-		vi /etc/fstab
-		# comment out line for old /dev/sdc
+    * Use the appropriate utility to create a 5TiB thin provisioned volume:
+        ```shell
+        lsblk
+        # /dev/sdc is available with 8GB
+        dnf install vdo kmod-vdo -y
+        umount /extradisk2
+        vdo create --name=myvolume --device=/dev/sdc --vdoLogicalSize=5T --force
+        vi /etc/fstab
+        # comment out line for old /dev/sdc
         ```
 
-	* Configure a basic web server that displays “Welcome to the web server” once connected to it. Ensure the firewall allows the http/https services:
-	    ```shell
-		vi /var/www/html/index.html
-		# add line "Welcome to the web server"
-		systemctl restart httpd.service
-		curl http://localhost
-		# success
-		# from server1
-		curl http://server2.eight.example.com
-		# no route to host shown
-		# on server2
-		firewall-cmd --add-port=80/tcp --permanent
-		firewall-cmd --reload
-		# from server1
-		curl http://server2.eight.example.com
-		# success
+    * Configure a basic web server that displays “Welcome to the web server” once connected to it. Ensure the firewall allows the http/https services:
+        ```shell
+        vi /var/www/html/index.html
+        # add line "Welcome to the web server"
+        systemctl restart httpd.service
+        curl http://localhost
+        # success
+        # from server1
+        curl http://server2.eight.example.com
+        # no route to host shown
+        # on server2
+        firewall-cmd --add-port=80/tcp --permanent
+        firewall-cmd --reload
+        # from server1
+        curl http://server2.eight.example.com
+        # success
         ```
 
-	* Find all files that are larger than 5MB in the /etc directory and copy them to /find/largefiles:
-	    ```shell
-		mkdir -p /find/largefiles
-		find /etc/ -size +5M -exec cp {} /find/largefiles \;
-		# the {} is substituted by the output of find, and the ; is mandatory for an exec but must be escaped
+    * Find all files that are larger than 5MB in the /etc directory and copy them to /find/largefiles:
+        ```shell
+        mkdir -p /find/largefiles
+        find /etc/ -size +5M -exec cp {} /find/largefiles \;
+        # the {} is substituted by the output of find, and the ; is mandatory for an exec but must be escaped
         ```
 
-	* Write a script named awesome.sh in the root directory on system1. If “me” is given as an argument, then the script should output “Yes, I’m awesome.” If “them” is given as an argument, then the script should output “Okay, they are awesome.” If the argument is empty or anything else is given, the script should output “Usage ./awesome.sh me|them”:
-	    ```shell
-		vi /awesome.sh
-		chmod +x /awesome.sh
-		# contents of awesome.sh
-		##!/bin/bash
-		#if [ $1 = "me" ]; then
-		#	echo "Yes, I'm awesome."
-		#elif [ $1  = "them"]; then
-		#	echo "Okay, they are awesome."
-		#else
-		#	echo "Usage /.awesome.sh me|them"
-		#fi
-		#note that = had to be used and not -eq
+    * Write a script named awesome.sh in the root directory on system1. If “me” is given as an argument, then the script should output “Yes, I’m awesome.” If “them” is given as an argument, then the script should output “Okay, they are awesome.” If the argument is empty or anything else is given, the script should output “Usage ./awesome.sh me|them”:
+        ```shell
+        vi /awesome.sh
+        chmod +x /awesome.sh
+        # contents of awesome.sh
+        ##!/bin/bash
+        #if [ $1 = "me" ]; then
+        #    echo "Yes, I'm awesome."
+        #elif [ $1  = "them"]; then
+        #    echo "Okay, they are awesome."
+        #else
+        #    echo "Usage /.awesome.sh me|them"
+        #fi
+        #note that = had to be used and not -eq
         ```
 
-	* Create users phil, laura, stewart, and kevin. All new users should have a file named “Welcome” in their home folder after account creation. All user passwords should expire after 60 days and be at least 8 characters in length. Phil and laura should be part of the “accounting” group. If the group doesn’t already exist, create it. Stewart and kevin should be part of the “marketing” group. If the group doesn’t already exist, create it:
-	    ```shell
-		groupadd accounting
-		groupadd marketing
-		vi /etc/security/pwquality.conf
-		# uncomment out the line that already had minlen = 8
-		mkdir /etc/skel/Welcome
-		useradd phil -G accounting
-		useradd laura -G accounting
-		useradd stewart -G marketing
-		useradd kevin -G marketing
-		chage -M 60 phil
-		chage -M 60 laura
-		chage -M 60 stewart
-		chage -M 60 kevin
-		chage -l phil # confirm
-		# can also change in /etc/login.defs
+    * Create users phil, laura, stewart, and kevin. All new users should have a file named “Welcome” in their home folder after account creation. All user passwords should expire after 60 days and be at least 8 characters in length. Phil and laura should be part of the “accounting” group. If the group doesn’t already exist, create it. Stewart and kevin should be part of the “marketing” group. If the group doesn’t already exist, create it:
+        ```shell
+        groupadd accounting
+        groupadd marketing
+        vi /etc/security/pwquality.conf
+        # uncomment out the line that already had minlen = 8
+        mkdir /etc/skel/Welcome
+        useradd phil -G accounting
+        useradd laura -G accounting
+        useradd stewart -G marketing
+        useradd kevin -G marketing
+        chage -M 60 phil
+        chage -M 60 laura
+        chage -M 60 stewart
+        chage -M 60 kevin
+        chage -l phil # confirm
+        # can also change in /etc/login.defs
         ```
 
-	* Only members of the accounting group should have access to the `/accounting` directory. Make laura the owner of this directory. Make the accounting group the group owner of the `/accounting` directory:
-	    ```shell
-		mkdir /accounting
-		chmod 770 /accounting
-		chown laura:accounting /accounting
+    * Only members of the accounting group should have access to the `/accounting` directory. Make laura the owner of this directory. Make the accounting group the group owner of the `/accounting` directory:
+        ```shell
+        mkdir /accounting
+        chmod 770 /accounting
+        chown laura:accounting /accounting
         ```
 
-	* Only members of the marketing group should have access to the `/marketing` directory. Make stewart the owner of this directory. Make the marketing group the group owner of the `/marketing` directory:
-	    ```shell
-		mkdir /marketing
-		chmod 770 /marketing
-		chown stewart:marketing /marketing
+    * Only members of the marketing group should have access to the `/marketing` directory. Make stewart the owner of this directory. Make the marketing group the group owner of the `/marketing` directory:
+        ```shell
+        mkdir /marketing
+        chmod 770 /marketing
+        chown stewart:marketing /marketing
         ```
 
-	* New files should be owned by the group owner and only the file creator should have the permissions to delete their own files:
-	    ```shell
-		chmod +ts /marketing
-		chmod +ts /accounting
+    * New files should be owned by the group owner and only the file creator should have the permissions to delete their own files:
+        ```shell
+        chmod +ts /marketing
+        chmod +ts /accounting
         ```
 
-	* Create a cron job that writes “This practice exam was easy and I’m ready to ace my RHCSA” to `/var/log/messages` at 12pm only on weekdays:
-	    ```shell
-		crontab -e
-		#* 12 * * 1-5 echo "This practise exam was easy and I'm ready to ace my RHCSA" >> /var/log/messagees
-		# you can look at info crontab if you forget the syntax
+    * Create a cron job that writes “This practice exam was easy and I’m ready to ace my RHCSA” to `/var/log/messages` at 12pm only on weekdays:
+        ```shell
+        crontab -e
+        #* 12 * * 1-5 echo "This practise exam was easy and I'm ready to ace my RHCSA" >> /var/log/messagees
+        # you can look at info crontab if you forget the syntax
         ```
 
 ## RHCE (RHEL 9)
@@ -4714,18 +4714,18 @@
 
 1. Modules
 
-    * Modules are essentially tools for particular tasks. They usually take parameters and return JSON. Modules can be run from the command line or within a playbook. Ansible ships with a significant amount of modules by default, and custom modules can also be written.
+    * Modules are essentially tools for tasks. They usually take parameters and return JSON. Modules can be run from the command line or within a playbook. Ansible ships with a significant number of modules by default, and custom modules can also be written.
 
-	* Each specific task in Ansible is written through a Module. Multiple Modules are writtein in sequential order. Multiple Modules for related Tasks are called a Play. All Plays together make a Playbook.
+    * Each specific task in Ansible is written through a Module. Multiple Modules are written in sequential order. Multiple Modules for related Tasks are called a Play. All Plays together make a Playbook.
 
-	* To run modules through a YAML file:
+    * To run modules through a YAML file:
         ```shell
         ansible-playbook example.yml
         ```
 
-	* The `--syntax-check` command can be used to check the syntax before running a playbook.
+    * The `--syntax-check` command can be used to check the syntax before running a playbook.
 
-	* To run a module independently:
+    * To run a module independently:
         ```shell
         ansible myservers -m ping
         ```
@@ -4754,272 +4754,272 @@
                 maxRequestsPerChild: 600
         ```
 
-	* An example of variables used within a playbook is shown below:
+    * An example of variables used within a playbook is shown below:
         ```yaml
-		---
-		- name: Create a file with vars
-		  hosts: localhost
-		  vars:
-		    fileName: createdusingvars
-		  tasks:
-		    - name: Create a file
-		      file:
-		        state: touch
-		        path: /tmp/{{ fileName }}.txt
+        ---
+        - name: Create a file with vars
+          hosts: localhost
+          vars:
+            fileName: createdusingvars
+          tasks:
+            - name: Create a file
+              file:
+                state: touch
+                path: /tmp/{{ fileName }}.txt
         ```
 
 1. Facts
 
     * Facts provide certain information about a given target host. They are automatically discovered by Ansible when it reaches out to a host. Facts can be disabled and can be cached for use in playbook executions.
 
-	* To gather a list of facts for a host:
+    * To gather a list of facts for a host:
         ```shell
         ansible localhost -m setup
         ```
 
 1. Loops
 
-	* Loops work hand in hand with conditions as we can loop certain tasks until a condition is met. Ansible provides the `loop` and `with_*` directives for creating loops.
+    * Loops work hand in hand with conditions as we can loop certain tasks until a condition is met. Ansible provides the `loop` and `with_*` directives for creating loops.
 
-	* An example is shown below:
+    * An example is shown below:
         ```yaml
-		---
-		- name: Create users with loop
-		  hosts: localhost
+        ---
+        - name: Create users with loop
+          hosts: localhost
 
-		  tasks:
-		    - name: Create users
-		      user:
-		        name: "{{ item }}"
-		      loop:
-		        - jerry
-		        - kramer
-		        - elaine
+          tasks:
+            - name: Create users
+              user:
+                name: "{{ item }}"
+              loop:
+                - jerry
+                - kramer
+                - elaine
         ```
 
-	* An alternate example is shown below:
+    * An alternate example is shown below:
         ```yaml
-		---
-		- name: Create users through loop
-		  hosts: localhost
+        ---
+        - name: Create users through loop
+          hosts: localhost
 
-		  vars:
-		    users: [jerry,kramer,elaine]
+          vars:
+            users: [jerry,kramer,elaine]
 
-		  tasks:
-		    - name: Create users
-		      user:
-		        name: "{{ item }}"
-		      with_items: "{{ users }}"
+          tasks:
+            - name: Create users
+              user:
+                name: "{{ item }}"
+              with_items: "{{ users }}"
         ```
 
-	* An example for installing packages using a loop is shown below:
+    * An example for installing packages using a loop is shown below:
         ```yaml
-		---
-		- name: Install packages using a loop
-		  hosts: localhost
+        ---
+        - name: Install packages using a loop
+          hosts: localhost
 
-		  vars:
-		    packages: [ftp, telnet, htop]
+          vars:
+            packages: [ftp, telnet, htop]
 
-		  tasks:
-		    - name: Install package
-		      yum:
-		        name: "{{ item }}"
-		        state: present
-		      with_items: "{{ packages }}"
+          tasks:
+            - name: Install package
+              yum:
+                name: "{{ item }}"
+                state: present
+              with_items: "{{ packages }}"
         ```
 
-	* An alternate example for installing packages which is possible because yum provides the loop implementation natively:
+    * An alternate example for installing packages which is possible because yum provides the loop implementation natively:
         ```yaml
-		---
-		- name: Install packages through loop
-		  hosts: localhost
+        ---
+        - name: Install packages through loop
+          hosts: localhost
 
-		  vars:
-		    packages: [ftp, telnet, htop]
+          vars:
+            packages: [ftp, telnet, htop]
 
-		  tasks:
-		    - name: Install packages
-		      yum:
-		        name: "{{ packages }}"
-		        state: present
+          tasks:
+            - name: Install packages
+              yum:
+                name: "{{ packages }}"
+                state: present
         ```
 
 1. Conditional tasks
 
 1. Plays
 
-	* The goal of a play is to map a group of hosts to some well-defined roles. A play can consist of one or more tasks which make calls to Ansible modules.
+    * The goal of a play is to map a group of hosts to some well-defined roles. A play can consist of one or more tasks which make calls to Ansible modules.
 
 1. Handling task failure
 
 1. Playbooks
 
-	* A playbook is a series of plays. An example of a playbook:
+    * A playbook is a series of plays. An example of a playbook:
         ```shell
-		---
-		- hosts: webservers
-		  become: yes
-		  tasks:
-		    - name: ensure apache is at the latest version
-		      yum:
-		        name: httpd
-		        state: latest
-		    - name: write our custom apache config file
-		      template:
-		        src: /srv/httpd.j2
-		        dest: /etc/httpd/conf/httpd.conf
-		    - name: ensure that apache is started
-		      service:
-		        name: httpd
-		        state: started
-		    - hosts: dbservers
-		      become: yes
-		      tasks:
-		      - name: ensure postgresql is at the latest version
-		        yum:
-		          name: postgresql
-		          state: latest
-		      - name: ensure that postgres is started
-		        service:
-		          name: postgresql
-		          state: started
+        ---
+        - hosts: webservers
+          become: yes
+          tasks:
+            - name: ensure apache is at the latest version
+              yum:
+                name: httpd
+                state: latest
+            - name: write our custom apache config file
+              template:
+                src: /srv/httpd.j2
+                dest: /etc/httpd/conf/httpd.conf
+            - name: ensure that apache is started
+              service:
+                name: httpd
+                state: started
+            - hosts: dbservers
+              become: yes
+              tasks:
+              - name: ensure postgresql is at the latest version
+                yum:
+                  name: postgresql
+                  state: latest
+              - name: ensure that postgres is started
+                service:
+                  name: postgresql
+                  state: started
         ```
 
 1. Configuration Files
 
-	* The Ansible configuration files are taken from the below locations in order:
-		* ANSIBLE_CONFIG (environment variable)
-		* ansible.cfg (in the current directory)
-		* `~/.ansible.cfg` (in the home directory)
-		* `/etc/ansible/ansible.cfg`
+    * The Ansible configuration files are taken from the below locations in order:
+        * ANSIBLE_CONFIG (environment variable)
+        * ansible.cfg (in the current directory)
+        * `~/.ansible.cfg` (in the home directory)
+        * `/etc/ansible/ansible.cfg`
 
-	* A configuration file will not automatically load if it is in a world-writable directory.
+    * A configuration file will not automatically load if it is in a world-writable directory.
 
-	* The ansible-config command can be used to view configurations:
-		* list - Prints all configuration options
-		* dump - Dumps configuration
-		* view - View the configuration file
+    * The ansible-config command can be used to view configurations:
+        * list - Prints all configuration options
+        * dump - Dumps configuration
+        * view - View the configuration file
 
-	* Commonly used settings:
-		* inventory - Specifies the default inventory file
-		* roles_path - Sets paths to search in for roles
-		* forks - Specifies the amount of hosts configured by Ansible at the same time (Parallelism)
-		* ansible_managed - Text inserted into templates which indicate that file is managed by Ansible and changes will be overwritten
+    * Commonly used settings:
+        * inventory - Specifies the default inventory file
+        * roles_path - Sets paths to search in for roles
+        * forks - Specifies the amount of hosts configured by Ansible at the same time (Parallelism)
+        * ansible_managed - Text inserted into templates which indicate that file is managed by Ansible and changes will be overwritten
 
 1. Roles
 
-	* Roles help to split playbooks into smaller groups. Roles let you automatically load related vars, files, tasks, handlers, and other Ansible artifacts based on a known file structure. After you group your content in roles, you can easily resuse them and share them with other users.
+    * Roles help to split playbooks into smaller groups. Roles let you automatically load related vars, files, tasks, handlers, and other Ansible artifacts based on a known file structure. After you group your content in roles, you can easily reuse them and share them with other users.
 
-	* Consider the playbook below:
+    * Consider the playbook below:
         ```yaml
-		---
-		- name: Setup httpd webserver
-		  hosts: east-webservers
+        ---
+        - name: Setup httpd webserver
+          hosts: east-webservers
 
-		  tasks:
-		    - name: Install httpd packages
-		      yum:
-		        name: httpd
-		        state: present
+          tasks:
+            - name: Install httpd packages
+              yum:
+                name: httpd
+                state: present
 
-		    - name: Start httpd
-		      service:
-		        name: httpd
-		        state: started
+            - name: Start httpd
+              service:
+                name: httpd
+                state: started
 
-		    - name: Open port http on firewall
-		      firewalld:
-		        service: http
-		        permanent: true
-		        state: enabled
+            - name: Open port http on firewall
+              firewalld:
+                service: http
+                permanent: true
+                state: enabled
 
-		    - name: Restart firewalld
-		      service:
-		        name: firewalld
-		        state: restarted
+            - name: Restart firewalld
+              service:
+                name: firewalld
+                state: restarted
 
-		  hosts: west-webservers
-		  tasks:
-		    - name: Install httpd packages
-		      yum:
-		        name: httpd
-		        state: present
+          hosts: west-webservers
+          tasks:
+            - name: Install httpd packages
+              yum:
+                name: httpd
+                state: present
 
-		    - name: Start httpd
-		      service:
-		        name: httpd
-		        state: started
+            - name: Start httpd
+              service:
+                name: httpd
+                state: started
         ```
 
-	* This playbook can be simplified with the addition of two roles. The first role is created in `/etc/ansible/roles/fullinstall/tasks/main.yml`:
+    * This playbook can be simplified with the addition of two roles. The first role is created in `/etc/ansible/roles/fullinstall/tasks/main.yml`:
         ```yaml
-		---
-		- name: Install httpd packages
-		  yum:
-		    name: httpd
-		    state: present
+        ---
+        - name: Install httpd packages
+          yum:
+            name: httpd
+            state: present
 
-		- name: Start httpd
-		  service:
-		    name: httpd
-		    state: started
+        - name: Start httpd
+          service:
+            name: httpd
+            state: started
 
-		- name: Open port http on firewall
-		  firewalld:
-		    service: http
-		    permanent: true
-		    state: enabled
+        - name: Open port http on firewall
+          firewalld:
+            service: http
+            permanent: true
+            state: enabled
 
-		- name: Restart firewalld
-		  service:
-		    name: firewalld
-		    state: restarted
+        - name: Restart firewalld
+          service:
+            name: firewalld
+            state: restarted
         ```
 
-	* The second role is created in `/etc/ansible/roles/basicinstall/tasks/main.yml`:
+    * The second role is created in `/etc/ansible/roles/basicinstall/tasks/main.yml`:
         ```yaml
-		---
-		- name: Install httpd packages
-		  yum:
-		    name: httpd
-		    state: present
+        ---
+        - name: Install httpd packages
+          yum:
+            name: httpd
+            state: present
 
-		- name: Start httpd
-		  service:
-		    name: httpd
-		    state: started
+        - name: Start httpd
+          service:
+            name: httpd
+            state: started
         ```
 
-	* The simplified playbook is shown below:
+    * The simplified playbook is shown below:
         ```yaml
-		---
-		- name: Full install
-		  hosts: all
-		  roles:
-		    - fullinstall
+        ---
+        - name: Full install
+          hosts: all
+          roles:
+            - fullinstall
 
-		- name: Basic install
-		  hosts: all
-		  roles:
-		    - basicinstall
+        - name: Basic install
+          hosts: all
+          roles:
+            - basicinstall
         ```
 
-	* Many roles are available in the Ansible Galaxy. To install a role run `ansible-galaxy install $role`. These roles will be installed into the users home directory in the users home directory in `.ansible/roles`. The role can then be copied into the standard Ansible location.
+    * Many roles are available in the Ansible Galaxy. To install a role run `ansible-galaxy install $role`. These roles will be installed into the users home directory in the users home directory in `.ansible/roles`. The role can then be copied into the standard Ansible location.
 
 1. Use provided documentation to look up specific information about Ansible modules and commands
 
-	* To check the documentation for the `yum` module:
+    * To check the documentation for the `yum` module:
         ```shell
-		ansible-doc -t module yum
+        ansible-doc -t module yum
         ```
 
 ### Use roles and Ansible Content Collections
 
 1. Create and work with roles
 
-	* Roles simplify long playbooks by grouping tasks into smaller playbooks.
+    * Roles simplify long playbooks by grouping tasks into smaller playbooks.
 
 1. Install roles and use them in playbooks
 
@@ -5031,76 +5031,76 @@
 
 1. Install required packages
 
-	* To install Ansible using dnf:
+    * To install Ansible using dnf:
         ```shell
-		subscription-manager repos --list | grep ansible
-		# find latest version
-		sudo subscription-manager repos --enable ansible-2.8-for-rhel-8-x86_64-rpms
-		dnf search ansible
-		# confirm available
-		dnf install -y ansible
+        subscription-manager repos --list | grep ansible
+        # find latest version
+        sudo subscription-manager repos --enable ansible-2.8-for-rhel-8-x86_64-rpms
+        dnf search ansible
+        # confirm available
+        dnf install -y ansible
         ```
 
-	* To install Ansible from disk:
+    * To install Ansible from disk:
         ```shell
-		sudo dnf install git
-		mkdir ansible
-		mkdir git
-		cd git
-		git clone --single-branch --branch stable -2.8 https://github.com/ansible/ansible.git
-		cd ansible
-		source ./hacking/env-setup
-		# make permanent
-		vi ~/.bash_profile
-		# add line
-		source ~/git/ansible/hacking/env-setup
-		pip2.7 install --user -r ./requirements.txt
-		# test the installation
-		ansible 127.0.0.1 -m ping
+        sudo dnf install git
+        mkdir ansible
+        mkdir git
+        cd git
+        git clone --single-branch --branch stable -2.8 https://github.com/ansible/ansible.git
+        cd ansible
+        source ./hacking/env-setup
+        # make permanent
+        vi ~/.bash_profile
+        # add line
+        source ~/git/ansible/hacking/env-setup
+        pip2.7 install --user -r ./requirements.txt
+        # test the installation
+        ansible 127.0.0.1 -m ping
         ```
 
 1. Create a static host inventory file
 
-	* An inventory is a list of hosts that Ansible manages. Inventory files may contain hosts, patterns, groups and variables. Multiple inventory files may be specified using a directory. Inventory files may be specified in INI or YAML format.
+    * An inventory is a list of hosts that Ansible manages. Inventory files may contain hosts, patterns, groups, and variables. Multiple inventory files may be specified using a directory. Inventory files may be specified in INI or YAML format.
 
-	* The default location is `/etc/ansible/hosts`. The location can be set in ansible.cfg or specified in the CLI using:
-	    ```shell
-		ansible -i <filename>
-		```
+    * The default location is `/etc/ansible/hosts`. The location can be set in ansible.cfg or specified in the CLI using:
+        ```shell
+        ansible -i <filename>
+        ```
 
-	* Best practices for inventory variables:
-		* Variables should be stored in YAML files located relative to the inventory file.
-		* Host and group variables should be stored in the host_vars and group_vars directories respectively (the directories need to be created).
-		* Variable files should be named after the host or group for which they contain variables (files may end in .yml or .yaml).
+    * Best practices for inventory variables:
+        * Variables should be stored in YAML files located relative to the inventory file.
+        * Host and group variables should be stored in the host_vars and group_vars directories respectively (the directories need to be created).
+        * Variable files should be named after the host or group for which they contain variables (files may end in .yml or .yaml).
 
-	* A host file can be static or dynamic. A dynamic host file can reflect updated IP addresses automatically but requires additional plugins.
+    * A host file can be static or dynamic. A dynamic host file can reflect updated IP addresses automatically but requires additional plugins.
 
-	* To view the hosts in the file:
-		```shell
-		ansible-inventory --list
-		```
+    * To view the hosts in the file:
+        ```shell
+        ansible-inventory --list
+        ```
 
 1. Create a configuration file
 
-	* An example of creating a custom configuration file, and updating the default configuration file:
-		```shell
-		cd ansible
-		vi ansible.cfg
+    * An example of creating a custom configuration file, and updating the default configuration file:
+        ```shell
+        cd ansible
+        vi ansible.cfg
 
-		### contents of file
-		[defaults]
+        ### contents of file
+        [defaults]
 
-		interpreter_python = auto
-		inventory = /home/cloud_user/ansible/inventory/inv.ini
-		roles_path = /etc/ansible/roles:/home/cloud_user/ansible/roles
-		###
+        interpreter_python = auto
+        inventory = /home/cloud_user/ansible/inventory/inv.ini
+        roles_path = /etc/ansible/roles:/home/cloud_user/ansible/roles
+        ###
 
-		mkdir roles
-		# add property to default ansible.cfg
-		sudo vi /etc/ansible/ansible.cfg
-		# add line
-		interpreter_python = auto
-		```
+        mkdir roles
+        # add property to default ansible.cfg
+        sudo vi /etc/ansible/ansible.cfg
+        # add line
+        interpreter_python = auto
+        ```
 
 1. Create and use static inventories to define groups of hosts
 
@@ -5108,28 +5108,28 @@
 
 1. Create and distribute SSH keys to managed nodes
 
-	* A control node is any machine with Ansible installed. You can run Ansible commands and playbooks from any control node. A managed node (also sometimes called a "host") is a network device or server you manage with Ansible. Ansible is not installed on managed nodes.
+    * A control node is any machine with Ansible installed. You can run Ansible commands and playbooks from any control node. A managed node (also sometimes called a "host") is a network device or server you manage with Ansible. Ansible is not installed on managed nodes.
 
-	* The following is an example of generating SSH keys on the control node and distributing them to managed nodes mypearson2c and mypearson3c:
-		```shell
-		ssh-keygen
-		# enter password
-		# now we have id.rsa and id_rsa.pub in /home/cloud_user/.ssh/
-		ssh-copy-id cloud_user@mspearson2c.mylabserver.com
-		# enter password
-		ssh-copy-id cloud_user@mspearson3c.mylabserver.com
-		# enter password
-		```
+    * The following is an example of generating SSH keys on the control node and distributing them to managed nodes mypearson2c and mypearson3c:
+        ```shell
+        ssh-keygen
+        # enter password
+        # now we have id.rsa and id_rsa.pub in /home/cloud_user/.ssh/
+        ssh-copy-id cloud_user@mspearson2c.mylabserver.com
+        # enter password
+        ssh-copy-id cloud_user@mspearson3c.mylabserver.com
+        # enter password
+        ```
 
 1. Configure privilege escalation on managed nodes
 
-	* The following is an example of configuring privilege escalation on managed nodes mypearson2c and mypearson3c:
-		```shell
-		# perform these steps on both mypearson2c and mypearson3c
-		sudo visudo
-		# add line
-		cloud_user ALL=(ALL) NOPASSWD: ALL
-		```
+    * The following is an example of configuring privilege escalation on managed nodes mypearson2c and mypearson3c:
+        ```shell
+        # perform these steps on both mypearson2c and mypearson3c
+        sudo visudo
+        # add line
+        cloud_user ALL=(ALL) NOPASSWD: ALL
+        ```
 
 1. Deploy files to managed nodes
 
@@ -5147,433 +5147,433 @@
 
 1. Know how to work with commonly used Ansible modules
 
-	* Commonly used modules include:
-		* Ping
-			* Validates a server is running and reachable.
-			* No required parameters.
-		* Setup
-			* Gather Ansible facts.
-			* No required parameters.
-		* Yum
-			* Manage packages with the YUM package manager.
-			* Common parameters are name and state.
-		* Service
-			* Control services on remote hosts:
-			* Common parameters are name (required), state and enabled.
-		* User
-			* Manage user accounts and attributes.
-			* Common parameters are name (required), state, group and groups.
-		* Copy
-			* Copy files to a remote host.
-			* Common parameters are src, dest (required), owner, group and mode.
-		* File
-			* Manage files and directories.
-			* Common parameters are path (required), state, owner, group and mode.
-		* Git
-			* Interact with git repositories.
-			* Common parameters are repo (required), dest (required) and clone.
+    * Commonly used modules include:
+        * Ping
+            * Validates a server is running and reachable.
+            * No required parameters.
+        * Setup
+            * Gather Ansible facts.
+            * No required parameters.
+        * Yum
+            * Manage packages with the YUM package manager.
+            * Common parameters are name and state.
+        * Service
+            * Control services on remote hosts:
+            * Common parameters are name (required), state and enabled.
+        * User
+            * Manage user accounts and attributes.
+            * Common parameters are name (required), state, group and groups.
+        * Copy
+            * Copy files to a remote host.
+            * Common parameters are src, dest (required), owner, group and mode.
+        * File
+            * Manage files and directories.
+            * Common parameters are path (required), state, owner, group and mode.
+        * Git
+            * Interact with git repositories.
+            * Common parameters are repo (required), dest (required) and clone.
 
-	* A sample playbook to copy a file to a remote client:
-		```yaml
-		---
-		- name: Copy a file from local to remote
-		  hosts: all
+    * A sample playbook to copy a file to a remote client:
+        ```yaml
+        ---
+        - name: Copy a file from local to remote
+          hosts: all
 
-		  tasks:
-		  - name: Copying file
-		    copy:
-		      src: /apps/ansible/temp
-		      dest: /tmp
-		      owner: myname
-		      group: myname
-		      mode: 0644
-		```
+          tasks:
+          - name: Copying file
+            copy:
+              src: /apps/ansible/temp
+              dest: /tmp
+              owner: myname
+              group: myname
+              mode: 0644
+        ```
 
-	* A sample playbook to change file permissions:
-		```shell
-		--
-		- name: Change file permissions
-		  hosts: all
+    * A sample playbook to change file permissions:
+        ```shell
+        --
+        - name: Change file permissions
+          hosts: all
 
-		  tasks:
-		    - name: File Permissions
-		      file:
-		        path: /etc/ansible/temp
-		        mode: '0777'
-		```
+          tasks:
+            - name: File Permissions
+              file:
+                path: /etc/ansible/temp
+                mode: '0777'
+        ```
 
-	* A sample playbook to check a file or directory status:
-		```yaml
-		---
-		- name: File status module
-		  hosts: localhost
+    * A sample playbook to check a file or directory status:
+        ```yaml
+        ---
+        - name: File status module
+          hosts: localhost
 
-		  tasks:
-		  - name: Check file status and attributes
-		    stat:
-		      path: /etc/hosts
-		    register: fs
+          tasks:
+          - name: Check file status and attributes
+            stat:
+              path: /etc/hosts
+            register: fs
 
-		  - name: Show results
-		    debug:
-		      msg: File attributes {{ fs }}
-		```
+          - name: Show results
+            debug:
+              msg: File attributes {{ fs }}
+        ```
 
-	* A sample playbook to create a directory or file and remove
-		```yaml
-		---
-		- name: Create and Remove file
-		  hosts: all
+    * A sample playbook to create a directory or file and remove
+        ```yaml
+        ---
+        - name: Create and Remove file
+          hosts: all
 
-		  tasks:
-		  - name: Create a directory
-		    file:
-		      path: /tmp/seinfeld
-		      owner: myuser
-		      mode: 770
-		      state: directory
+          tasks:
+          - name: Create a directory
+            file:
+              path: /tmp/seinfeld
+              owner: myuser
+              mode: 770
+              state: directory
 
-		  - name: Create a file in that directory
-		    file:
-		      path: /tmp/seinfeld/jerry
-		      state: touch
+          - name: Create a file in that directory
+            file:
+              path: /tmp/seinfeld/jerry
+              state: touch
 
-		  - name: Stat the new file jerry
-		    stat:
-		      path: /tmp/seinfeld/jerry
-		    register: jf
+          - name: Stat the new file jerry
+            stat:
+              path: /tmp/seinfeld/jerry
+            register: jf
 
-		  - name: Show file status
-		    debug:
-		      msg: File status and attributes {{ jf }}
+          - name: Show file status
+            debug:
+              msg: File status and attributes {{ jf }}
 
-		  - name: Remove file
-		    file:
-		      path: /tmp/seinfeld/jerry
-		      state: absent
-		```
+          - name: Remove file
+            file:
+              path: /tmp/seinfeld/jerry
+              state: absent
+        ```
 
-	* A sample playbook to create a file and add text:
-		```yaml
-		---
-		- name: Create a file and add text
-		  hosts: localhost
+    * A sample playbook to create a file and add text:
+        ```yaml
+        ---
+        - name: Create a file and add text
+          hosts: localhost
 
-		  tasks:
-		  - name: Create a new file
-		    file:
-		      path: /tmp/george
-		      state: touch
+          tasks:
+          - name: Create a new file
+            file:
+              path: /tmp/george
+              state: touch
 
-		  - name: Add text to the file
-		    blockinfile:
-		      path: /tmp/george
-		      block: Sample text
-		```
+          - name: Add text to the file
+            blockinfile:
+              path: /tmp/george
+              block: Sample text
+        ```
 
-	* A sample playbook to setup httpd and open a firewall port:
-	    ```yaml
-		---
-		- name: Setup httpd and open firewall port
-		  hosts: all
-		  tasks:
-		    - name: Install apache packages
-		      yum:
-		        name: httpd
-		        state: present
+    * A sample playbook to setup httpd and open a firewall port:
+        ```yaml
+        ---
+        - name: Setup httpd and open firewall port
+          hosts: all
+          tasks:
+            - name: Install apache packages
+              yum:
+                name: httpd
+                state: present
 
-		    - name: Start httpd
-		      service:
-		        name: httpd
-		        state: started
+            - name: Start httpd
+              service:
+                name: httpd
+                state: started
 
-		    - name: Open port 80 for http access
-		      firewalld:
-		        service: http
-		        permanent: true
-		        state: enabled
+            - name: Open port 80 for http access
+              firewalld:
+                service: http
+                permanent: true
+                state: enabled
 
-		    - name: Restart firewalld service to load firewall changes
-		      service:
-		        name: firewalld
-		        state: reloaded
-		```
+            - name: Restart firewalld service to load firewall changes
+              service:
+                name: firewalld
+                state: reloaded
+        ```
 
-	* Note that managing firewalld requires the following collection:
-	    ```shell
-		ansible-galaxy collection install --ignore-certs ansible.posix
-		```
+    * Note that managing firewalld requires the following collection:
+        ```shell
+        ansible-galaxy collection install --ignore-certs ansible.posix
+        ```
 
-	* A sample playbook to run a shell script:
-	    ```yaml
-		---
-		- name: Playbook for shell script
-		  hosts: all
-		  tasks:
-		    - name: Run shell script
-		      shell: "/home/username/cfile.sh"
-		```
+    * A sample playbook to run a shell script:
+        ```yaml
+        ---
+        - name: Playbook for shell script
+          hosts: all
+          tasks:
+            - name: Run shell script
+              shell: "/home/username/cfile.sh"
+        ```
 
-	* A sample playbook to setup a cronjob:
-	    ```yaml
-		---
-		- name: Create a cron job
-		  hosts: all
+    * A sample playbook to setup a cronjob:
+        ```yaml
+        ---
+        - name: Create a cron job
+          hosts: all
 
-		  tasks:
-		    - name: Schedule cron
-		      cron:
-		        name: This job is scheduled by Ansible
-		        minute: "0"
-		        hour: "10"
-		        day: "*"
-		        month: "*"
-		        weekday: "4"
-		        user: root
-		        job: "/home/username/cfile.sh"
-		```
+          tasks:
+            - name: Schedule cron
+              cron:
+                name: This job is scheduled by Ansible
+                minute: "0"
+                hour: "10"
+                day: "*"
+                month: "*"
+                weekday: "4"
+                user: root
+                job: "/home/username/cfile.sh"
+        ```
 
-	* A sample playbook to download a file:
-	    ```yaml
-		---
-		- name: Download Tomcat from tomcat.apache.org
-		  hosts: all
-		  tasks:
-		    - name: Create a directory /opt/tomcat
-		      file:
-		        path: /opt/tomcat
-		        state: directory
-		        mode: 0755
-		        owner: root
-		        group: root
-		    - name: Download Tomcat using get_url
-		      get_url:
-		        url: https://dlcdn.apache.org/tomcat/tomcat-8/v8.5.95/bin/apache-tomcat-8.5.95.tar.gz
-		        dest: /opt/tomcat
-		        mode: 0755
-		```
+    * A sample playbook to download a file:
+        ```yaml
+        ---
+        - name: Download Tomcat from tomcat.apache.org
+          hosts: all
+          tasks:
+            - name: Create a directory /opt/tomcat
+              file:
+                path: /opt/tomcat
+                state: directory
+                mode: 0755
+                owner: root
+                group: root
+            - name: Download Tomcat using get_url
+              get_url:
+                url: https://dlcdn.apache.org/tomcat/tomcat-8/v8.5.95/bin/apache-tomcat-8.5.95.tar.gz
+                dest: /opt/tomcat
+                mode: 0755
+        ```
 
-	* A sample playbook to download a file:
-	    ```yaml
-		---
-		- name: Create and mount new storage
-		  hosts: all
+    * A sample playbook to download a file:
+        ```yaml
+        ---
+        - name: Create and mount new storage
+          hosts: all
 
-		  tasks:
-		    - name: Create new partition
-		      parted:
-		        name: files
-		        label: gpt
-		        device: /dev/sdb
-		        number: 1
-		        state: present
-		        part_start: 1MiB
-		        part_end: 1GiB
+          tasks:
+            - name: Create new partition
+              parted:
+                name: files
+                label: gpt
+                device: /dev/sdb
+                number: 1
+                state: present
+                part_start: 1MiB
+                part_end: 1GiB
 
-		    - name: Create xfs filesystem
-		      filesystem:
-		        dev: /dev/sdb1
-		        fstype: xfs
+            - name: Create xfs filesystem
+              filesystem:
+                dev: /dev/sdb1
+                fstype: xfs
 
-		    - name: Create mount directory
-		      file:
-		        path: /data
-		        state: directory
+            - name: Create mount directory
+              file:
+                path: /data
+                state: directory
 
-		    - name: Mount the filesystem
-		      mount:
-		        src: /dev/sdb1
-		        path: /data
-		        fstype: xfs
-		        state: mounted
-		```
+            - name: Mount the filesystem
+              mount:
+                src: /dev/sdb1
+                path: /data
+                fstype: xfs
+                state: mounted
+        ```
 
-	* A sample playbook to create a user:
-	    ```yaml
-		---
-		- name: Playbook for creating users
-		  hosts: all
+    * A sample playbook to create a user:
+        ```yaml
+        ---
+        - name: Playbook for creating users
+          hosts: all
 
-		  tasks:
-		    - name: Create users
-		      user:
-		        name: george
-		        home: /home/george
-		        shell: /bin/bash
-		```
+          tasks:
+            - name: Create users
+              user:
+                name: george
+                home: /home/george
+                shell: /bin/bash
+        ```
 
-	* A sample playbook to update the password for a user:
-	    ```yaml
-		---
-		- name: Add or update user password
-		  hosts: all
+    * A sample playbook to update the password for a user:
+        ```yaml
+        ---
+        - name: Add or update user password
+          hosts: all
 
-		  tasks:
-		    - name: Change "george" password
-		      user:
-		        name: george
-		        update_password: always
-		        password: "{{ newpassword|password_hash('sha512') }}"
-		```
+          tasks:
+            - name: Change "george" password
+              user:
+                name: george
+                update_password: always
+                password: "{{ newpassword|password_hash('sha512') }}"
+        ```
 
-	* To run the playbook and provide a password:
-	    ```shell
-		ansible-playbook changepass.yml --extra-vars newpassword=abc123
-		```
+    * To run the playbook and provide a password:
+        ```shell
+        ansible-playbook changepass.yml --extra-vars newpassword=abc123
+        ```
 
-	* A sample playbook to kill a process:
-	    ```yaml
-		---
-		- name: Find a process and kill it
-		  hosts: 192.168.1.105
+    * A sample playbook to kill a process:
+        ```yaml
+        ---
+        - name: Find a process and kill it
+          hosts: 192.168.1.105
 
-		  tasks:
-		    - name: Get running process from remote host
-		      ignore_errors: yes
-		      shell: "ps -few | grep top | awk '{print $2}'"
-		      register: running_process
+          tasks:
+            - name: Get running process from remote host
+              ignore_errors: yes
+              shell: "ps -few | grep top | awk '{print $2}'"
+              register: running_process
 
-		    - name: Show process
-		      debug:
-		        msg: Processes are {{ running_process }}
+            - name: Show process
+              debug:
+                msg: Processes are {{ running_process }}
 
-		    - name: Kill running processes
-		      ignore_errors: yes
-		      shell: "kill {{ item }}"
-		      with_items: "{{ running_process.stdout_lines }}"
-		```
+            - name: Kill running processes
+              ignore_errors: yes
+              shell: "kill {{ item }}"
+              with_items: "{{ running_process.stdout_lines }}"
+        ```
 
-	* A sample playbook to kill a process:
-	    ```yaml
-		---
-		- name: Find a process and kill it
-		  hosts: 192.168.1.105
+    * A sample playbook to kill a process:
+        ```yaml
+        ---
+        - name: Find a process and kill it
+          hosts: 192.168.1.105
 
-		  tasks:
-		    - name: Get running process from remote host
-		      ignore_errors: yes
-		      shell: "ps -few | grep top | awk '{print $2}'"
-		      register: running_process
+          tasks:
+            - name: Get running process from remote host
+              ignore_errors: yes
+              shell: "ps -few | grep top | awk '{print $2}'"
+              register: running_process
 
-		    - name: Show process
-		      debug:
-		        msg: Processes are {{ running_process }}
+            - name: Show process
+              debug:
+                msg: Processes are {{ running_process }}
 
-		    - name: Kill running processes
-		      ignore_errors: yes
-		      shell: "kill {{ item }}"
-		      with_items: "{{ running_process.stdout_lines }}"
-		```
+            - name: Kill running processes
+              ignore_errors: yes
+              shell: "kill {{ item }}"
+              with_items: "{{ running_process.stdout_lines }}"
+        ```
 
-	* To run a playbook from a particular task:
-	    ```shell
-		ansible-playbook yamlfile.yml --start-at-task 'Task name'
-		```
+    * To run a playbook from a particular task:
+        ```shell
+        ansible-playbook yamlfile.yml --start-at-task 'Task name'
+        ```
 
 1. Use variables to retrieve the results of running a command
 
-	* The register keyword is used to store the results of running a command as a variable. Variables can then be referenced by other tasks in the playbook. Registered variables are only valid on the host for the current playbook run. The return values differ from module to module.
+    * The register keyword is used to store the results of running a command as a variable. Variables can then be referenced by other tasks in the playbook. Registered variables are only valid on the host for the current playbook run. The return values differ from module to module.
 
-	* A sample playbook register.yml is shown below:
-		```shell
-		---
-		- hosts: mspearson2
-		  tasks:
-		    - name: create a file
-		      file:
-		        path: /tmp/testFile
-		        state: touch
-		      register: var
-		    - name: display debug msg
-		      debug: msg="Register output is {{ var }}"
-		    - name: edit file
-		      lineinfile:
-		        path: /tmp/testFile
-		        line: "The uid is {{ var.uid }} and gid is {{ var.gid }}"
-		```
+    * A sample playbook register.yml is shown below:
+        ```shell
+        ---
+        - hosts: mspearson2
+          tasks:
+            - name: create a file
+              file:
+                path: /tmp/testFile
+                state: touch
+              register: var
+            - name: display debug msg
+              debug: msg="Register output is {{ var }}"
+            - name: edit file
+              lineinfile:
+                path: /tmp/testFile
+                line: "The uid is {{ var.uid }} and gid is {{ var.gid }}"
+        ```
 
-	* This playbook is run using:
-		```shell
-		ansible-playbook playbooks/register.yml
-		```
+    * This playbook is run using:
+        ```shell
+        ansible-playbook playbooks/register.yml
+        ```
 
-	* The result stored in `/tmp/testFile` shows the variables for uid and gid.
+    * The result stored in `/tmp/testFile` shows the variables for uid and gid.
 
 1. Use conditionals to control play execution
 
-	* Handlers are executed at the end of the play once all tasks are finished. They are typically used to start, reload, restart, or stop services.  Sometimes you only want to run a task when a change is made on a machine. For example, restarting a service only if a task updates the configuration of that service.
+    * Handlers are executed at the end of the play once all tasks are finished. They are typically used to start, reload, restart, or stop services.  Sometimes you only want to run a task when a change is made on a machine. For example, restarting a service only if a task updates the configuration of that service.
 
-	* A sample handler is shown below:
-		```yaml
-		---
-		- name: Verify Apache installation
-		  hosts: localhost
+    * A sample handler is shown below:
+        ```yaml
+        ---
+        - name: Verify Apache installation
+          hosts: localhost
 
-		  tasks:
-		    - name: Ensure Apache is at the latest version
-		      yum:
-		        name: httpd
-		        state: latest
+          tasks:
+            - name: Ensure Apache is at the latest version
+              yum:
+                name: httpd
+                state: latest
 
-		    - name: Copy updated Apache config file
-		      copy:
-		        src: /tmp/httpd.conf
-		        dest: /etc/httpd.conf
-		      notify:
-		        - Restart Apache
+            - name: Copy updated Apache config file
+              copy:
+                src: /tmp/httpd.conf
+                dest: /etc/httpd.conf
+              notify:
+                - Restart Apache
 
-		    - name: Ensure Apache is running
-		      service:
-		        name: httpd
-		        state: started
+            - name: Ensure Apache is running
+              service:
+                name: httpd
+                state: started
 
-		  handlers:
-		    - name: Restart Apache
-		      service:
-		        name: httpd
-		        state: restarted
-		```
+          handlers:
+            - name: Restart Apache
+              service:
+                name: httpd
+                state: restarted
+        ```
 
-	* The when statement can be used to conditionally execute tasks. An example is shown below:
-		```yaml
-		---
-		- name: Install Apache WebServer
-		  hosts: localhost
-		  tasks:
-		    - name: Install Apache on an Ubuntu Server
-		      apt-get:
-		        name: apache2
-		        state: present
-		      when: ansible_os_family == "Ubuntu"
+    * The when statement can be used to conditionally execute tasks. An example is shown below:
+        ```yaml
+        ---
+        - name: Install Apache WebServer
+          hosts: localhost
+          tasks:
+            - name: Install Apache on an Ubuntu Server
+              apt-get:
+                name: apache2
+                state: present
+              when: ansible_os_family == "Ubuntu"
 
-		    - name: Install Apache on CentOS Server
-		      yum:
-		        name: httpd
-		        state: present
-		      when: ansible_os_family == "Redhat"
-		```
+            - name: Install Apache on CentOS Server
+              yum:
+                name: httpd
+                state: present
+              when: ansible_os_family == "Redhat"
+        ```
 
-	* Tags are references or aliases to a task. Instead of runing an entire playbook, use tags to target a specific task you need to run. Consider the playbook `httpbytags.yml` shown below:
-		```yaml
-		---
-		- name: Setup Apache server
-		  hosts: localhost
-		  tasks:
-		    - name: Install httpd
-		      yum:
-		        name: httpd
-		        state: present
-		      tags: i-httpd
-		    - name: Start httpd
-		      service:
-		        name: httpd
-		        state: started
-		      tags: s-httpd
-		```
+    * Tags are references or aliases to a task. Instead of running an entire playbook, use tags to target a specific task you need to run. Consider the playbook `httpbytags.yml` shown below:
+        ```yaml
+        ---
+        - name: Setup Apache server
+          hosts: localhost
+          tasks:
+            - name: Install httpd
+              yum:
+                name: httpd
+                state: present
+              tags: i-httpd
+            - name: Start httpd
+              service:
+                name: httpd
+                state: started
+              tags: s-httpd
+        ```
 
-	* To list tags in a playbook run `ansible-playbook httpbytags.yml --list-tags`.
+    * To list tags in a playbook run `ansible-playbook httpbytags.yml --list-tags`.
 
-	* To target tasks using tags run `ansible-playbook httpbytags.yml -t i-httpd`. To skip tasks using tags run `ansible-playbook httpbytags.yml --skip-tags i-httpd`
+    * To target tasks using tags run `ansible-playbook httpbytags.yml -t i-httpd`. To skip tasks using tags run `ansible-playbook httpbytags.yml --skip-tags i-httpd`
 
 
 1. Configure error handling
@@ -5608,13 +5608,13 @@
 
 1. Use Ansible Vault in playbooks to protect sensitive data
 
-	* An encrypted playbook can be created using `ansible-playbook $playbook_name --ask-vault-pass`. The YAML file can then be executed by `ansible-playbook $playbook_name --ask-vault-pass`.
+    * An encrypted playbook can be created using `ansible-playbook $playbook_name --ask-vault-pass`. The YAML file can then be executed by `ansible-playbook $playbook_name --ask-vault-pass`.
 
-	* A non-encrypted playbook can be encrypted using `ansible-vault encrypt $playbook_name`.
+    * A non-encrypted playbook can be encrypted using `ansible-vault encrypt $playbook_name`.
 
-	* An encrypted playbook can be viewed using `ansible-vault view $playbook_name` and edited with `ansible-vault edit httpvault.yml`. You will be prompted for passwords where they are not provided in the command.
+    * An encrypted playbook can be viewed using `ansible-vault view $playbook_name` and edited with `ansible-vault edit httpvault.yml`. You will be prompted for passwords where they are not provided in the command.
 
-	* Instead of encrypting the entire playbook, strings within the playbook can be encrypted. This is done using `ansible-vault encrypt_string $string`. The encrypted value can be substituted for the variable value inside of the playbook. The `--ask-vault-pass` option must be provided when running the playbook regardless of whether individual strings are encrypted or the entire playbook.
+    * Instead of encrypting the entire playbook, strings within the playbook can be encrypted. This is done using `ansible-vault encrypt_string $string`. The encrypted value can be substituted for the variable value inside of the playbook. The `--ask-vault-pass` option must be provided when running the playbook regardless of whether individual strings are encrypted or the entire playbook.
 
 ### Exercises
 
@@ -5622,436 +5622,504 @@
 
 1. Setup
 
-	* Create a VirtualBox machine for the control node. In VirtualBox create a new machine with the VirtualBox additions and the RHEL 9.2 installer ISOs attached as IDE devices. Set networking mode to Bridged Adapter. Set the Pointing Device to USB Tablet and enable the USB 3.0 Controller. Set shared Clipbloard and Drag'n'Drop to Bidirectional. Uncheck Audio output. Start the machine Install RHEL.
+    * Create a VirtualBox machine for the control node. In VirtualBox create a new machine with the VirtualBox additions and the RHEL 9.2 installer ISOs attached as IDE devices. Set networking mode to Bridged Adapter. Set the Pointing Device to USB Tablet and enable the USB 3.0 Controller. Set shared Clipboard and Drag'n'Drop to Bidirectional. Uncheck Audio output. Start the machine and install RHEL.
 
-	* On the control node run the following setup as root:
-		```shell
-		blkid # note the UUID of the RHEL ISO
-		mkdir /mnt/rheliso
-		vi /etc/fstab
-		# add the below line
-		# UUID="2023-04-13-16-58-02-00" /mnt/rheliso iso9660 loop 0 0
-		mount -a # confirm no error is returned
-		```
+    * On the control node run the following setup as root:
+        ```shell
+        blkid # note the UUID of the RHEL ISO
+        mkdir /mnt/rheliso
+        vi /etc/fstab
+        # add the below line
+        # UUID="2023-04-13-16-58-02-00" /mnt/rheliso iso9660 loop 0 0
+        mount -a # confirm no error is returned
+        ```
 
-	* On the control node setup the dnf repositories as root:
-		```shell
-		vi /etc/yum.repos.d/redhat.repo # add the below content
-		# [BaseOS]
-		# name=BaseOS
-		# baseUrl=file:///mnt/rheliso/BaseOS
-		# enabled=1
-		# gpgcheck=0
-		#
-		# [AppStream]
-		# name=AppStream
-		# enabled=1
-		# baseurl=file:///mnt/rheliso/AppStream
-		# gpgcheck=0
-		dnf repolist # confirm repos are returned
-		```
+    * On the control node setup the dnf repositories as root:
+        ```shell
+        vi /etc/yum.repos.d/redhat.repo # add the below content
+        # [BaseOS]
+        # name=BaseOS
+        # baseUrl=file:///mnt/rheliso/BaseOS
+        # enabled=1
+        # gpgcheck=0
+        #
+        # [AppStream]
+        # name=AppStream
+        # enabled=1
+        # baseurl=file:///mnt/rheliso/AppStream
+        # gpgcheck=0
+        dnf repolist # confirm repos are returned
+        ```
 
-	* On the control node run the following setup as root to install guest additions:
-		```shell
-		dnf install kernel-headers kernel-devel
-		# run the guest additions installer
-		```
+    * On the control node run the following setup as root to install guest additions:
+        ```shell
+        dnf install kernel-headers kernel-devel
+        # run the guest additions installer
+        ```
 
-	* On the control node run the following setup:
-		```shell
-		useradd ansible
-		echo password | passwd --stdin ansible
-		echo "ansible ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ansible
-		dnf install ansible-core -y
-		ssh-keygen # select all defaults
-		```
-	* Clone the control node machine five times for managed nodes 1-5. Atttach a 2GB SATA drive to nodes 1-3, and a 1GB SATA drive to node 4. Note that cloning means the above steps are also done on each managed node, but if the servers existed already we would have had to do this manually.
+    * On the control node run the following setup:
+        ```shell
+        useradd ansible
+        echo password | passwd --stdin ansible
+        echo "ansible ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ansible
+        dnf install ansible-core -y
+        ssh-keygen # select all defaults
+        ```
+    * Clone the control node machine five times for managed nodes 1-5. Attach a 2GB SATA drive to nodes 1-3, and a 1GB SATA drive to node 4. Note that cloning means the above steps are also done on each managed node, but if the servers existed already, we would have had to do this manually.
 
-	* On each managed node get the ip address using `ifconfig`. On the control node, switch to the toot user and add hostnames for the managed nodes:
-		```shell
-		vi /etc/hosts
-		# add the following lines
-		# 192.168.1.116 node1.example.com
-		# 192.168.1.117 node2.example.com
-		# 192.168.1.109 node3.example.com
-		# 192.168.1.118 node4.example.com
-		# 192.168.1.111 node5.example.com
-		```
+    * On each managed node get the IP address using `ifconfig`. On the control node, switch to the toot user and add hostnames for the managed nodes:
+        ```shell
+        vi /etc/hosts
+        # add the following lines
+        # 192.168.1.116 node1.example.com
+        # 192.168.1.117 node2.example.com
+        # 192.168.1.109 node3.example.com
+        # 192.168.1.118 node4.example.com
+        # 192.168.1.111 node5.example.com
+        ```
 
-	* On the control node create run the following setup:
-		```shell
-		useradd ansible
-		echo password | passwd --stdin ansible # password is "password"
-		echo "ansible ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ansible
-		dnf install ansible-core -y
-		ssh-keygen # select all defaults
-		```
+    * On the control node create run the following setup:
+        ```shell
+        useradd ansible
+        echo password | passwd --stdin ansible # password is "password"
+        echo "ansible ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ansible
+        dnf install ansible-core -y
+        ssh-keygen # select all defaults
+        ```
 
 1. Task 1
 
-	* Run the following commands on the control node:
- 		```shell
-		vi /etc/ansible/ansible/hosts # add the below
-		# [dev]
-		# node1.example.com
-		# 
-		# [test]
-		# node2.example.com
-		# 
-		# [proxy]
-		# node3.example.com
-		# 
-		# [prod]
-		# node4.example.com
-		# node5.example.com
-		# 
-		# [webservers:children]
-		# prod
+    * Run the following commands on the control node:
+         ```shell
+        vi /etc/ansible/ansible/hosts # add the below
+        # [dev]
+        # node1.example.com
+        # 
+        # [test]
+        # node2.example.com
+        # 
+        # [proxy]
+        # node3.example.com
+        # 
+        # [prod]
+        # node4.example.com
+        # node5.example.com
+        # 
+        # [webservers:children]
+        # prod
 
-		vi /etc/ansible/ansible/ansible.cfg
-		# [defaults]
-		# roles_path=/home/ansible/ansible/roles
-		# inventory=/home/ansible/ansible/hosts
-		# remote_user=ansible
-		# host_key_checking=false
+        vi /etc/ansible/ansible/ansible.cfg
+        # [defaults]
+        # roles_path=/home/ansible/ansible/roles
+        # inventory=/home/ansible/ansible/hosts
+        # remote_user=ansible
+        # host_key_checking=false
 
-		# [privilege_escalation]
-		# become=true
-		# become_user=root
-		# become_method=sudo
-		# become_ask_pass=false
-		```
+        # [privilege_escalation]
+        # become=true
+        # become_user=root
+        # become_method=sudo
+        # become_ask_pass=false
+        ```
 
 1. Task 2
 
-	* To list the available modules run `ansible-doc -l`. To get help on a module run `ansible-doc -t module $module`.
+    * To list the available modules run `ansible-doc -l`. To get help on a module run `ansible-doc -t module $module`.
 
-	* Create and run the following script on the control node:
-		```shell
-		#!/bin/bash
-		ansible all -m yum_repository -a "name=EPEL description=RHEL9 baseurl=https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm gpgcheck=no enabled=no"
-		```
+    * Create and run the following script on the control node:
+        ```shell
+        #!/bin/bash
+        ansible all -m yum_repository -a "name=EPEL description=RHEL9 baseurl=https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm gpgcheck=no enabled=no"
+        ```
 
 1. Task 3
 
-	* Create and run the following playbook on the control node. The playbook can be tested using `ansible-playbook packages.yml -C`.
-		```yaml
-		---
-		- name: Install packages
-		  hosts: dev,prod,webservers
-		  become: true
-		  tasks:
-		    - name: Install common packages
-		      yum:
-		        name:
-		          - httpd
-		          - mod_ssl
-		          - mariadb
-		        state: present
+    * Create and run the following playbook on the control node. The playbook can be tested using `ansible-playbook packages.yml -C`.
+        ```yaml
+        ---
+        - name: Install packages
+          hosts: dev,prod,webservers
+          become: true
+          tasks:
+            - name: Install common packages
+              yum:
+                name:
+                  - httpd
+                  - mod_ssl
+                  - mariadb
+                state: present
 
-		    - name: Install dev specific packages
-		      yum:
-		        name:
-		          - '@Development tools'
-		        state: latest
-		      when: "'dev' in group_names"
+            - name: Install dev specific packages
+              yum:
+                name:
+                  - '@Development tools'
+                state: latest
+              when: "'dev' in group_names"
 
-		    - name: Update all packages on dev to the latest version
-		      yum:
-		        name:
-		          - '*'
-		        state: latest
-		      when: "'dev' in group_names"
-		```
+            - name: Update all packages on dev to the latest version
+              yum:
+                name:
+                  - '*'
+                state: latest
+              when: "'dev' in group_names"
+        ```
 
 1. Task 4
 
-	* Create the following file `main.yml` at `/home/ansible/ansible/roles/sample-apache/tasks`:
-		```yaml
-		- name: Start and enable httpd
-		  service:
-		    name: httpd
-		    state: started
-		    enabled: yes
+    * Create the following file `main.yml` at `/home/ansible/ansible/roles/sample-apache/tasks`:
+        ```yaml
+        - name: Start and enable httpd
+          service:
+            name: httpd
+            state: started
+            enabled: yes
 
-		- name: Start and enable firewalld
-		  service:
-		    name: firewalld
-		    state: started
-		    enabled: yes
+        - name: Start and enable firewalld
+          service:
+            name: firewalld
+            state: started
+            enabled: yes
 
-		- name: Allow http service
-		  firewalld:
-		    service: http
-		    state: enabled
-		    permanent: true
-		    immediate: true
+        - name: Allow http service
+          firewalld:
+            service: http
+            state: enabled
+            permanent: true
+            immediate: true
 
-		- name: Create and serve message
-		  template:
-		    src: /home/ansible/ansible/roles/sample-apache/templates/index.html.j2
-		    dest: /var/www/html/index.html
-		  notify:
-		    - restart
-		```
+        - name: Create and serve message
+          template:
+            src: /home/ansible/ansible/roles/sample-apache/templates/index.html.j2
+            dest: /var/www/html/index.html
+          notify:
+            - restart
+        ```
 
-	* Create the following file at `/home/ansible/ansible/roles/sample-apache/templates/index.html.j2`:
-		```shell
-		Welcome to {{  ansible_fqdn }} on {{  ansible_default_ipv4.address }}
-		```
+    * Create the following file at `/home/ansible/ansible/roles/sample-apache/templates/index.html.j2`:
+        ```shell
+        Welcome to {{  ansible_fqdn }} on {{  ansible_default_ipv4.address }}
+        ```
 
-	* If you forget the ansible facts variables you can run `ansible localhost -m setup`. Note that the `firewalld` module requires you to run `ansible-galaxy collection install ansible.posix`.
+    * If you forget the ansible facts variables you can run `ansible localhost -m setup`. Note that the `firewalld` module requires you to run `ansible-galaxy collection install ansible.posix`.
 
-	* Create the following file `main.yml` at `/home/ansible/ansible/roles/sample-apache/handlers`:
-		```yaml
-		- name: restart
-		  service:
-		    name: httpd
-		    state: restarted
-		```
+    * Create the following file `main.yml` at `/home/ansible/ansible/roles/sample-apache/handlers`:
+        ```yaml
+        - name: restart
+          service:
+            name: httpd
+            state: restarted
+        ```
 
 1. Task 5
 
-	* Create a file `requirements.yml` at `/home/ansible/ansible/roles/requirements.yml`:
-		```yaml
-		- name: haproxy-role
-		  src: geerlingguy.haproxy
+    * Create a file `requirements.yml` at `/home/ansible/ansible/roles/requirements.yml`:
+        ```yaml
+        - name: haproxy-role
+          src: geerlingguy.haproxy
 
-		- name: php_role
-		  src: geerlingguy.php
-		```
+        - name: php_role
+          src: geerlingguy.php
+        ```
 
-	* Install the roles using `ansible-galaxy install -r requirements.yml -p /home/ansible/ansible/roles`. Observe the new roles available in the directory.
+    * Install the roles using `ansible-galaxy install -r requirements.yml -p /home/ansible/ansible/roles`. Observe the new roles available in the directory.
 
 1. Task 6
 
-	* Create a file `requirements.yml` at `/home/ansible/ansible/roles/requirements.yml`:
-		```yaml
-		- name: haproxy-role
-		  src: geerlingguy.haproxy
+    * Create a file `requirements.yml` at `/home/ansible/ansible/roles/requirements.yml`:
+        ```yaml
+        - name: haproxy-role
+          src: geerlingguy.haproxy
 
-		- name: php_role
-		  src: geerlingguy.php
-		```
+        - name: php_role
+          src: geerlingguy.php
+        ```
 
-	* Install the roles using `ansible-galaxy install -r requirements.yml -p /home/ansible/ansible/roles`. Observe the new roles available in the directory.
+    * Install the roles using `ansible-galaxy install -r requirements.yml -p /home/ansible/ansible/roles`. Observe the new roles available in the directory.
 
 1. Task 7
 
-	* Update the `/etc/hosts` file on managed node 3 to define the FQDNs used in the below playbook.
+    * Update the `/etc/hosts` file on managed node 3 to define the FQDNs used in the below playbook.
 
-	* Create the playbook `/home/ansible/ansible/role.yml`:
-		```yaml
+    * Create the playbook `/home/ansible/ansible/role.yml`:
+        ```yaml
+        ---
+        - name: Install haproxy-role
+          hosts: proxy
+          become: true
+          vars:
+            haproxy_frontend_port: 81
+            haproxy_backend_servers:
+              - name: node4.example.com
+                address: 192.168.1.118:80
+              - name: node5.example.com
+                address: 192.168.1.111:80
+
+          tasks:
+            - name: Install haproxy-role prereqs
+              yum:
+                name:
+                  - haproxy
+                state: present
+
+            - name: Open port 81
+              firewalld:
+                port: 81/tcp
+                permanent: true
+                state: enabled
+                immediate: true
+              notify: Restart httpd service
+
+            - name: Install haproxy-role
+              include_role:
+                name: haproxy-role
+
+          handlers:
+            - name: Restart httpd service
+              service:
+                name: httpd
+                state: restarted
+
+        - name: Install php_role
+          hosts: prod
+          become: true
+          tasks:
+            - name: Install php_role prereqs
+              yum:
+                name:
+                  - php
+                  - php-xml.x86_64
+                state: present
+
+            - name: Install php_role
+              include_role:
+                name: php_role
+
+          handlers:
+            - name: Restart httpd service
+              service:
+                name:
+                  - httpd
+                  - firewalld
+                state: restarted
+        ```
+
+    * Installation currently fails due to a missing php-xmlrpc package. This appears to be an incompatibility with RHEL 9. Attempting ot install this package from the EPEL repository gives an error about failing to download metadata.
+
+1. Task 8
+
+    * Create a file `/home/ansible/ansible/secrets.txt`:
+        ```shell
+        echo reallysafepw > secret.txt
+        ```
+
+    * Create a file `lock.yml` at `/home/ansible/ansible/lock.yml` using `ansible-vault encrypt lock.yml --vault-password-file secret.txt`. The contents of the original `lock.yml`:
+        ```yaml
+        pw_dev: dev
+        pw_mgr: mgr
+        ```
+
+    * You can also directly create the encrypted playbook using `ansible-vault create lock.yml` and entering the password when prompted.
+
+1. Task 9
+
+	* Create a file `/home/ansible/ansible/users_list.yml`:
+	    ```yaml
+        users:
+		  - username: bill
+		    job: developer
+		  - username: chris
+		    job: manager
+		  - username: dave
+		    job: test
+		  - username: ethan
+		    job: developer
+        ```
+
+	* Create a file `/home/ansible/ansible/users.yml` and run it with `ansible-playbook users.yml --vault-password-file secret.txt`:
+	    ```yaml
 		---
-		- name: Install haproxy-role
-		  hosts: proxy
+		- name: Create users
+		  hosts: all
 		  become: true
-		  vars:
-		    haproxy_frontend_port: 81
-		    haproxy_backend_servers:
-		      - name: node4.example.com
-		        address: 192.168.1.118:80
-		      - name: node5.example.com
-		        address: 192.168.1.111:80
-
+		  vars_files:
+		    - lock.yml
+		    - users_list.yml
+		
 		  tasks:
-		    - name: Install haproxy-role prereqs
-		      yum:
-		        name:
-		          - haproxy
-		        state: present
-
-		    - name: Open port 81
-		      firewalld:
-		        port: 81/tcp
-		        permanent: true
-		        state: enabled
-		        immediate: true
-		      notify: Restart httpd service
-
-		    - name: Install haproxy-role
-		      include_role:
-		        name: haproxy-role
-
-		  handlers:
-		    - name: Restart httpd service
-		      service:
-		        name: httpd
-		        state: restarted
-
-		- name: Install php_role
-		  hosts: prod
-		  become: true
-		  tasks:
-		    - name: Install php_role prereqs
-		      yum:
-		        name:
-		          - php
-		          - php-xml.x86_64
-		        state: present
-
-		    - name: Install php_role
-		      include_role:
-		        name: php_role
-
-		  handlers:
-		    - name: Restart httpd service
-		      service:
-		        name:
-		          - httpd
-		          - firewalld
-		        state: restarted
-		```
-
-	* Installation currently fails due to a missing php-xmlrpc package. This appears to be an incompatibility with RHEL 9. Attempting ot install this package from the EPEL repository gives an error about failing to download metadata.
+		    - name: Create devops group
+		      group:
+		        name: devops
+		      when: "'dev' in group_names"
+		
+		    - name: Create managers group
+		      group:
+		        name: managers
+		      when: "('proxy' in group_names)"
+		
+		    - name: Create developer users
+		      user:
+		        name: "{{  item.username }}"
+		        group: devops
+		        password: "{{  pw_dev | password_hash('sha512')  }}"
+		      when: "('dev' in group_names) and ('developer' in item.job)"
+		      loop: "{{  users  }}"
+		
+		    - name: Create manager users
+		      user:
+		        name: "{{  item.username  }}"
+		        group: managers
+		        password: "{{  pw_mgr | password_hash('sha512')  }}"
+		      when: "('proxy' in group_names) and ('manager' in item.job)"
+		      loop: "{{  users  }}"
+        ```
 
 #### Archive
 
 1. Validate a working configuration using ad hoc Ansible commands
-	
-	* An ad hoc command is used to execute one line commands. They are useful for non-routine tasks such as file transfers, package management, managing services, user and group management, fact gathering, general system information, software deployment from Git, and playbook creation testing.
+    
+    * An ad hoc command is used to execute one-line commands. They are useful for non-routine tasks such as file transfers, package management, managing services, user and group management, fact gathering, general system information, software deployment from Git, and playbook creation testing.
  
-	* The syntax of an ad hoc command is shown below:
-		```shell
-		ansible host -i inventory_file -m module -a "arguments"
-		```
+    * The syntax of an ad hoc command is shown below:
+        ```shell
+        ansible host -i inventory_file -m module -a "arguments"
+        ```
 
-	* Arguments require double quotes and are space delimited, and commands are executed as the user that is running them. The -b option can be used to execute the command as the root user. The -a option may be used without the -m command to run shell commands.
+    * Arguments require double quotes and are space delimited, and commands are executed as the user that is running them. The -b option can be used to execute the command as the root user. The -a option may be used without the -m command to run shell commands.
 
-	* Examples of ad hoc commands are shown below:
-		```shell
-		# an example for the ping module
-		ansible -i inventory/inv.ini all -m ping
+    * Examples of ad hoc commands are shown below:
+        ```shell
+        # an example for the ping module
+        ansible -i inventory/inv.ini all -m ping
 
-		# an example for the setup module against the mypearson2 host
-		ansible mypearson2 -i inventory/inv.ini all -m setup
+        # an example for the setup module against the mypearson2 host
+        ansible mypearson2 -i inventory/inv.ini all -m setup
 
-		# an example of a shell command against the mypearson2 host
-		ansible mspearson2 -a "ls -l /tmp"
+        # an example of a shell command against the mypearson2 host
+        ansible mspearson2 -a "ls -l /tmp"
 
-		# an example of a shell command against the labservers group
-		ansible labservers -a "ls -l /tmp"
+        # an example of a shell command against the labservers group
+        ansible labservers -a "ls -l /tmp"
 
-		# ping localhost
-		ansible localhost -m ping
+        # ping localhost
+        ansible localhost -m ping
 
-		# create a file on all remote clients
-		ansible all -m file -a "path=/home/username/adhoc1 state=touch mode=700"
+        # create a file on all remote clients
+        ansible all -m file -a "path=/home/username/adhoc1 state=touch mode=700"
 
-		# delete a file on all remote clients
-		ansible all -m file -a "path=/home/username/adhoc1 state=absent"
+        # delete a file on all remote clients
+        ansible all -m file -a "path=/home/username/adhoc1 state=absent"
 
-		# delete a file to all remote clients
-		ansible all -m copy -a "src=/tmp/adhoc2 dest=/home/username/adhoc2"
+        # delete a file to all remote clients
+        ansible all -m copy -a "src=/tmp/adhoc2 dest=/home/username/adhoc2"
 
-		# installing a package
-		ansible all -m yum -a "name=telnet state=present"
-		ansible all -m yum -a "name=httpd-manual state=present"
+        # installing a package
+        ansible all -m yum -a "name=telnet state=present"
+        ansible all -m yum -a "name=httpd-manual state=present"
 
-		# start a service
-		ansible all -m service -a "name=httpd state=started"
+        # start a service
+        ansible all -m service -a "name=httpd state=started"
 
-		# start a service and enable at boot time
-		ansible all -m service -a "name=httpd state=started enabled=yes"
+        # start a service and enable at boot time
+        ansible all -m service -a "name=httpd state=started enabled=yes"
 
-		# check service status on remote client
-		ansible all -m shell -a "systemctl status httpd"
+        # check service status on remote client
+        ansible all -m shell -a "systemctl status httpd"
 
-		# remove package
-		ansible all -m yum -a "name=httpd state=absent"
-		# or
-		ansible all -m shell -a "yum remove httpd"
+        # remove package
+        ansible all -m yum -a "name=httpd state=absent"
+        # or
+        ansible all -m shell -a "yum remove httpd"
 
-		# create a user on remote clients
-		ansible all -m user -a "name=jsmith home=/home/jsmith shell=/bin/bash state=present"
+        # create a user on remote clients
+        ansible all -m user -a "name=jsmith home=/home/jsmith shell=/bin/bash state=present"
 
-		# add a user to a different group
-		ansible all -m user -a "name=jsmith group=group"
+        # add a user to a different group
+        ansible all -m user -a "name=jsmith group=group"
 
-		# deleting a user on remote clients
-		ansible all -m user -a "name=jsmith home=/home/jsmith shell=/bin/bash state=absent"
+        # deleting a user on remote clients
+        ansible all -m user -a "name=jsmith home=/home/jsmith shell=/bin/bash state=absent"
 
-		# gather system information from remote clients
-		ansible all -m setup
+        # gather system information from remote clients
+        ansible all -m setup
 
-		# run a command on a remote host without a shell module
-		ansible client1 -a "/sbin/reboot"
-		```
+        # run a command on a remote host without a shell module
+        ansible client1 -a "/sbin/reboot"
+        ```
 
 ### Script administration tasks
 
 1. Create simple shell scripts
 
-	* The first line of a shell script must include `#!/bin/bash`. Comments can be added by using the # symbol. Execute permissions are required on the script before it can be executed. The script can be executed using the absolute or relative path.
+    * The first line of a shell script must include `#!/bin/bash`. Comments can be added by using the # symbol. Execute permissions are required on the script before it can be executed. The script can be executed using the absolute or relative path.
 
-	* A sample shell script is shown below:
-		```shell
-		#!/bin/bash
-		# hello world script
-		echo "Hello world!"
-		```
+    * A sample shell script is shown below:
+        ```shell
+        #!/bin/bash
+        # hello world script
+        echo "Hello world!"
+        ```
 
-	* A sample shell script using a for loop is shown below:
-		```shell
-		#!/bin/bash
-		# for loop
-		for i in {1..5}
-		do
-			echo "Hello $i times!"
-		done
-		```
+    * A sample shell script using a for loop is shown below:
+        ```shell
+        #!/bin/bash
+        # for loop
+        for i in {1..5}
+        do
+            echo "Hello $i times!"
+        done
+        ```
 
 1. Create simple shell scripts that run ad hoc Ansible commands
 
-	* A script containing adhoc commands is shown below:
-		```shell
-		#!/bin/bash
-		
-		# Create the user matt
-		ansible mcpearson3c.mylabserver.com -i /home/cloud_user/ansible/inventory/inv.ini -b -m user -a "name=matt"
+    * A script containing adhoc commands is shown below:
+        ```shell
+        #!/bin/bash
+        
+        # Create the user matt
+        ansible mcpearson3c.mylabserver.com -i /home/cloud_user/ansible/inventory/inv.ini -b -m user -a "name=matt"
 
-		# Create the demo directory in matt's home directory
-		ansible mspearson3c.mylabserver.com -i /home/cloud_user/ansible/inventory/inv.ini -b -m file -a "path=/home/matt/demo state=directory owner=matt group=matt mode=0755"
+        # Create the demo directory in matt's home directory
+        ansible mspearson3c.mylabserver.com -i /home/cloud_user/ansible/inventory/inv.ini -b -m file -a "path=/home/matt/demo state=directory owner=matt group=matt mode=0755"
 
-		# Copy testFile to matt's home directory
-		ansible mspearson3c.mylabserver.com -i /home/cloud_user/ansible/inventory/inv.ini -b -m copy -a "src=/home/cloud_user/ansible/testFile dest=/home/matt/testFile mode=0644 owner=matt group=matt"
+        # Copy testFile to matt's home directory
+        ansible mspearson3c.mylabserver.com -i /home/cloud_user/ansible/inventory/inv.ini -b -m copy -a "src=/home/cloud_user/ansible/testFile dest=/home/matt/testFile mode=0644 owner=matt group=matt"
 
-		# Install httpd to the webservers group and start and enable the httpd service
-		ansible webservers -i /home/cloud_user/ansible/inventory/inv.ini -b -m yum -a "name=httpd state=latest"
-		ansible webservers -i /home/cloud_user/ansible/inventory/inv.ini -b -m service -a "name=httpd state=started enabled=yes"
-		```
+        # Install httpd to the webservers group and start and enable the httpd service
+        ansible webservers -i /home/cloud_user/ansible/inventory/inv.ini -b -m yum -a "name=httpd state=latest"
+        ansible webservers -i /home/cloud_user/ansible/inventory/inv.ini -b -m service -a "name=httpd state=started enabled=yes"
+        ```
 
-	* Ad hoc commands can be a powerful tool for running commands across an inventory and getting the desired results. The following example can be run on a host to retrieve log files from multiple managed nodes:
-		```shell
-		#!/bin/bash
+    * Ad hoc commands can be a powerful tool for running commands across an inventory and getting the desired results. The following example can be run on a host to retrieve log files from multiple managed nodes:
+        ```shell
+        #!/bin/bash
 
-		for i in webserver1 dbserver1 adminserver1;
-   		do ssh ansible@$i "sudo tar -czf messages.tar.gz /var/log/messages";
-		done
-		ansible -m fetch -a "src=/home/ansible/messages.tar.gz dest=/tmp/messages" all
-		```
+        for i in webserver1 dbserver1 adminserver1;
+           do ssh ansible@$i "sudo tar -czf messages.tar.gz /var/log/messages";
+        done
+        ansible -m fetch -a "src=/home/ansible/messages.tar.gz dest=/tmp/messages" all
+        ```
 
-	* To mount an ISO and use it as a repo:
-		```shell
-		mount -t iso9660 -o loop rhel-9.2-x86_64-dvd.iso /mnt/disc
-		# to make it permanent edit /etc/fstab
-		# /mnt/disc/rhel-9.2-x86_64-dvd.iso /mnt/iso iso9660 loop,ro,nofail 0 0
-		mount -a
-		# add the following entries to /etc/yum.repos.d/redhat.repo
-		#
-		# [BaseOS]
-		# name=BaseOS
-		# baseurl=file:///mnt/disc/BaseOS/
-		# enabled=1
-		# gpgcheck=0
-		#
-		# [AppStream]
-		# name=AppStream
-		# baseurl=file:///mnt/disc/AppStream/
-		# enabled=1
-		# gpgcheck=0
-		dnf repolist # confirm repos
-		```
+    * To mount an ISO and use it as a repo:
+        ```shell
+        mount -t iso9660 -o loop rhel-9.2-x86_64-dvd.iso /mnt/disc
+        # to make it permanent edit /etc/fstab
+        # /mnt/disc/rhel-9.2-x86_64-dvd.iso /mnt/iso iso9660 loop,ro,nofail 0 0
+        mount -a
+        # add the following entries to /etc/yum.repos.d/redhat.repo
+        #
+        # [BaseOS]
+        # name=BaseOS
+        # baseurl=file:///mnt/disc/BaseOS/
+        # enabled=1
+        # gpgcheck=0
+        #
+        # [AppStream]
+        # name=AppStream
+        # baseurl=file:///mnt/disc/AppStream/
+        # enabled=1
+        # gpgcheck=0
+        dnf repolist # confirm repos
+        ```
 
 1. Create roles
 
