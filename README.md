@@ -5973,6 +5973,106 @@
 		      loop: "{{  users  }}"
         ```
 
+1. Task 10
+
+	* Create a file `/home/ansible/ansible/report.txt`:
+	    ```yaml
+        HOST=inventory hostname
+		MEMORY=total memory in mb
+		BIOS=bios version
+		SDA_DISK_SIZE=disk size
+		SDB_DISK_SIZE=disk size
+        ```
+
+	* Create a file `/home/ansible/ansible/report.yml`:
+	    ```yaml
+		---
+		- name: Create a report
+		  hosts: all
+		  tasks:
+		    - name: Copy the report template
+		      copy:
+		        src: /home/ansible/ansible/report.txt
+		        dest: /root/report.txt
+
+		    - name: Populate the HOST varible
+		      lineinfile:
+		        path: /root/report.txt
+		        state: present
+		        regex: "^HOST="
+		        line: "HOST='{{ ansible_facts.hostname  }}'"
+
+		    - name: Populate the MEMORY varible
+		      lineinfile:
+		        path: /root/report.txt
+		        state: present
+		        regex: "^MEMORY="
+		        line: "MEMORY='{{ ansible_facts.memtotal_mb  }}'"
+
+		    - name: Populate the BIOS varible
+		      lineinfile:
+		        path: /root/report.txt
+		        state: present
+		        regex: "^BIOS="
+		        line: "BIOS='{{ ansible_bios_version  }}'"
+
+		    - name: Populate the SDA_DISK_SIZE varible
+		      lineinfile:
+		        path: /root/report.txt
+		        state: present
+		        regex: "^SDA_DISK_SIZE="
+		        line: "SDA_DISK_SIZE='{{  ansible_devices.sda.size  }}'"
+		      when: 'ansible_devices.sda.size is defined'
+
+		    - name: Populate the SDA_DISK_SIZE varible
+		      lineinfile:
+		        path: /root/report.txt
+		        state: present
+		        regex: "^SDA_DISK_SIZE=NONE"
+		        line: "SDA_DISK_SIZE='{{  ansible_devices.sda.size  }}'"
+		      when: 'ansible_devices.sda.size is not defined'
+
+		    - name: Populate the SDB_DISK_SIZE varible
+		      lineinfile:
+		        path: /root/report.txt
+		        state: present
+		        regex: "^SDB_DISK_SIZE="
+		        line: "SDB_DISK_SIZE='{{  ansible_devices.sdb.size  }}'"
+		      when: 'ansible_devices.sdb.size is defined'
+
+		    - name: Populate the SDB_DISK_SIZE varible
+		      lineinfile:
+		        path: /root/report.txt
+		        state: present
+		        regex: "^SDB_DISK_SIZE="
+		        line: "SDB_DISK_SIZE=NONE"
+		      when: 'ansible_devices.sdb.size is not defined'
+        ```
+
+1. Task 11
+
+	* The `hostvars` variable contains information about hosts in the inventory. You can run it to get an idea of the variables available when creating a j2 template.
+
+	* Create a file `/home/ansible/ansible/hosts.j2`:
+	    ```jinja2
+        {%for host in groups['all']%}
+		{{hostvars[host]['ansible_default_ipv4']['address']}} {{hostvars[host]['ansible_fqdn']  {{hostvars[host]['ansible_hostname']}}
+		{%endfor%}
+        ```
+
+	* Create a playbook `/home/ansible/ansible/hosts.yml` and run it with `ansible-playbook hosts.yml`:
+	    ```yml
+		---
+		- name: Populate j2 template
+		  hosts: all
+		  tasks:
+		    - name: Populate j2 template
+		      template:
+		        src: /home/ansible/ansible/hosts.j2
+		        dest: /root/myhosts
+		      when: "'dev' in group_names"
+        ```
+
 #### Archive
 
 1. Validate a working configuration using ad hoc Ansible commands
