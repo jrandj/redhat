@@ -1,9 +1,9 @@
 # Red Hat
 
-- [RHCSA 8 (RHEL 8)](#RHCSA-8-(RHEL-8))
-- [RHCE 9 (RHEL 9)](#RHCE-9-(RHEL-9))
+- [RHCSA 8)](#RHCSA-8)
+- [RHCE 9](#RHCE-9))
 
-## RHCSA (RHEL 8)
+## RHCSA 8
 
 - [Understand and use essential tools](#Understand-and-use-essential-tools)
 - [Create simple shell scripts](#Create-simple-shell-scripts)
@@ -4777,6 +4777,79 @@
         ansible localhost -m setup
         ```
 
+    * You can also include this task in a playbook to list the facts:
+        ```yaml
+        ---
+        - name: Print all available facts
+          ansible.builtin.debug:
+            var: ansible_facts
+        ```
+
+    * Nested facts can be referred to using the below syntax:
+        ```shell
+        {{ ansible_facts['devices']['xvda']['model'] }}
+        ```
+
+    * In addition to Facts, Ansible contains many special (or magic) variables that are automatically available.
+
+    * The `hostvars` variable contains host details for any host in the play, at any point in the playbook. To access access a fact from another node, you can use the syntax `{{  hostvars['test.example.com']['ansible_facts']['distribution']  }}`.
+
+    * The `groups` variable lists all of the groups and hosts in the inventory. You can use this to enumerate the hosts within a group:
+        ```jinja2
+        {% for host in groups['app_servers'] %}
+               # something that applies to all app servers.
+        {% endfor %}
+        ```
+
+    * The below example shows using hostvars and groups together to find all of the IP addresses in a group:
+        ```jinja2
+        {% for host in groups['app_servers'] %}
+               {{ hostvars[host]['ansible_facts']['eth0']['ipv4']['address'] }}
+        {% endfor %}
+        ```
+
+    * The `group_names` variable contains a list of all the groups the current host is in. The below example shows using this variable to create a templated file that varies based on the group membership of the host:
+        ```jinja2
+        {% if 'webserver' in group_names %}
+           # some part of a configuration file that only applies to webservers
+        {% endif %}
+        ```
+
+    * The `inventory_hostname` variable contains the host as configured as configured in your inventory, as an alternative to `ansible_hostname` when fact-gathering is disabled. You can also use `inventory_hostname_short` which contains the part up to the first period.
+
+    * The `ansible_play_hosts` is the list of all hosts still active in the current play.
+
+    * The `ansible_play_batch` is a list of hostnames that are in scope for the current ‘batch’ of the play. The batch size is defined by `serial`, when not set it is equivalent to the whole play.
+
+    * The `ansible_playbook_python` is the path to the Python executable used to invoke the Ansible command line tool.
+
+    * The `inventory_dir` is the pathname of the directory holding Ansible’s inventory host file.
+
+    * The `playbook_dir` contains the playbook base directory.
+
+    * The `role_path` contains the current role’s pathname and only works inside a role.
+
+    * The `ansible_check_mode` is a boolean, set to `True` if you run Ansible wtih `--check`.
+
+    * Special variables can be viewed in a playbook such as the below:
+        ```yaml
+        ---
+        - name: Show some special variables
+          hosts: localhost
+          tasks:
+            - name: Show inventory host name
+              debug:
+                msg: "{{  inventory_hostname  }}"
+
+            - name: Show group
+              debug:
+                msg: "{{  group_names  }}"
+
+            - name: Show host variables
+              debug:
+                msg: "{{  hostvars  }}"
+        ```
+
 1. Loops
 
     * Loops work hand in hand with conditions as we can loop certain tasks until a condition is met. Ansible provides the `loop` and `with_*` directives for creating loops.
@@ -5665,6 +5738,7 @@
         dnf install ansible-core -y
         ssh-keygen # select all defaults
         ```
+
     * Clone the control node machine five times for managed nodes 1-5. Attach a 2GB SATA drive to nodes 1-3, and a 1GB SATA drive to node 4. Note that cloning means the above steps are also done on each managed node, but if the servers existed already, we would have had to do this manually.
 
     * On each managed node get the IP address using `ifconfig`. On the control node, switch to the toot user and add hostnames for the managed nodes:
@@ -5903,7 +5977,7 @@
                 state: restarted
         ```
 
-    * Installation currently fails due to a missing php-xmlrpc package. This appears to be an incompatibility with RHEL 9. Attempting ot install this package from the EPEL repository gives an error about failing to download metadata.
+    * Installation currently fails due to a missing php-xmlrpc package. This appears to be an incompatibility with RHEL 9. Attempting to install this package from the EPEL repository gives an error about failing to download metadata.
 
 1. Task 8
 
@@ -5922,155 +5996,234 @@
 
 1. Task 9
 
-	* Create a file `/home/ansible/ansible/users_list.yml`:
-	    ```yaml
+    * Create a file `/home/ansible/ansible/users_list.yml`:
+        ```yaml
         users:
-		  - username: bill
-		    job: developer
-		  - username: chris
-		    job: manager
-		  - username: dave
-		    job: test
-		  - username: ethan
-		    job: developer
+          - username: bill
+            job: developer
+          - username: chris
+            job: manager
+          - username: dave
+            job: test
+          - username: ethan
+            job: developer
         ```
 
-	* Create a file `/home/ansible/ansible/users.yml` and run it with `ansible-playbook users.yml --vault-password-file secret.txt`:
-	    ```yaml
-		---
-		- name: Create users
-		  hosts: all
-		  become: true
-		  vars_files:
-		    - lock.yml
-		    - users_list.yml
-		
-		  tasks:
-		    - name: Create devops group
-		      group:
-		        name: devops
-		      when: "'dev' in group_names"
-		
-		    - name: Create managers group
-		      group:
-		        name: managers
-		      when: "('proxy' in group_names)"
-		
-		    - name: Create developer users
-		      user:
-		        name: "{{  item.username }}"
-		        group: devops
-		        password: "{{  pw_dev | password_hash('sha512')  }}"
-		      when: "('dev' in group_names) and ('developer' in item.job)"
-		      loop: "{{  users  }}"
-		
-		    - name: Create manager users
-		      user:
-		        name: "{{  item.username  }}"
-		        group: managers
-		        password: "{{  pw_mgr | password_hash('sha512')  }}"
-		      when: "('proxy' in group_names) and ('manager' in item.job)"
-		      loop: "{{  users  }}"
+    * Create a file `/home/ansible/ansible/users.yml` and run it with `ansible-playbook users.yml --vault-password-file secret.txt`:
+        ```yaml
+        ---
+        - name: Create users
+          hosts: all
+          become: true
+          vars_files:
+            - lock.yml
+            - users_list.yml
+
+          tasks:
+            - name: Create devops group
+              group:
+                name: devops
+              when: "'dev' in group_names"
+
+            - name: Create managers group
+              group:
+                name: managers
+              when: "('proxy' in group_names)"
+
+            - name: Create developer users
+              user:
+                name: "{{  item.username }}"
+                group: devops
+                password: "{{  pw_dev | password_hash('sha512')  }}"
+              when: "('dev' in group_names) and ('developer' in item.job)"
+              loop: "{{  users  }}"
+
+            - name: Create manager users
+              user:
+                name: "{{  item.username  }}"
+                group: managers
+                password: "{{  pw_mgr | password_hash('sha512')  }}"
+              when: "('proxy' in group_names) and ('manager' in item.job)"
+              loop: "{{  users  }}"
         ```
 
 1. Task 10
 
-	* Create a file `/home/ansible/ansible/report.txt`:
-	    ```yaml
+    * Create a file `/home/ansible/ansible/report.txt`:
+        ```yaml
         HOST=inventory hostname
-		MEMORY=total memory in mb
-		BIOS=bios version
-		SDA_DISK_SIZE=disk size
-		SDB_DISK_SIZE=disk size
+        MEMORY=total memory in mb
+        BIOS=bios version
+        SDA_DISK_SIZE=disk size
+        SDB_DISK_SIZE=disk size
         ```
 
-	* Create a file `/home/ansible/ansible/report.yml`:
-	    ```yaml
-		---
-		- name: Create a report
-		  hosts: all
-		  tasks:
-		    - name: Copy the report template
-		      copy:
-		        src: /home/ansible/ansible/report.txt
-		        dest: /root/report.txt
+    * Create a file `/home/ansible/ansible/report.yml`:
+        ```yaml
+        ---
+        - name: Create a report
+          hosts: all
+          tasks:
+            - name: Copy the report template
+              copy:
+                src: /home/ansible/ansible/report.txt
+                dest: /root/report.txt
 
-		    - name: Populate the HOST varible
-		      lineinfile:
-		        path: /root/report.txt
-		        state: present
-		        regex: "^HOST="
-		        line: "HOST='{{ ansible_facts.hostname  }}'"
+            - name: Populate the HOST varible
+              lineinfile:
+                path: /root/report.txt
+                state: present
+                regex: "^HOST="
+                line: "HOST='{{ ansible_facts.hostname  }}'"
 
-		    - name: Populate the MEMORY varible
-		      lineinfile:
-		        path: /root/report.txt
-		        state: present
-		        regex: "^MEMORY="
-		        line: "MEMORY='{{ ansible_facts.memtotal_mb  }}'"
+            - name: Populate the MEMORY varible
+              lineinfile:
+                path: /root/report.txt
+                state: present
+                regex: "^MEMORY="
+                line: "MEMORY='{{ ansible_facts.memtotal_mb  }}'"
 
-		    - name: Populate the BIOS varible
-		      lineinfile:
-		        path: /root/report.txt
-		        state: present
-		        regex: "^BIOS="
-		        line: "BIOS='{{ ansible_bios_version  }}'"
+            - name: Populate the BIOS varible
+              lineinfile:
+                path: /root/report.txt
+                state: present
+                regex: "^BIOS="
+                line: "BIOS='{{ ansible_bios_version  }}'"
 
-		    - name: Populate the SDA_DISK_SIZE varible
-		      lineinfile:
-		        path: /root/report.txt
-		        state: present
-		        regex: "^SDA_DISK_SIZE="
-		        line: "SDA_DISK_SIZE='{{  ansible_devices.sda.size  }}'"
-		      when: 'ansible_devices.sda.size is defined'
+            - name: Populate the SDA_DISK_SIZE varible
+              lineinfile:
+                path: /root/report.txt
+                state: present
+                regex: "^SDA_DISK_SIZE="
+                line: "SDA_DISK_SIZE='{{  ansible_devices.sda.size  }}'"
+              when: 'ansible_devices.sda.size is defined'
 
-		    - name: Populate the SDA_DISK_SIZE varible
-		      lineinfile:
-		        path: /root/report.txt
-		        state: present
-		        regex: "^SDA_DISK_SIZE=NONE"
-		        line: "SDA_DISK_SIZE='{{  ansible_devices.sda.size  }}'"
-		      when: 'ansible_devices.sda.size is not defined'
+            - name: Populate the SDA_DISK_SIZE varible
+              lineinfile:
+                path: /root/report.txt
+                state: present
+                regex: "^SDA_DISK_SIZE=NONE"
+                line: "SDA_DISK_SIZE='{{  ansible_devices.sda.size  }}'"
+              when: 'ansible_devices.sda.size is not defined'
 
-		    - name: Populate the SDB_DISK_SIZE varible
-		      lineinfile:
-		        path: /root/report.txt
-		        state: present
-		        regex: "^SDB_DISK_SIZE="
-		        line: "SDB_DISK_SIZE='{{  ansible_devices.sdb.size  }}'"
-		      when: 'ansible_devices.sdb.size is defined'
+            - name: Populate the SDB_DISK_SIZE varible
+              lineinfile:
+                path: /root/report.txt
+                state: present
+                regex: "^SDB_DISK_SIZE="
+                line: "SDB_DISK_SIZE='{{  ansible_devices.sdb.size  }}'"
+              when: 'ansible_devices.sdb.size is defined'
 
-		    - name: Populate the SDB_DISK_SIZE varible
-		      lineinfile:
-		        path: /root/report.txt
-		        state: present
-		        regex: "^SDB_DISK_SIZE="
-		        line: "SDB_DISK_SIZE=NONE"
-		      when: 'ansible_devices.sdb.size is not defined'
+            - name: Populate the SDB_DISK_SIZE varible
+              lineinfile:
+                path: /root/report.txt
+                state: present
+                regex: "^SDB_DISK_SIZE="
+                line: "SDB_DISK_SIZE=NONE"
+              when: 'ansible_devices.sdb.size is not defined'
         ```
 
 1. Task 11
 
-	* The `hostvars` variable contains information about hosts in the inventory. You can run it to get an idea of the variables available when creating a j2 template.
+    * The `hostvars` variable contains information about hosts in the inventory. You can run it to get an idea of the variables available when creating a j2 template.
 
-	* Create a file `/home/ansible/ansible/hosts.j2`:
-	    ```jinja2
+    * Create a file `/home/ansible/ansible/hosts.j2`:
+        ```jinja2
         {%for host in groups['all']%}
-		{{hostvars[host]['ansible_default_ipv4']['address']}} {{hostvars[host]['ansible_fqdn']  {{hostvars[host]['ansible_hostname']}}
-		{%endfor%}
+        {{hostvars[host]['ansible_default_ipv4']['address']}} {{hostvars[host]['ansible_fqdn']  {{hostvars[host]['ansible_hostname']}}
+        {%endfor%}
         ```
 
-	* Create a playbook `/home/ansible/ansible/hosts.yml` and run it with `ansible-playbook hosts.yml`:
-	    ```yml
-		---
-		- name: Populate j2 template
-		  hosts: all
-		  tasks:
-		    - name: Populate j2 template
-		      template:
-		        src: /home/ansible/ansible/hosts.j2
-		        dest: /root/myhosts
-		      when: "'dev' in group_names"
+    * Create a playbook `/home/ansible/ansible/hosts.yml` and run it with `ansible-playbook hosts.yml`:
+        ```yml
+        ---
+        - name: Populate j2 template
+          hosts: all
+          tasks:
+            - name: Populate j2 template
+              template:
+                src: /home/ansible/ansible/hosts.j2
+                dest: /root/myhosts
+              when: "'dev' in group_names"
+        ```
+
+1. Task 12
+
+    * The tasks below are available in the community.general collection. Run `ansible-galaxy collection install community.general -p /home/ansible/ansible/collections` to install the collection.
+
+    * Create a playbook `/home/ansible/ansible/logvol.yml` and run it with `ansible-playbook logvol.yml`:
+        ```yml
+        ---
+        - name: Create logical volumes
+          hosts: all
+          become: true
+          tasks:
+            - name: Create partition
+              community.general.parted:
+                device: /dev/sdb
+                state: present
+                flags: [ lvm ]
+                number: 1
+              when: "ansible_devices.sdb is defined"
+
+            - name: Create LVG
+              community.general.lvg:
+                vg: vg0
+                pvs: /dev/sdb1
+                state: present
+              when: "ansible_devices.sdb.partitions.sdb1 is defined"
+
+            - name: Create 1500MB LVOL
+              community.general.lvol:
+                vg: vg0
+                lv: lv0
+                size: 1500m
+                state: present
+              when: "ansible_lvm.vgs.vg0 is defined and ((ansible_lvm.vgs.vg0.size_g | float) > 1.5) and ansible_lvm.lvs.lv0 is not defined"
+
+            - name: Print error message
+              debug:
+                msg: "Not enough space for logical volume."
+              when: "ansible_lvm.vgs.vg0 is defined and ((ansible_lvm.vgs.vg0.size_g | float) < 1.5)"
+
+            - name: Create 800MB LVOL
+              community.general.lvol:
+                vg: vg0
+                lv: lv0
+                size: 800m
+                state: present
+              when: "ansible_lvm.vgs.vg0 is defined and ((ansible_lvm.vgs.vg0.size_g | float) > 0.8) and ansible_lvm.lvs.lv0 is not defined"
+
+            - name: Create the filesystem
+              community.general.filesystem:
+                fstype: xfs
+                dev: /dev/vg0/lv0
+                state: present
+              when: "ansible_lvm.vgs.vg0 is defined"
+        ```
+
+1. Task 13
+
+    * The `hostvars` variable contains information about hosts in the inventory. You can run it to get an idea of the variables available when creating a j2 template.
+
+    * Create a file `/home/ansible/ansible/hosts.j2`:
+        ```jinja2
+        {%for host in groups['all']%}
+        {{hostvars[host]['ansible_default_ipv4']['address']}} {{hostvars[host]['ansible_fqdn']  {{hostvars[host]['ansible_hostname']}}
+        {%endfor%}
+        ```
+
+    * Create a playbook `/home/ansible/ansible/hosts.yml` and run it with `ansible-playbook hosts.yml`:
+        ```yml
+        ---
+        - name: Populate j2 template
+          hosts: all
+          tasks:
+            - name: Populate j2 template
+              template:
+                src: /home/ansible/ansible/hosts.j2
+                dest: /root/myhosts
+              when: "'dev' in group_names"
         ```
 
 #### Archive
