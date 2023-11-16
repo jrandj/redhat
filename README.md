@@ -4646,7 +4646,7 @@
         # you can look at info crontab if you forget the syntax
         ```
 
-## RHCE (RHEL 9)
+## RHCE 9
 
 - [Be able to perform all tasks expected of a Red Hat Certified System Administrator](#Be-able-to-perform-all-tasks-expected-of-a-Red-Hat-Certified-System-Administrator)
 - [Understand core components of Ansible](#Understand-core-components-of-Ansible)
@@ -5761,6 +5761,11 @@
         ssh-keygen # select all defaults
         ```
 
+	* On the control node run the following to make vim friendlier for playbook creation:
+        ```shell
+        echo "autocmd FileType yaml setlocal ai ts=2 sw=2 et cuc nu" >> ~/.vimrc
+        ```
+
 1. Task 1
 
     * Run the following commands on the control node:
@@ -5899,19 +5904,6 @@
 
 1. Task 6
 
-    * Create a file `requirements.yml` at `/home/ansible/ansible/roles/requirements.yml`:
-        ```yaml
-        - name: haproxy-role
-          src: geerlingguy.haproxy
-
-        - name: php_role
-          src: geerlingguy.php
-        ```
-
-    * Install the roles using `ansible-galaxy install -r requirements.yml -p /home/ansible/ansible/roles`. Observe the new roles available in the directory.
-
-1. Task 7
-
     * Update the `/etc/hosts` file on managed node 3 to define the FQDNs used in the below playbook.
 
     * Create the playbook `/home/ansible/ansible/role.yml`:
@@ -5979,7 +5971,7 @@
 
     * Installation currently fails due to a missing php-xmlrpc package. This appears to be an incompatibility with RHEL 9. Attempting to install this package from the EPEL repository gives an error about failing to download metadata.
 
-1. Task 8
+1. Task 7
 
     * Create a file `/home/ansible/ansible/secrets.txt`:
         ```shell
@@ -5994,7 +5986,7 @@
 
     * You can also directly create the encrypted playbook using `ansible-vault create lock.yml` and entering the password when prompted.
 
-1. Task 9
+1. Task 8
 
     * Create a file `/home/ansible/ansible/users_list.yml`:
         ```yaml
@@ -6047,7 +6039,7 @@
               loop: "{{  users  }}"
         ```
 
-1. Task 10
+1. Task 9
 
     * Create a file `/home/ansible/ansible/report.txt`:
         ```yaml
@@ -6123,7 +6115,7 @@
               when: 'ansible_devices.sdb.size is not defined'
         ```
 
-1. Task 11
+1. Task 10
 
     * The `hostvars` variable contains information about hosts in the inventory. You can run it to get an idea of the variables available when creating a j2 template.
 
@@ -6147,7 +6139,7 @@
               when: "'dev' in group_names"
         ```
 
-1. Task 12
+1. Task 11
 
     * The tasks below are available in the community.general collection. Run `ansible-galaxy collection install community.general -p /home/ansible/ansible/collections` to install the collection.
 
@@ -6202,28 +6194,146 @@
               when: "ansible_lvm.vgs.vg0 is defined"
         ```
 
-1. Task 13
+1. Task 12
 
-    * The `hostvars` variable contains information about hosts in the inventory. You can run it to get an idea of the variables available when creating a j2 template.
-
-    * Create a file `/home/ansible/ansible/hosts.j2`:
-        ```jinja2
-        {%for host in groups['all']%}
-        {{hostvars[host]['ansible_default_ipv4']['address']}} {{hostvars[host]['ansible_fqdn']  {{hostvars[host]['ansible_hostname']}}
-        {%endfor%}
+    * Create a file at `/home/ansible/ansible/index.html`:
+        ```html
+        Development
         ```
 
-    * Create a playbook `/home/ansible/ansible/hosts.yml` and run it with `ansible-playbook hosts.yml`:
+   * Create a playbook `/home/ansible/ansible/index.html` and run it with `ansible-playbook logvol.yml`:
+        ```yaml
+		---
+		- name: Serve a file
+		  hosts: dev
+		  become: true
+		  tasks:
+		    - name: Create the webdev user
+		      user:
+		        name: webdev
+		        state: present
+		
+		    - name: Create webdev directory
+		      file:
+		        path: /webdev
+		        state: directory
+		        mode: '2755'
+		        owner: webdev
+		
+		    - name: Create the html webdev directory
+		      file:
+		        path: /var/www/html/webdev
+		        state: directory
+		        mode: '2755'
+		        owner: root
+		
+		    - name: Set correct SELinux file context
+		      sefcontext:
+		        target: '/var/www/html/webdev(/.*)?'
+		        setype: httpd_sys_content_t
+		        state: present
+		
+		    - name: Set correct SELinux file context
+		      sefcontext:
+		        target: '/webdev(/.*)?'
+		        setype: httpd_sys_content_t
+		        state: present
+		
+		    - name: Check firewall rules
+		      firewalld:
+		        service: http
+		        permanent: true
+		        state: enabled
+		        immediate: true
+		
+		    - name: Copy html file into webdev directory
+		      copy:
+		        src: /home/ansible/ansible/index.html
+		        dest: /webdev/index.html
+		        owner: webdev
+		      notify: Restart httpd
+		
+		- name: Create the symlink
+		      file:
+		        src: /webdev
+		        dest: /var/www/html/webdev
+		        state: link
+		        force: yes
+		
+		  handlers:
+		    - name: Restart httpd
+		      service:
+		        name: httpd
+		        state: restarted
+		        enabled: yes
+        ```
+
+	* Note that the for the above to work on the `dev` host I had to set `DocumentRoot "/var/www/html/webdev` in `/etc/httpd/conf/httpd.conf`. There is likely a better solution than that.
+
+1. Task 13
+
+    * The system roles can be installed using:
+        ```shell
+        dnf install rhel-system roles
+        ```
+
+	* Once installed, documentation and sample playbooks are available at `/usr/share/doc/rhel-system-roles/` under each role.
+
+	* Create a playbook `/home/ansible/ansible/timesync.yml` and run it with `ansible-playbook timesync.yml`:
         ```yml
-        ---
-        - name: Populate j2 template
-          hosts: all
-          tasks:
-            - name: Populate j2 template
-              template:
-                src: /home/ansible/ansible/hosts.j2
-                dest: /root/myhosts
-              when: "'dev' in group_names"
+		---  
+		- name: Set the time using timesync
+		  hosts: all
+		  vars:
+		    timesync_ntp_servers:
+		      - hostname: 0.uk.pool.ntp.org
+		        boost: true
+		  roles:
+		    - /usr/share/ansible/roles/rhel-system-roles.timesync
+        ```
+
+1. Task 14
+
+	* Create a playbook `/home/ansible/ansible/regulartasks.yml` and run it with `ansible-playbook regulartasks.yml`:
+        ```yml
+		---      
+		- name: Append the date
+		  hosts: all
+		  become: true
+		  tasks: 
+		    - name: Append the date using cron
+		      cron:
+		        name: datejob
+		        hour: "12"
+		        user: root
+		        job: "date >> /root/datefile"
+        ```
+
+1. Task 15
+
+	* Create a playbook `/home/ansible/ansible/issue.yml` and run it with `ansible-playbook issue.yml`:
+        ```yml
+		---    
+		- name: Update a file conditionally
+		  hosts: all
+		  tasks:
+		    - name: Update file for dev
+		      copy:
+		        content: "Development"
+		        dest: /etc/issue
+		      when: "'dev' in group_names"
+		
+		    - name: Update file for tets
+		      copy:
+		        content: "Test"
+		        dest: /etc/issue
+		      when: "'test' in group_names"
+		
+		    - name: Update file for prod
+		      copy:
+		        content: "Production"
+		        dest: /etc/issue
+		      when: "'prod' in group_names"
         ```
 
 #### Archive
