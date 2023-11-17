@@ -1,7 +1,7 @@
 # Red Hat
 
-- [RHCSA 8)](#RHCSA-8)
-- [RHCE 9](#RHCE-9))
+- [RHCSA 8](#RHCSA-8)
+- [RHCE 9](#RHCE-9)
 
 ## RHCSA 8
 
@@ -15,7 +15,7 @@
 - [Manage users and groups](#Manage-users-and-groups)
 - [Manage security](#Manage-security)
 - [Manage containers](#Manage-containers)
-- [Exercises](#Exercises)
+- [RHCSA Exercises](#RHCSA-Exercises)
 
 ### Understand and use essential tools
 
@@ -2016,7 +2016,7 @@
         podman run --privileged -it -v /home/containers/disk1:/mnt docker.io/library/httpd /bin/bash #  --privileged to allow with SELinux, -it for interactive terminal, -v to mount, and /bin/bash to provide a terminal
         ```
 
-### Exercises
+### RHCSA Exercises
 
 1. Recovery and Practise Tasks
 
@@ -4657,7 +4657,7 @@
 - [Create Ansible plays and playbooks](#Create-Ansible-plays-and-playbooks)
 - [Automate standard RHCSA tasks using Ansible modules that work with](#Automate-standard-RHCSA-tasks-using-Ansible-modules-that-work-with)
 - [Manage-content](#Manage-content)
-- [Exercises](#Exercises)
+- [RHCE Exercises](#RHCE-Exercises)
 
 ### Be able to perform all tasks expected of a Red Hat Certified System Administrator
 
@@ -5689,7 +5689,7 @@
 
     * Instead of encrypting the entire playbook, strings within the playbook can be encrypted. This is done using `ansible-vault encrypt_string $string`. The encrypted value can be substituted for the variable value inside of the playbook. The `--ask-vault-pass` option must be provided when running the playbook regardless of whether individual strings are encrypted or the entire playbook.
 
-### Exercises
+### RHCE Exercises
 
 #### Practise Exam 1
 
@@ -5750,15 +5750,6 @@
         # 192.168.1.109 node3.example.com
         # 192.168.1.118 node4.example.com
         # 192.168.1.111 node5.example.com
-        ```
-
-    * On the control node create run the following setup:
-        ```shell
-        useradd ansible
-        echo password | passwd --stdin ansible # password is "password"
-        echo "ansible ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ansible
-        dnf install ansible-core -y
-        ssh-keygen # select all defaults
         ```
 
 	* On the control node run the following to make vim friendlier for playbook creation:
@@ -6274,7 +6265,7 @@
 
     * The system roles can be installed using:
         ```shell
-        dnf install rhel-system roles
+        dnf install rhel-system-roles -y
         ```
 
 	* Once installed, documentation and sample playbooks are available at `/usr/share/doc/rhel-system-roles/` under each role.
@@ -6334,6 +6325,137 @@
 		        content: "Production"
 		        dest: /etc/issue
 		      when: "'prod' in group_names"
+        ```
+
+1. Task 16
+
+	* Create an encrypted playbook using `ansible-vault create myvault.yml`:
+        ```shell
+		ansible-vault create myvault.yml # enter pw as notsafepw
+		ansible-vault rekey myvault.yml # enter old and new pw as requested
+        ```
+
+1. Task 17
+
+	* Create a playbook `ansible-vault create target.yml`:
+        ```yaml
+		---      
+		- name: Change default target
+		  hosts: all
+		  tasks: 
+		    - name: Change default target
+		      file:
+		        src: /usr/lib/systemd/system/multi-user.target
+		        dest: /etc/systemd/system/default.target
+		        state: link
+        ```
+
+	* This is not a good solutiona as it requires implementation level knowledge.
+
+#### Practise Exam 2
+
+1. Setup
+
+    * Create a VirtualBox machine for the control node. In VirtualBox create a new machine with the VirtualBox additions and the RHEL 9.2 installer ISOs attached as IDE devices. Set networking mode to Bridged Adapter. Set the Pointing Device to USB Tablet and enable the USB 3.0 Controller. Set shared Clipboard and Drag'n'Drop to Bidirectional. Uncheck Audio output. Start the machine and install RHEL.
+
+    * On the control node run the following setup as root:
+        ```shell
+        blkid # note the UUID of the RHEL ISO
+        mkdir /mnt/rheliso
+        vi /etc/fstab
+        echo "UUID="" /mnt/rheliso iso9660 loop 0 0" >> /etc/fstab
+        mount -a # confirm no error is returned
+        ```
+
+    * On the control node setup the dnf repositories as root:
+        ```shell
+        vi /etc/yum.repos.d/redhat.repo # add the below content
+        # [BaseOS]
+        # name=BaseOS
+        # baseUrl=file:///mnt/rheliso/BaseOS
+        # enabled=1
+        # gpgcheck=0
+        #
+        # [AppStream]
+        # name=AppStream
+        # enabled=1
+        # baseurl=file:///mnt/rheliso/AppStream
+        # gpgcheck=0
+        dnf repolist # confirm repos are returned
+		```
+
+    * On the control node run the following setup as root to install guest additions:
+        ```shell
+        dnf install kernel-headers kernel-devel
+        # run the guest additions installer
+        ```
+
+    * On the control node run the following setup:
+        ```shell
+        useradd ansible
+        echo password | passwd --stdin ansible
+        echo "ansible ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ansible
+        dnf install ansible-core rhel-system-roles -y
+		'''
+
+	* On the control node run the following to make vim friendlier for playbook creation:
+        ```shell
+        echo "autocmd FileType yaml setlocal ai ts=2 sw=2 et cuc nu" >> ~/.vimrc
+        ```
+
+    * Clone the control node machine five times for managed nodes 1-5. Attach a 2GB SATA drive to nodes 1-3, and a 1GB SATA drive to node 4. Note that cloning means the above steps are also done on each managed node, but if the servers existed already, we would have had to do this manually.
+
+    * On each managed node get the IP address using `ifconfig`. On the control node, switch to the toot user and add hostnames for the managed nodes:
+        ```shell
+        vi /etc/hosts
+        # add the following lines
+        # 192.168.1.116 node1.example.com
+        # 192.168.1.117 node2.example.com
+        # 192.168.1.109 node3.example.com
+        # 192.168.1.118 node4.example.com
+        # 192.168.1.111 node5.example.com
+        ```
+
+	* On the control node run the following:
+       ```shell
+        ssh-keygen # select defaults
+		ssh-copy-id ansible@node1.example.com # repeat for the remaining managed nodes
+		ansible all -m ping # confirm ssh connectivity
+		'''
+
+1. Task 1
+
+    * Run the following commands on the control node:
+         ```shell
+        vi /etc/ansible/ansible/hosts # add the below
+        # [dev]
+        # node1.example.com
+        # 
+        # [test]
+        # node2.example.com
+        # 
+        # [proxy]
+        # node3.example.com
+        # 
+        # [prod]
+        # node4.example.com
+        # node5.example.com
+        # 
+        # [webservers:children]
+        # prod
+
+        vi /etc/ansible/ansible/ansible.cfg
+        # [defaults]
+        # roles_path=/home/ansible/ansible/roles
+        # inventory=/home/ansible/ansible/hosts
+        # remote_user=ansible
+        # host_key_checking=false
+
+        # [privilege_escalation]
+        # become=true
+        # become_user=root
+        # become_method=sudo
+        # become_ask_pass=false
         ```
 
 #### Archive
