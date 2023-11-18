@@ -5543,6 +5543,8 @@
         ansible-playbook yamlfile.yml --start-at-task 'Task name'
         ```
 
+	* The `-b` flag will run a module in become mode (privilege escalation).
+
 1. Use variables to retrieve the results of running a command
 
     * The register keyword is used to store the results of running a command as a variable. Variables can then be referenced by other tasks in the playbook. Registered variables are only valid on the host for the current playbook run. The return values differ from module to module.
@@ -6456,6 +6458,53 @@
         # become_user=root
         # become_method=sudo
         # become_ask_pass=false
+        ```
+
+1. Task 2
+
+	* Create and run the following `adhoc.sh` script on the control node:
+         ```shell
+        #!/bin/bash
+		# create the 'devops' user with necessary permissions
+		ansible all -u ansible -m user -a "name=devops" --ask-pass
+		ansible all -u ansible -m shell -a "echo password | passwd --stdin devops"
+		ansible all -u ansible -m shell -a "echo 'devops ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/devops"
+		
+		# allow SSH without password
+		ssh-copy-id -i /home/devops/.ssh/id_rsa.pub node1.example.com
+		ssh-copy-id -i /home/devops/.ssh/id_rsa.pub node2.example.com
+		ssh-copy-id -i /home/devops/.ssh/id_rsa.pub node3.example.com
+		ssh-copy-id -i /home/devops/.ssh/id_rsa.pub node4.example.com
+		ssh-copy-id -i /home/devops/.ssh/id_rsa.pub node5.example.com
+        ```
+
+	* Note that this requires an existing user `ansible` to authenticate to the managed nodes. The ask pass parameter is used initially as the devops user is not created in the remote systems, and there are no keys setup for the devops user yet.
+
+1. Task 3
+
+	* Create and run the following playbook `/home/ansible/ansible/motd.yml` script on the control node:
+         ```yaml
+		 ---  
+		- name: Write to /etc/motd
+		  hosts: all
+		  tasks:
+		    - name: Write to /etc/motd for dev
+		      copy:
+		        content: 'Welcome to Dev Server {{  ansible_fqdn  }}'
+		        dest: /etc/motd
+		      when: "'dev' in group_names"
+		
+		    - name: Write to /etc/motd for webservers
+		      copy:
+		        content: 'Welcome to Apache Server {{  ansible_fqdn  }}'
+		        dest: /etc/motd
+		      when: "'webservers' in group_names"
+		
+		    - name: Write to /etc/motd for test
+		      copy:
+		        content: 'Welcome to MySQL Server {{  ansible_fqdn  }}'
+		        dest: /etc/motd
+		      when: "'test' in group_names"
         ```
 
 #### Archive
