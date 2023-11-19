@@ -6507,6 +6507,171 @@
 		      when: "'test' in group_names"
         ```
 
+1. Task 4
+
+	* Create and run the following playbook `/home/ansible/ansible/sshd.yml` script on the control node:
+         ```yaml
+		---
+		- name: Configure SSHD daemon
+		  hosts: all
+		  become: true
+		  tasks: 
+		    - name: Set Banner
+		      lineinfile:
+		        path: /etc/ssh/sshd_config.d/50-redhat.conf
+		        regexp: '^Banner '
+		        line: Banner /etc/issue
+		        state: present
+		
+		    - name: Set PermitRootLogin
+		      lineinfile:
+		        path: /etc/ssh/sshd_config.d/50-redhat.conf
+		        regexp: '^PermitRootLogin '
+		        line: PermitRootLogin no
+		        state: present
+		
+		    - name: Set MaxAuthTries
+		      lineinfile:
+		        path: /etc/ssh/sshd_config.d/50-redhat.conf
+		        regexp: '^MaxAuthTries '
+		        line: MaxAuthTries 6
+		        state: present
+		
+		    - name: Restart SSHD
+		      service:
+		        name: sshd
+		        state: restarted
+        ```
+
+1. Task 5
+
+	* Run the following commands on the control node:
+         ```shell
+		ansible-vault create secret.yml # set password as admin123
+		# set file contents as below
+		# user_pass: user        
+		# database_pass: database
+		echo admin123 > secret.txt
+		ansible-vault view secret.yml --vault-pass-file secret.txt
+        ```
+
+1. Task 6
+
+	* Create `/vars/userlist.yml`:
+		---      
+		users:          
+		- username: alice  
+		  job: developer
+		- username: vincent
+		  job: manager  
+		- username: sandy  
+		  job: tester   
+		- username: patrick
+		  job: developer
+        ```
+
+	* Create and run the playbook `/home/ansible/ansible/users.yml`:
+         ```yaml
+		---      
+		- name: Create users
+		  hosts: all
+		  vars_files:
+		    - userlist.yml
+		    - secret.yml
+		  tasks: 
+		    - name: Create developer users from the userlist
+		      user:
+		        name: "{{  item.username }}"
+		        group: wheel
+		        password: "{{  user_pass | password_hash('sha512')  }}"
+		      with_items: "{{  users }}"
+		      when: "('dev' in group_names) and (item.job == 'developer')"
+		
+		    - name: Create manager users from the userlist
+		      user:
+		        name: "{{  item.username }}"
+		        group: wheel
+		        password: "{{  database_pass | password_hash('sha512')  }}"
+		      with_items: "{{  users }}"
+		      when: "('test' in group_names) and (item.job == 'manager')"
+        ```
+
+1. Task 7
+
+	* Create and run the script `/home/ansible/ansible/repository.sh`:
+         ```shell
+		#!/bin/bash
+		ansible test -m yum_repository -a "name=mysql56-community description='MySQL 5.6 YUM Repo' baseurl=http://repo.example.com/rpms enabled=0"
+        ```
+
+1. Task 8
+
+	* Update networking to NAT on the control node to install additional collections. Create and run the script `/home/ansible/ansible/repository.sh`:
+         ```shell
+		ansible-galaxy collection install ansible.posix
+		ansible-galaxy collection install community.general
+        ```
+
+	* Revert the networking to Bridged Adapter. Add an additional 1GB and 2GB drive to nodes 4 and 5 respectively. Create and run the playbook `/home/ansible/ansible/logvol.yml`:
+	         ```yaml
+			---    
+			- name: Setup volumes
+			  hosts: all
+			  become: true
+			  tasks:
+			    - name: Create partition
+			      parted:
+			        device: /dev/sdb
+			        number: 1
+			        flags: [ lvm ]
+			        state: present
+			      when: "ansible_facts['devices']['sdb'] is defined"
+			
+			    - name: Create volume group
+			      lvg:
+			        vg: vg0
+			        pvs: /dev/sdb1
+			      when: "ansible_facts['devices']['sdb'] is defined"
+			
+			    - name: Create logical volume
+			      lvol:
+			        vg: vg0
+			        lv: lv0
+			        size: 1500m
+			        state: present
+			      when: "ansible_facts['devices']['sdb'] is defined and ansible_lvm['vgs']['vg0'] is defined and ansible_lvm['lvs']['lv0'] is not defined and (ansible_lvm['vgs']['vg0']['free_g'] | float) > 1.5"
+			
+			    - name: Print error message
+			      debug:
+			        msg: "Not enough space in volume group"
+			      when: "ansible_facts['devices']['sdb'] is defined and ansible_lvm['vgs']['vg0'] is defined and (ansible_lvm['vgs']['vg0']['free_g']) | float <= 1.5"
+			
+			    - name: Create logical volume
+			      lvol:
+			        vg: vg0
+			        lv: lv0
+			        size: 800m
+			        state: present
+			      when: "ansible_facts['devices']['sdb'] is defined and ansible_lvm['vgs']['vg0'] is defined and ansible_lvm['lvs']['lv0'] is not defined and (ansible_lvm['vgs']['vg0']['free_g']) | float > 0.8"
+			
+			    - name: Create the file system
+			      filesystem:
+			        dev: /dev/vg0/lv0
+			        state: present
+			        fstype: xfs
+			      when: "ansible_lvm['lvs']['lv0'] is defined"
+			
+			    - name: Mount file system
+			      mount:
+			        src: /dev/vg0/lv0
+			        path: /mnt/data
+			        state: mounted
+			        fstype: xfs
+			      when: "ansible_lvm['lvs']['lv0'] is defined"
+	        ```
+
+	* Note that for some reason you can't access the lvm properties using `ansible_facts['ansible_lvm']`.
+
 #### Archive
 
 1. Validate a working configuration using ad hoc Ansible commands
