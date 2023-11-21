@@ -5543,7 +5543,7 @@
         ansible-playbook yamlfile.yml --start-at-task 'Task name'
         ```
 
-	* The `-b` flag will run a module in become mode (privilege escalation).
+    * The `-b` flag will run a module in become mode (privilege escalation).
 
 1. Use variables to retrieve the results of running a command
 
@@ -5754,7 +5754,7 @@
         # 192.168.1.111 node5.example.com
         ```
 
-	* On the control node run the following to make vim friendlier for playbook creation:
+    * On the control node run the following to make vim friendlier for playbook creation:
         ```shell
         echo "autocmd FileType yaml setlocal ai ts=2 sw=2 et cuc nu" >> ~/.vimrc
         ```
@@ -6196,72 +6196,72 @@
 
    * Create a playbook `/home/ansible/ansible/index.html` and run it with `ansible-playbook logvol.yml`:
         ```yaml
-		---
-		- name: Serve a file
-		  hosts: dev
-		  become: true
-		  tasks:
-		    - name: Create the webdev user
-		      user:
-		        name: webdev
-		        state: present
-		
-		    - name: Create webdev directory
-		      file:
-		        path: /webdev
-		        state: directory
-		        mode: '2755'
-		        owner: webdev
-		
-		    - name: Create the html webdev directory
-		      file:
-		        path: /var/www/html/webdev
-		        state: directory
-		        mode: '2755'
-		        owner: root
-		
-		    - name: Set correct SELinux file context
-		      sefcontext:
-		        target: '/var/www/html/webdev(/.*)?'
-		        setype: httpd_sys_content_t
-		        state: present
-		
-		    - name: Set correct SELinux file context
-		      sefcontext:
-		        target: '/webdev(/.*)?'
-		        setype: httpd_sys_content_t
-		        state: present
-		
-		    - name: Check firewall rules
-		      firewalld:
-		        service: http
-		        permanent: true
-		        state: enabled
-		        immediate: true
-		
-		    - name: Copy html file into webdev directory
-		      copy:
-		        src: /home/ansible/ansible/index.html
-		        dest: /webdev/index.html
-		        owner: webdev
-		      notify: Restart httpd
-		
-		- name: Create the symlink
-		      file:
-		        src: /webdev
-		        dest: /var/www/html/webdev
-		        state: link
-		        force: yes
-		
-		  handlers:
-		    - name: Restart httpd
-		      service:
-		        name: httpd
-		        state: restarted
-		        enabled: yes
+        ---
+        - name: Serve a file
+          hosts: dev
+          become: true
+          tasks:
+            - name: Create the webdev user
+              user:
+                name: webdev
+                state: present
+        
+            - name: Create webdev directory
+              file:
+                path: /webdev
+                state: directory
+                mode: '2755'
+                owner: webdev
+        
+            - name: Create the html webdev directory
+              file:
+                path: /var/www/html/webdev
+                state: directory
+                mode: '2755'
+                owner: root
+        
+            - name: Set correct SELinux file context
+              sefcontext:
+                target: '/var/www/html/webdev(/.*)?'
+                setype: httpd_sys_content_t
+                state: present
+        
+            - name: Set correct SELinux file context
+              sefcontext:
+                target: '/webdev(/.*)?'
+                setype: httpd_sys_content_t
+                state: present
+        
+            - name: Check firewall rules
+              firewalld:
+                service: http
+                permanent: true
+                state: enabled
+                immediate: true
+        
+            - name: Copy html file into webdev directory
+              copy:
+                src: /home/ansible/ansible/index.html
+                dest: /webdev/index.html
+                owner: webdev
+              notify: Restart httpd
+        
+        - name: Create the symlink
+              file:
+                src: /webdev
+                dest: /var/www/html/webdev
+                state: link
+                force: yes
+        
+          handlers:
+            - name: Restart httpd
+              service:
+                name: httpd
+                state: restarted
+                enabled: yes
         ```
 
-	* Note that the for the above to work on the `dev` host I had to set `DocumentRoot "/var/www/html/webdev` in `/etc/httpd/conf/httpd.conf`. There is likely a better solution than that.
+    * Note that the for the above to work on the `dev` host I had to set `DocumentRoot "/var/www/html/webdev` in `/etc/httpd/conf/httpd.conf`. There is likely a better solution than that.
 
 1. Task 13
 
@@ -6270,89 +6270,89 @@
         dnf install rhel-system-roles -y
         ```
 
-	* Once installed, documentation and sample playbooks are available at `/usr/share/doc/rhel-system-roles/` under each role.
+    * Once installed, documentation and sample playbooks are available at `/usr/share/doc/rhel-system-roles/` under each role.
 
-	* Create a playbook `/home/ansible/ansible/timesync.yml` and run it with `ansible-playbook timesync.yml`:
+    * Create a playbook `/home/ansible/ansible/timesync.yml` and run it with `ansible-playbook timesync.yml`:
         ```yml
-		---  
-		- name: Set the time using timesync
-		  hosts: all
-		  vars:
-		    timesync_ntp_servers:
-		      - hostname: 0.uk.pool.ntp.org
-		        boost: true
-		  roles:
-		    - /usr/share/ansible/roles/rhel-system-roles.timesync
+        ---  
+        - name: Set the time using timesync
+          hosts: all
+          vars:
+            timesync_ntp_servers:
+              - hostname: 0.uk.pool.ntp.org
+                boost: true
+          roles:
+            - /usr/share/ansible/roles/rhel-system-roles.timesync
         ```
 
 1. Task 14
 
-	* Create a playbook `/home/ansible/ansible/regulartasks.yml` and run it with `ansible-playbook regulartasks.yml`:
+    * Create a playbook `/home/ansible/ansible/regulartasks.yml` and run it with `ansible-playbook regulartasks.yml`:
         ```yml
-		---      
-		- name: Append the date
-		  hosts: all
-		  become: true
-		  tasks: 
-		    - name: Append the date using cron
-		      cron:
-		        name: datejob
-		        hour: "12"
-		        user: root
-		        job: "date >> /root/datefile"
+        ---      
+        - name: Append the date
+          hosts: all
+          become: true
+          tasks: 
+            - name: Append the date using cron
+              cron:
+                name: datejob
+                hour: "12"
+                user: root
+                job: "date >> /root/datefile"
         ```
 
 1. Task 15
 
-	* Create a playbook `/home/ansible/ansible/issue.yml` and run it with `ansible-playbook issue.yml`:
+    * Create a playbook `/home/ansible/ansible/issue.yml` and run it with `ansible-playbook issue.yml`:
         ```yml
-		---    
-		- name: Update a file conditionally
-		  hosts: all
-		  tasks:
-		    - name: Update file for dev
-		      copy:
-		        content: "Development"
-		        dest: /etc/issue
-		      when: "'dev' in group_names"
-		
-		    - name: Update file for tets
-		      copy:
-		        content: "Test"
-		        dest: /etc/issue
-		      when: "'test' in group_names"
-		
-		    - name: Update file for prod
-		      copy:
-		        content: "Production"
-		        dest: /etc/issue
-		      when: "'prod' in group_names"
+        ---    
+        - name: Update a file conditionally
+          hosts: all
+          tasks:
+            - name: Update file for dev
+              copy:
+                content: "Development"
+                dest: /etc/issue
+              when: "'dev' in group_names"
+        
+            - name: Update file for tets
+              copy:
+                content: "Test"
+                dest: /etc/issue
+              when: "'test' in group_names"
+        
+            - name: Update file for prod
+              copy:
+                content: "Production"
+                dest: /etc/issue
+              when: "'prod' in group_names"
         ```
 
 1. Task 16
 
-	* Create an encrypted playbook using `ansible-vault create myvault.yml`:
+    * Create an encrypted playbook using `ansible-vault create myvault.yml`:
         ```shell
-		ansible-vault create myvault.yml # enter pw as notsafepw
-		ansible-vault rekey myvault.yml # enter old and new pw as requested
+        ansible-vault create myvault.yml # enter pw as notsafepw
+        ansible-vault rekey myvault.yml # enter old and new pw as requested
         ```
 
 1. Task 17
 
-	* Create a playbook `ansible-vault create target.yml`:
+    * Create a playbook `ansible-vault create target.yml`:
         ```yaml
-		---      
-		- name: Change default target
-		  hosts: all
-		  tasks: 
-		    - name: Change default target
-		      file:
-		        src: /usr/lib/systemd/system/multi-user.target
-		        dest: /etc/systemd/system/default.target
-		        state: link
+        ---      
+        - name: Change default target
+          hosts: all
+          tasks: 
+            - name: Change default target
+              file:
+                src: /usr/lib/systemd/system/multi-user.target
+                dest: /etc/systemd/system/default.target
+                state: link
         ```
 
-	* This is not a good solutiona as it requires implementation level knowledge.
+    * This is not a good solution as it requires implementation level knowledge.
 
 #### Practise Exam 2
 
@@ -6384,7 +6384,7 @@
         # baseurl=file:///mnt/rheliso/AppStream
         # gpgcheck=0
         dnf repolist # confirm repos are returned
-		```
+        ```
 
     * On the control node run the following setup as root to install guest additions:
         ```shell
@@ -6398,9 +6398,9 @@
         echo password | passwd --stdin ansible
         echo "ansible ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ansible
         dnf install ansible-core rhel-system-roles -y
-		'''
+        '''
 
-	* On the control node run the following to make vim friendlier for playbook creation:
+    * On the control node run the following to make vim friendlier for playbook creation:
         ```shell
         echo "autocmd FileType yaml setlocal ai ts=2 sw=2 et cuc nu" >> ~/.vimrc
         ```
@@ -6418,12 +6418,12 @@
         # 192.168.1.111 node5.example.com
         ```
 
-	* On the control node run the following:
+    * On the control node run the following:
        ```shell
         ssh-keygen # select defaults
-		ssh-copy-id ansible@node1.example.com # repeat for the remaining managed nodes
-		ansible all -m ping # confirm ssh connectivity
-		'''
+        ssh-copy-id ansible@node1.example.com # repeat for the remaining managed nodes
+        ansible all -m ping # confirm ssh connectivity
+        '''
 
 1. Task 1
 
@@ -6462,215 +6462,330 @@
 
 1. Task 2
 
-	* Create and run the following `adhoc.sh` script on the control node:
+    * Create and run the following `adhoc.sh` script on the control node:
          ```shell
         #!/bin/bash
-		# create the 'devops' user with necessary permissions
-		ansible all -u ansible -m user -a "name=devops" --ask-pass
-		ansible all -u ansible -m shell -a "echo password | passwd --stdin devops"
-		ansible all -u ansible -m shell -a "echo 'devops ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/devops"
-		
-		# allow SSH without password
-		ssh-copy-id -i /home/devops/.ssh/id_rsa.pub node1.example.com
-		ssh-copy-id -i /home/devops/.ssh/id_rsa.pub node2.example.com
-		ssh-copy-id -i /home/devops/.ssh/id_rsa.pub node3.example.com
-		ssh-copy-id -i /home/devops/.ssh/id_rsa.pub node4.example.com
-		ssh-copy-id -i /home/devops/.ssh/id_rsa.pub node5.example.com
+        # create the 'devops' user with necessary permissions
+        ansible all -u ansible -m user -a "name=devops" --ask-pass
+        ansible all -u ansible -m shell -a "echo password | passwd --stdin devops"
+        ansible all -u ansible -m shell -a "echo 'devops ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/devops"
+        
+        # allow SSH without password
+        ssh-copy-id -i /home/devops/.ssh/id_rsa.pub node1.example.com
+        ssh-copy-id -i /home/devops/.ssh/id_rsa.pub node2.example.com
+        ssh-copy-id -i /home/devops/.ssh/id_rsa.pub node3.example.com
+        ssh-copy-id -i /home/devops/.ssh/id_rsa.pub node4.example.com
+        ssh-copy-id -i /home/devops/.ssh/id_rsa.pub node5.example.com
         ```
 
-	* Note that this requires an existing user `ansible` to authenticate to the managed nodes. The ask pass parameter is used initially as the devops user is not created in the remote systems, and there are no keys setup for the devops user yet.
+    * Note that this requires an existing user `ansible` to authenticate to the managed nodes. The ask pass parameter is used initially as the devops user is not created in the remote systems, and there are no keys setup for the devops user yet.
 
 1. Task 3
 
-	* Create and run the following playbook `/home/ansible/ansible/motd.yml` script on the control node:
+    * Create and run the following playbook `/home/ansible/ansible/motd.yml` script on the control node:
          ```yaml
-		 ---  
-		- name: Write to /etc/motd
-		  hosts: all
-		  tasks:
-		    - name: Write to /etc/motd for dev
-		      copy:
-		        content: 'Welcome to Dev Server {{  ansible_fqdn  }}'
-		        dest: /etc/motd
-		      when: "'dev' in group_names"
-		
-		    - name: Write to /etc/motd for webservers
-		      copy:
-		        content: 'Welcome to Apache Server {{  ansible_fqdn  }}'
-		        dest: /etc/motd
-		      when: "'webservers' in group_names"
-		
-		    - name: Write to /etc/motd for test
-		      copy:
-		        content: 'Welcome to MySQL Server {{  ansible_fqdn  }}'
-		        dest: /etc/motd
-		      when: "'test' in group_names"
+         ---  
+        - name: Write to /etc/motd
+          hosts: all
+          tasks:
+            - name: Write to /etc/motd for dev
+              copy:
+                content: 'Welcome to Dev Server {{  ansible_fqdn  }}'
+                dest: /etc/motd
+              when: "'dev' in group_names"
+        
+            - name: Write to /etc/motd for webservers
+              copy:
+                content: 'Welcome to Apache Server {{  ansible_fqdn  }}'
+                dest: /etc/motd
+              when: "'webservers' in group_names"
+        
+            - name: Write to /etc/motd for test
+              copy:
+                content: 'Welcome to MySQL Server {{  ansible_fqdn  }}'
+                dest: /etc/motd
+              when: "'test' in group_names"
         ```
 
 1. Task 4
 
-	* Create and run the following playbook `/home/ansible/ansible/sshd.yml` script on the control node:
+    * Create and run the following playbook `/home/ansible/ansible/sshd.yml` script on the control node:
          ```yaml
-		---
-		- name: Configure SSHD daemon
-		  hosts: all
-		  become: true
-		  tasks: 
-		    - name: Set Banner
-		      lineinfile:
-		        path: /etc/ssh/sshd_config.d/50-redhat.conf
-		        regexp: '^Banner '
-		        line: Banner /etc/issue
-		        state: present
-		
-		    - name: Set PermitRootLogin
-		      lineinfile:
-		        path: /etc/ssh/sshd_config.d/50-redhat.conf
-		        regexp: '^PermitRootLogin '
-		        line: PermitRootLogin no
-		        state: present
-		
-		    - name: Set MaxAuthTries
-		      lineinfile:
-		        path: /etc/ssh/sshd_config.d/50-redhat.conf
-		        regexp: '^MaxAuthTries '
-		        line: MaxAuthTries 6
-		        state: present
-		
-		    - name: Restart SSHD
-		      service:
-		        name: sshd
-		        state: restarted
+        ---
+        - name: Configure SSHD daemon
+          hosts: all
+          become: true
+          tasks: 
+            - name: Set Banner
+              lineinfile:
+                path: /etc/ssh/sshd_config.d/50-redhat.conf
+                regexp: '^Banner '
+                line: Banner /etc/issue
+                state: present
+        
+            - name: Set PermitRootLogin
+              lineinfile:
+                path: /etc/ssh/sshd_config.d/50-redhat.conf
+                regexp: '^PermitRootLogin '
+                line: PermitRootLogin no
+                state: present
+        
+            - name: Set MaxAuthTries
+              lineinfile:
+                path: /etc/ssh/sshd_config.d/50-redhat.conf
+                regexp: '^MaxAuthTries '
+                line: MaxAuthTries 6
+                state: present
+        
+            - name: Restart SSHD
+              service:
+                name: sshd
+                state: restarted
         ```
 
 1. Task 5
 
-	* Run the following commands on the control node:
+    * Run the following commands on the control node:
          ```shell
-		ansible-vault create secret.yml # set password as admin123
-		# set file contents as below
-		# user_pass: user        
-		# database_pass: database
-		echo admin123 > secret.txt
-		ansible-vault view secret.yml --vault-pass-file secret.txt
+        ansible-vault create secret.yml # set password as admin123
+        # set file contents as below
+        # user_pass: user        
+        # database_pass: database
+        echo admin123 > secret.txt
+        ansible-vault view secret.yml --vault-pass-file secret.txt
         ```
 
 1. Task 6
 
-	* Create `/vars/userlist.yml`:
-		---      
-		users:          
-		- username: alice  
-		  job: developer
-		- username: vincent
-		  job: manager  
-		- username: sandy  
-		  job: tester   
-		- username: patrick
-		  job: developer
+    * Create `/vars/userlist.yml`:
+         ```yaml
+        ---      
+        users:          
+        - username: alice  
+          job: developer
+        - username: vincent
+          job: manager  
+        - username: sandy  
+          job: tester   
+        - username: patrick
+          job: developer
         ```
 
-	* Create and run the playbook `/home/ansible/ansible/users.yml`:
+    * Create and run the playbook `/home/ansible/ansible/users.yml`:
          ```yaml
-		---      
-		- name: Create users
-		  hosts: all
-		  vars_files:
-		    - userlist.yml
-		    - secret.yml
-		  tasks: 
-		    - name: Create developer users from the userlist
-		      user:
-		        name: "{{  item.username }}"
-		        group: wheel
-		        password: "{{  user_pass | password_hash('sha512')  }}"
-		      with_items: "{{  users }}"
-		      when: "('dev' in group_names) and (item.job == 'developer')"
-		
-		    - name: Create manager users from the userlist
-		      user:
-		        name: "{{  item.username }}"
-		        group: wheel
-		        password: "{{  database_pass | password_hash('sha512')  }}"
-		      with_items: "{{  users }}"
-		      when: "('test' in group_names) and (item.job == 'manager')"
+        ---      
+        - name: Create users
+          hosts: all
+          vars_files:
+            - userlist.yml
+            - secret.yml
+          tasks: 
+            - name: Create developer users from the userlist
+              user:
+                name: "{{  item.username }}"
+                group: wheel
+                password: "{{  user_pass | password_hash('sha512')  }}"
+              with_items: "{{  users }}"
+              when: "('dev' in group_names) and (item.job == 'developer')"
+        
+            - name: Create manager users from the userlist
+              user:
+                name: "{{  item.username }}"
+                group: wheel
+                password: "{{  database_pass | password_hash('sha512')  }}"
+              with_items: "{{  users }}"
+              when: "('test' in group_names) and (item.job == 'manager')"
         ```
 
 1. Task 7
 
-	* Create and run the script `/home/ansible/ansible/repository.sh`:
+    * Create and run the script `/home/ansible/ansible/repository.sh`:
          ```shell
-		#!/bin/bash
-		ansible test -m yum_repository -a "name=mysql56-community description='MySQL 5.6 YUM Repo' baseurl=http://repo.example.com/rpms enabled=0"
+        #!/bin/bash
+        ansible test -m yum_repository -a "name=mysql56-community description='MySQL 5.6 YUM Repo' baseurl=http://repo.example.com/rpms enabled=0"
         ```
 
 1. Task 8
 
-	* Update networking to NAT on the control node to install additional collections. Create and run the script `/home/ansible/ansible/repository.sh`:
+    * Update networking to NAT on the control node to install additional collections. Create and run the script `/home/ansible/ansible/repository.sh`:
          ```shell
-		ansible-galaxy collection install ansible.posix
-		ansible-galaxy collection install community.general
+        ansible-galaxy collection install ansible.posix
+        ansible-galaxy collection install community.general
         ```
 
-	* Revert the networking to Bridged Adapter. Add an additional 1GB and 2GB drive to nodes 4 and 5 respectively. Create and run the playbook `/home/ansible/ansible/logvol.yml`:
-	         ```yaml
-			---    
-			- name: Setup volumes
-			  hosts: all
-			  become: true
-			  tasks:
-			    - name: Create partition
-			      parted:
-			        device: /dev/sdb
-			        number: 1
-			        flags: [ lvm ]
-			        state: present
-			      when: "ansible_facts['devices']['sdb'] is defined"
-			
-			    - name: Create volume group
-			      lvg:
-			        vg: vg0
-			        pvs: /dev/sdb1
-			      when: "ansible_facts['devices']['sdb'] is defined"
-			
-			    - name: Create logical volume
-			      lvol:
-			        vg: vg0
-			        lv: lv0
-			        size: 1500m
-			        state: present
-			      when: "ansible_facts['devices']['sdb'] is defined and ansible_lvm['vgs']['vg0'] is defined and ansible_lvm['lvs']['lv0'] is not defined and (ansible_lvm['vgs']['vg0']['free_g'] | float) > 1.5"
-			
-			    - name: Print error message
-			      debug:
-			        msg: "Not enough space in volume group"
-			      when: "ansible_facts['devices']['sdb'] is defined and ansible_lvm['vgs']['vg0'] is defined and (ansible_lvm['vgs']['vg0']['free_g']) | float <= 1.5"
-			
-			    - name: Create logical volume
-			      lvol:
-			        vg: vg0
-			        lv: lv0
-			        size: 800m
-			        state: present
-			      when: "ansible_facts['devices']['sdb'] is defined and ansible_lvm['vgs']['vg0'] is defined and ansible_lvm['lvs']['lv0'] is not defined and (ansible_lvm['vgs']['vg0']['free_g']) | float > 0.8"
-			
-			    - name: Create the file system
-			      filesystem:
-			        dev: /dev/vg0/lv0
-			        state: present
-			        fstype: xfs
-			      when: "ansible_lvm['lvs']['lv0'] is defined"
-			
-			    - name: Mount file system
-			      mount:
-			        src: /dev/vg0/lv0
-			        path: /mnt/data
-			        state: mounted
-			        fstype: xfs
-			      when: "ansible_lvm['lvs']['lv0'] is defined"
-	        ```
+    * Revert the networking to Bridged Adapter. Add an additional 1GB and 2GB drive to nodes 4 and 5 respectively. Create and run the playbook `/home/ansible/ansible/logvol.yml`:
+             ```yaml
+            ---    
+            - name: Setup volumes
+              hosts: all
+              become: true
+              tasks:
+                - name: Create partition
+                  parted:
+                    device: /dev/sdb
+                    number: 1
+                    flags: [ lvm ]
+                    state: present
+                  when: "ansible_facts['devices']['sdb'] is defined"
+            
+                - name: Create volume group
+                  lvg:
+                    vg: vg0
+                    pvs: /dev/sdb1
+                  when: "ansible_facts['devices']['sdb'] is defined"
+            
+                - name: Create logical volume
+                  lvol:
+                    vg: vg0
+                    lv: lv0
+                    size: 1500m
+                    state: present
+                  when: "ansible_facts['devices']['sdb'] is defined and ansible_lvm['vgs']['vg0'] is defined and ansible_lvm['lvs']['lv0'] is not defined and (ansible_lvm['vgs']['vg0']['free_g'] | float) > 1.5"
+            
+                - name: Print error message
+                  debug:
+                    msg: "Not enough space in volume group"
+                  when: "ansible_facts['devices']['sdb'] is defined and ansible_lvm['vgs']['vg0'] is defined and (ansible_lvm['vgs']['vg0']['free_g']) | float <= 1.5"
+            
+                - name: Create logical volume
+                  lvol:
+                    vg: vg0
+                    lv: lv0
+                    size: 800m
+                    state: present
+                  when: "ansible_facts['devices']['sdb'] is defined and ansible_lvm['vgs']['vg0'] is defined and ansible_lvm['lvs']['lv0'] is not defined and (ansible_lvm['vgs']['vg0']['free_g']) | float > 0.8"
+            
+                - name: Create the file system
+                  filesystem:
+                    dev: /dev/vg0/lv0
+                    state: present
+                    fstype: xfs
+                  when: "ansible_lvm['lvs']['lv0'] is defined"
+            
+                - name: Mount file system
+                  mount:
+                    src: /dev/vg0/lv0
+                    path: /mnt/data
+                    state: mounted
+                    fstype: xfs
+                  when: "ansible_lvm['lvs']['lv0'] is defined"
+            ```
 
-	* Note that for some reason you can't access the lvm properties using `ansible_facts['ansible_lvm']`.
+    * Note that for some reason you can't access the lvm properties using `ansible_facts['ansible_lvm']`.
+
+1. Task 9
+
+    * Create and run the playbook `/home/ansible/ansible/regular_tasks.yml`:
+         ```yaml
+        ---      
+        - name: Create cron job on dev
+          hosts: dev
+          become: true
+          tasks: 
+            - name: Create cron job on dev
+              cron:
+                name: hourly job
+                minute: "0"
+                job: "date >> /root/time"
+        ```
+
+1. Task 10
+
+    * Create the role `/home/ansible/ansible/roles/sample-apache/tasks/main.yml`:
+         ```yaml
+        - name: Install httpd
+          yum:
+            name: httpd
+            state: present
+        
+        - name: Enable http in firewalld
+          firewalld:
+            service: http
+            state: enabled
+            permanent: true
+            immediate: true
+        
+        - name: Start httpd
+          service:
+            name: httpd
+            state: started
+            enabled: yes
+        
+        - name: Copy template
+          template:
+            src: /home/ansible/ansible/index.html.j2
+            dest: /var/www/html/index.html
+          notify:
+            - Restart httpd
+        ```
+
+    * Create the handler `/home/ansible/ansible/index.html.j2`:
+         ```shell
+        Welcome to the server {{  ansible_hostname  }}
+        ```
+
+    * Create and run the playbook  
+         ```yaml
+        ---  
+        - name: Setup Apache
+          hosts: all
+          become: true
+          roles:
+            - sample-apache
+        ```
+
+1. Task 11
+
+    * Create the file `/home/ansible/ansible/requirements.yml`:
+         ```yaml
+        - name: haproxy-role
+           src: geerlingguy.haproxy
+        ```
+
+    * Install the role using `ansible-galaxy install -r requirements.yml -p roles`.
+
+    * The documentation in `/home/ansible/ansible/roles/haproxy-role` can be referred. Create and run the playbook `/home/ansible/ansible/haproxy.yml`:
+         ```yaml
+        ---    
+        - name: Configure load balancing
+          hosts: proxy
+          become: true
+          vars:
+            haproxy_frontend_port: 80
+            haproxy_backend_servers:
+              - name: node4.example.com
+                address: 192.168.1.111:80
+              - name: node5.example.com
+                address: 192.168.1.112:80
+          pre_tasks:
+            - name: Install pre-requisites
+              yum:
+                name:
+                  - haproxy
+                state: present
+          roles:
+            - haproxy-role
+        ```
+
+    * In this instance the hostnames for node4 and node5 were added to the `/etc/hosts` file in node3. The httpd service was running on node3 which initially prevented playbook completion. This was identified using `sudo ss -6 -tlnp | grep 80` and resolved using `sudo systemctl stop httpd`.
+
+1. Task 12
+
+    * Create and run the playbook `/home/ansible/ansible/timesync.yml`:
+         ```yaml
+        ---
+        - name: Install timesync
+          hosts: all
+          vars: 
+            timesync_ntp_servers:
+              - hostname: 0.uk.pool.ntp.org
+          tasks:
+            - name: Set timezone to UTC
+              timezone:
+                name: UTC
+          roles:
+            - /usr/share/ansible/roles/rhel-system-roles.timesync
+        ```
 
 #### Archive
 
