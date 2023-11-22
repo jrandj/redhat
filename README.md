@@ -6787,6 +6787,117 @@
             - /usr/share/ansible/roles/rhel-system-roles.timesync
         ```
 
+1. Task 13
+
+	* Create a file `/home/ansible/ansible/hosts.j2`:
+         ```jinja2
+        ---
+		{%for host in groups['all']%}
+		{{  hostvars[host]['ansible_default_ipv4']['address']  }} {{  hostvars[host]['ansible_fqdn']  }} {{  hostvars[host]['ansible_hostname']  }}
+		{%endfor%}
+        ```
+
+    * Create and run the playbook `/home/ansible/ansible/hosts.yml`:
+         ```yaml
+		---
+		- name: Create file based on template
+		  hosts: all
+		  become: true
+		  tasks:
+		    - name: Create file based on template
+		      template:
+		        src: /home/ansible/ansible/hosts.j2
+		        dest: /root/myhosts
+		      when: "'dev' in group_names"
+        ```
+
+1. Task 14
+
+	* Create a file `/home/ansible/ansible/requirements.yml`:
+         ```yaml
+		---                     
+		- name: sample-php_roles
+		  src: geerlingguy.php
+        ```
+
+	* Run `ansible-galaxy install -r requirements.yml -p roles`.
+
+1. Task 15
+
+	* Create a file `/home/ansible/ansible/specs.empty`:
+         ```yaml
+		---                     
+		HOST=
+		MEMORY=
+		BIOS=
+		SDA_DISK_SIZE=
+		SDB_DISK_SIZE=
+        ```
+
+	* Create and run the playbook `/home/ansible/ansible/specs.yml`:
+         ```yaml
+		---    
+		- name: Populate specs file
+		  hosts: all
+		  become: true
+		  tasks:
+		    - name: Copy file to hosts
+		      copy:
+		        src: /home/ansible/ansible/specs.empty
+		        dest: /root/specs.txt
+		    - name: Update hosts
+		      lineinfile:
+		        path: /root/specs.txt
+		        regexp: '^HOST='
+		        line: 'HOST={{  ansible_hostname  }}'
+		    - name: Update memory
+		      lineinfile:
+		        path: /root/specs.txt
+		        regexp: '^MEMORY='
+		        line: 'MEMORY={{  ansible_memtotal_mb  }}'
+		    - name: Update BIOS
+		      lineinfile:
+		        path: /root/specs.txt
+		        regexp: '^BIOS='
+		        line: 'BIOS={{  ansible_bios_version  }}'
+		    - name: Update SDA disk size
+		      lineinfile:
+		        path: /root/specs.txt
+		        regexp: '^SDA_DISK_SIZE='
+		        line: "SDA_DISK_SIZE={{  ansible_devices['sda']['size']  }}"
+		      when: "ansible_devices['sda'] is defined"
+		    - name: Update SDB disk size
+		      lineinfile:
+		        path: /root/specs.txt
+		        regexp: '^SDB_DISK_SIZE='
+		        line: "SDB_DISK_SIZE={{  ansible_devices['sdb']['size']  }}"
+		      when: "ansible_devices['sdb'] is defined"
+        ```
+
+1. Task 16
+
+	* Create and run the playbook `/home/ansible/ansible/packages.yml`:
+         ```yaml
+		---    
+		- name: Install packages
+		  hosts: all
+		  become: true
+		  tasks:
+		    - name: Install packages using yum for proxy
+		      yum:
+		        name:
+		          - httpd
+		          - mod_ssl
+		        state: present
+		      when: "'proxy' in group_names"
+		    - name: Install packages using yum for dev
+		      yum:
+		        name:
+		          - '@Development tools'
+		        state: present
+		      when: "'dev' in group_names"
+        ```
+
 #### Archive
 
 1. Validate a working configuration using ad hoc Ansible commands
