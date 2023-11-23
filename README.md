@@ -4679,7 +4679,7 @@
 
 1. Inventories
 
-    * Inventories are what Ansible uses to locate and run against multiple hosts. The default ansible 'hosts' file is `/etc/ansible/hosts`. The default location of the hosts file can be set in `/etc/ansible/ansible.cfg`. The default location for roles is in `/etc/ansible/roles`.
+    * Inventories are what Ansible uses to locate and run against multiple hosts. The default ansible 'hosts' file is `/etc/ansible/hosts`. The default location of the hosts file can be set in `/etc/ansible/ansible.cfg`.
 
     * The file can contain individual hosts, groups of hosts, groups of groups, and host and group level variables. It can also contain variables that determine how you connect to a host.
 
@@ -4797,21 +4797,21 @@
     * The `groups` variable lists all of the groups and hosts in the inventory. You can use this to enumerate the hosts within a group:
         ```jinja2
         {% for host in groups['app_servers'] %}
-               # something that applies to all app servers.
+        # something that applies to all app servers.
         {% endfor %}
         ```
 
     * The below example shows using hostvars and groups together to find all of the IP addresses in a group:
         ```jinja2
         {% for host in groups['app_servers'] %}
-               {{ hostvars[host]['ansible_facts']['eth0']['ipv4']['address'] }}
+        {{ hostvars[host]['ansible_facts']['eth0']['ipv4']['address'] }}
         {% endfor %}
         ```
 
     * The `group_names` variable contains a list of all the groups the current host is in. The below example shows using this variable to create a templated file that varies based on the group membership of the host:
         ```jinja2
         {% if 'webserver' in group_names %}
-           # some part of a configuration file that only applies to webservers
+        # some part of a configuration file that only applies to webservers
         {% endif %}
         ```
 
@@ -4921,16 +4921,30 @@
 
 1. Conditional tasks
 
+	* The `when` keyboard is used to make tasks conditional.
+
 1. Plays
 
     * The goal of a play is to map a group of hosts to some well-defined roles. A play can consist of one or more tasks which make calls to Ansible modules.
 
 1. Handling task failure
 
+	* By default, Ansible stops executing tasks on a host when a task fails on that host. You can use the `ignore_errors` option to continue despite the failure. This directive only works when the task can run and returns a value of 'failed'.
+	
+	* Ansible lets you define what "failure" means in each task using the `failed_when` conditional. This is commonly used on registered variables:
+		```yaml
+		- name: Fail task when both files are identical
+		  ansible.builtin.raw: diff foo/file1 bar/file2
+		  register: diff_cmd
+		  failed_when: diff_cmd.rc == 0 or diff_cmd.rc >= 2
+        ```
+
+	* Ansible lets you define when a particular task has “changed” a remote node using the changed_when conditional. This lets you determine, based on return codes or output, whether a change should be reported in Ansible statistics and whether a handler should be triggered or not. usually a handler is used to handle executing tasks only if there is a change.
+
 1. Playbooks
 
     * A playbook is a series of plays. An example of a playbook:
-        ```shell
+        ```dnf
         ---
         - hosts: webservers
           become: yes
@@ -4963,8 +4977,8 @@
 1. Configuration Files
 
     * The Ansible configuration files are taken from the below locations in order:
-        * ANSIBLE_CONFIG (environment variable)
-        * ansible.cfg (in the current directory)
+        * `ANSIBLE_CONFIG` (environment variable)
+        * `ansible.cfg` (in the current directory)
         * `~/.ansible.cfg` (in the home directory)
         * `/etc/ansible/ansible.cfg`
 
@@ -5096,9 +5110,57 @@
 
 1. Install roles and use them in playbooks
 
+	* The default location for roles is in `/etc/ansible/roles` which is configurable as `roles_path` in ansible.cfg. Ansible also looks for roles in collections, in the `roles` directory relative to the playbook file, and in the directory where the playbook file is located.
+
+	* To install a role run:
+        ```shell
+        ansible-galaxy install author.role
+        ```
+
 1. Install Content Collections and use them in playbooks
 
+	* To install a collection run:
+        ```shell
+        ansible-galaxy collection install authorname.collectionname
+        ```
+
+	* Collections can be used in playbooks by using:
+        ```shell
+        tasks:
+		 import_role: 
+		    name: awx.awx
+        ```
+
+	* Or by using:
+        ```shell
+        collections:
+		 name: awx.awx 
+		tasks:
+        ```
+
+	* The Fully Qualified Collection Name (FQCN) is used when referring to modules provided by an Ansible Collection.
+
 1. Obtain a set of related roles, supplementary modules, and other content from content collections, and use them in a playbook.
+
+    * To install Ansible using dnf:
+        ```shell
+        ansible galaxy collection install ansible-posix
+        ```
+
+	* Note that the collection is installed into `~/ansible~`. This can be overwritten with `-p /path/to/collection`, but you must update `ansible.cfg` accordingly. The documentation of the installed collection can be referred, but the `ansible-doc` command only searches the system directories for documentation.
+
+	* Create and run a playbook enforce-selinux.yml:
+        ```yaml
+		 ---
+		- name: set SELinux to enforcing
+		  hosts: localhost
+		  become: yes
+		  tasks:
+		  - name: set SElinux to enforcing
+		    ansible.posix.selinux:
+		      policy: targeted
+		      state: enforcing
+        ```
 
 ### Install and configure an Ansible control node
 
@@ -6896,6 +6958,17 @@
 		          - '@Development tools'
 		        state: present
 		      when: "'dev' in group_names"
+        ```
+
+1. Task 17
+
+	* Create and run the playbook `/home/ansible/ansible/mysecret.yml`:
+         ```shell
+		ansible-vault create mysecret.yml # enter notasafepass
+		# add a line dev_pass: devops
+		ansible-vault rekey mysecret.yml # enter new password devops123
+		ansible-vault edit mysecret.yml
+		# add a line dev_pass: devops123
         ```
 
 #### Archive
