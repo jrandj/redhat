@@ -5168,30 +5168,9 @@
 
     * To install Ansible using dnf:
         ```shell
-        subscription-manager repos --list | grep ansible
-        # find latest version
-        sudo subscription-manager repos --enable ansible-2.8-for-rhel-8-x86_64-rpms
-        dnf search ansible
-        # confirm available
-        dnf install -y ansible
-        ```
-
-    * To install Ansible from disk:
-        ```shell
-        sudo dnf install git
-        mkdir ansible
-        mkdir git
-        cd git
-        git clone --single-branch --branch stable -2.8 https://github.com/ansible/ansible.git
-        cd ansible
-        source ./hacking/env-setup
-        # make permanent
-        vi ~/.bash_profile
-        # add line
-        source ~/git/ansible/hacking/env-setup
-        pip2.7 install --user -r ./requirements.txt
-        # test the installation
-        ansible 127.0.0.1 -m ping
+        sudo subscription-manager repos --enable codeready-builder-for-rhel-9-$(arch)-rpms
+        sudo dnf install epel-release epel-next-release
+        dnf install -y ansible-core
         ```
 
 1. Create a static host inventory file
@@ -5205,7 +5184,7 @@
 
     * Best practices for inventory variables:
         * Variables should be stored in YAML files located relative to the inventory file.
-        * Host and group variables should be stored in the host_vars and group_vars directories respectively (the directories need to be created).
+        * Host and group variables should be stored in the `host_vars` and `group_vars` directories respectively (the directories need to be created).
         * Variable files should be named after the host or group for which they contain variables (files may end in .yml or .yaml).
 
     * A host file can be static or dynamic. A dynamic host file can reflect updated IP addresses automatically but requires additional plugins.
@@ -5239,6 +5218,18 @@
 
 1. Create and use static inventories to define groups of hosts
 
+	* A sample inventory file is shown below:
+        ```yaml
+		[webservers]
+		foo.example.com
+		bar.example.com
+		
+		[dbservers]
+		one.example.com
+		two.example.com
+		three.example.com
+        ```
+
 ### Configure Ansible managed nodes
 
 1. Create and distribute SSH keys to managed nodes
@@ -5268,15 +5259,57 @@
 
 1. Deploy files to managed nodes
 
+	* The copy module can be used to copy files into managed nodes.
+
 1. Be able to analyze simple shell scripts and convert them to playbooks
+
+	* Common Ansible modules can be used to replicate the functionailty of scripts. The `command` and `shell` modules allow you to execute commands.
 
 ### Run playbooks with Automation content navigator
 
 1. Know how to run playbooks with Automation content navigator
 
+	* ANsible content navigator is a commond line, content-creator-focused tool with a text-based user interface. You can use it to launch and watch jobs and playbooks, share playbook and job run artifacts in JSON, browse and introspect automation execution environments, and more.
+
+	* Install Ansible Navigator:
+        ```shell
+		# install podman
+		sudo dnf install container-tools
+		# install ansible-navigator
+        sudo dnf install python3-pip
+		python3 -m pip install ansible-navigator --user
+		ansible-navigator
+        ```
+
+	* You can also install Ansible Navigator using:
+        ```shell
+		subscription-manager register
+		subscription-manager list --available # find the Pool ID for the subscription containing Ansible Automation Platform
+		subscription-manager attach --pool-=$Pool_ID
+		subscription-manager repos --list | grep ansible
+		subscription-manager repos --enable ansible-automation-platform-2.4-for-rhel-9-aarch64-rpms
+		dnf install ansible-navigator -y
+        ```
+
+	* After running `ansible-navigator` you are presented with an interactive interface. You can type `:run <playbook> -i <inventory>` to run a playbook. You can also run a playbook using `ansible-navigator run -m stdout $playbook`. This provides backwards compatability with the standard `ansible-playbook` command.
+
+	* Note that there is no ansible-doc for ansible-navigator, but you can use `ansible-navagotor --help`.
+
 1. Use Automation content navigator to find new modules in available Ansible Content Collections and use them
 
+	* Run the following
+        ```shell
+		ansible-galaxy collection install community.general -p collections
+		ansible-galaxy collection # collection shows as type bind_mount
+        ```
+
 1. Use Automation content navigator to create inventories and configure the Ansible environment
+
+	* Run the following
+        ```shell
+		ansible-navigator inventory -i assets/inventory.cfg # inspect an inventory
+		ansible-navigator config
+        ```
 
 ### Create Ansible plays and playbooks
 
