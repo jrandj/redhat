@@ -4939,12 +4939,12 @@
 		  failed_when: diff_cmd.rc == 0 or diff_cmd.rc >= 2
         ```
 
-	* Ansible lets you define when a particular task has “changed” a remote node using the changed_when conditional. This lets you determine, based on return codes or output, whether a change should be reported in Ansible statistics and whether a handler should be triggered or not. usually a handler is used to handle executing tasks only if there is a change.
+	* Ansible lets you define when a particular task has “changed” a remote node using the `changed_when` conditional. This lets you determine, based on return codes or output, whether a change should be reported in Ansible statistics and whether a handler should be triggered or not. usually a handler is used to handle executing tasks only if there is a change.
 
 1. Playbooks
 
     * A playbook is a series of plays. An example of a playbook:
-        ```dnf
+        ```yaml
         ---
         - hosts: webservers
           become: yes
@@ -5142,12 +5142,12 @@
 
 1. Obtain a set of related roles, supplementary modules, and other content from content collections, and use them in a playbook.
 
-    * To install Ansible using dnf:
+    * To install the `ansible-posix` collection:
         ```shell
         ansible galaxy collection install ansible-posix
         ```
 
-	* Note that the collection is installed into `~/ansible~`. This can be overwritten with `-p /path/to/collection`, but you must update `ansible.cfg` accordingly. The documentation of the installed collection can be referred, but the `ansible-doc` command only searches the system directories for documentation.
+	* Note that the collection is installed into `~/ansible`. This can be overwritten with `-p /path/to/collection`, but you must update `ansible.cfg` accordingly. The documentation of the installed collection can be referred, but the `ansible-doc` command only searches the system directories for documentation.
 
 	* Create and run a playbook enforce-selinux.yml:
         ```yaml
@@ -5200,20 +5200,13 @@
         ```shell
         cd ansible
         vi ansible.cfg
+		mkdir roles
 
         ### contents of file
         [defaults]
-
         interpreter_python = auto
         inventory = /home/cloud_user/ansible/inventory/inv.ini
-        roles_path = /etc/ansible/roles:/home/cloud_user/ansible/roles
-        ###
-
-        mkdir roles
-        # add property to default ansible.cfg
-        sudo vi /etc/ansible/ansible.cfg
-        # add line
-        interpreter_python = auto
+        roles_path = /etc/ansible/roles:/home/cloud_user/ansible/roles       
         ```
 
 1. Create and use static inventories to define groups of hosts
@@ -5247,6 +5240,51 @@
         # enter password
         ```
 
+	* A playbook can be used to distribute keys to managed nodes. To install the `openssh_keypair` module:
+        ```shell
+        ansible-galaxy collection install community.crypto
+        ```
+
+	* Create a playbook `/home/ansible/ansible/bootstrap.yml`:
+        ```yaml
+		---
+		- name: Key preparation
+		  hosts: localhost
+		  tasks:
+		    - name: SSH key directory exists
+		      file:
+		        path: /home/ansible/.ssh
+		        state: directory
+		        mode: 0700
+
+		    - name: SSH keypair exists
+		      community.crypto.openssh_keypair:
+		        path: /home/ansible/.ssh/id_rsa
+		        state: present
+
+		- name: Bootstrap automation user and install keys
+		  hosts: all
+		  tasks:
+		    - name: Confirm user exists
+		      user:
+		        name: ansible
+		        state: present
+
+		    - name: sudo passwordless access for ansible user
+		      copy:
+		        content: "ansible ALL=(ALL) NOPASSWD:ALL"
+		        dest: /etc/sudoers.d/ansible
+		        validate: /usr/sbin/visudo -csf %s
+
+		    - name: Public key is in remote authorized keys
+		      ansible.posix.authorized_key:
+		        user: ansible
+		        state: present
+		        key: "{{ lookup('file', /home/ansible/.ssh/id_rsa.pub')  }}"
+        ```
+
+	* Note that until you have setup the keys, in `ansible.cfg` you will need to set `ask_pass=true` and `host_key_checking=false` under `[defaults]`, and `become_ask_pass=true` under `[privilege_escalation]`. This will allow you to provide the authentication and sudo passwords as part of the playbook execution.
+
 1. Configure privilege escalation on managed nodes
 
     * The following is an example of configuring privilege escalation on managed nodes mypearson2c and mypearson3c:
@@ -5257,19 +5295,21 @@
         cloud_user ALL=(ALL) NOPASSWD: ALL
         ```
 
+	* The example above provides a playbook for setting up privilege escalation on managed nodes.
+
 1. Deploy files to managed nodes
 
 	* The copy module can be used to copy files into managed nodes.
 
 1. Be able to analyze simple shell scripts and convert them to playbooks
 
-	* Common Ansible modules can be used to replicate the functionailty of scripts. The `command` and `shell` modules allow you to execute commands.
+	* Common Ansible modules can be used to replicate the functionailty of scripts. The `command` and `shell` modules allow you to execute commands on the managed nodes.
 
 ### Run playbooks with Automation content navigator
 
 1. Know how to run playbooks with Automation content navigator
 
-	* ANsible content navigator is a commond line, content-creator-focused tool with a text-based user interface. You can use it to launch and watch jobs and playbooks, share playbook and job run artifacts in JSON, browse and introspect automation execution environments, and more.
+	* Anible content navigator is a commond line, content-creator-focused tool with a text-based user interface. You can use it to launch and watch jobs and playbooks, share playbook and job run artifacts in JSON, browse and introspect automation execution environments, and more.
 
 	* Install Ansible Navigator:
         ```shell
@@ -5293,11 +5333,11 @@
 
 	* After running `ansible-navigator` you are presented with an interactive interface. You can type `:run <playbook> -i <inventory>` to run a playbook. You can also run a playbook using `ansible-navigator run -m stdout $playbook`. This provides backwards compatability with the standard `ansible-playbook` command.
 
-	* Note that there is no ansible-doc for ansible-navigator, but you can use `ansible-navagotor --help`.
+	* Note that there is no ansible-doc for ansible-navigator, but you can use `ansible-navigator --help`.
 
 1. Use Automation content navigator to find new modules in available Ansible Content Collections and use them
 
-	* Run the following
+	* Run the following:
         ```shell
 		ansible-galaxy collection install community.general -p collections
 		ansible-galaxy collection # collection shows as type bind_mount
@@ -5305,7 +5345,7 @@
 
 1. Use Automation content navigator to create inventories and configure the Ansible environment
 
-	* Run the following
+	* Run the following:
         ```shell
 		ansible-navigator inventory -i assets/inventory.cfg # inspect an inventory
 		ansible-navigator config
@@ -5326,7 +5366,7 @@
             * Manage packages with the YUM package manager.
             * Common parameters are name and state.
         * Service
-            * Control services on remote hosts:
+            * Control services on remote hosts.
             * Common parameters are name (required), state and enabled.
         * User
             * Manage user accounts and attributes.
@@ -5346,7 +5386,6 @@
         ---
         - name: Copy a file from local to remote
           hosts: all
-
           tasks:
           - name: Copying file
             copy:
@@ -5358,11 +5397,10 @@
         ```
 
     * A sample playbook to change file permissions:
-        ```shell
+        ```yaml
         --
         - name: Change file permissions
           hosts: all
-
           tasks:
             - name: File Permissions
               file:
@@ -5375,7 +5413,6 @@
         ---
         - name: File status module
           hosts: localhost
-
           tasks:
           - name: Check file status and attributes
             stat:
@@ -5392,7 +5429,6 @@
         ---
         - name: Create and Remove file
           hosts: all
-
           tasks:
           - name: Create a directory
             file:
@@ -5426,7 +5462,6 @@
         ---
         - name: Create a file and add text
           hosts: localhost
-
           tasks:
           - name: Create a new file
             file:
@@ -5487,7 +5522,6 @@
         ---
         - name: Create a cron job
           hosts: all
-
           tasks:
             - name: Schedule cron
               cron:
@@ -5526,7 +5560,6 @@
         ---
         - name: Create and mount new storage
           hosts: all
-
           tasks:
             - name: Create new partition
               parted:
@@ -5561,7 +5594,6 @@
         ---
         - name: Playbook for creating users
           hosts: all
-
           tasks:
             - name: Create users
               user:
@@ -5575,7 +5607,6 @@
         ---
         - name: Add or update user password
           hosts: all
-
           tasks:
             - name: Change "george" password
               user:
@@ -5594,7 +5625,6 @@
         ---
         - name: Find a process and kill it
           hosts: 192.168.1.105
-
           tasks:
             - name: Get running process from remote host
               ignore_errors: yes
@@ -5616,7 +5646,6 @@
         ---
         - name: Find a process and kill it
           hosts: 192.168.1.105
-
           tasks:
             - name: Get running process from remote host
               ignore_errors: yes
@@ -5645,7 +5674,7 @@
     * The register keyword is used to store the results of running a command as a variable. Variables can then be referenced by other tasks in the playbook. Registered variables are only valid on the host for the current playbook run. The return values differ from module to module.
 
     * A sample playbook register.yml is shown below:
-        ```shell
+        ```yaml
         ---
         - hosts: mspearson2
           tasks:
@@ -5745,36 +5774,61 @@
 
     * To target tasks using tags run `ansible-playbook httpbytags.yml -t i-httpd`. To skip tasks using tags run `ansible-playbook httpbytags.yml --skip-tags i-httpd`
 
-
 1. Configure error handling
 
+	* By default, Ansible stops executing tasks on a host when a task fails on that host. You can use `ignore_errors` to continue despite of the failure.
+
 1. Create playbooks to configure systems to a specified state
+
+	* Various example playbooks are provided in the surrounding sections.
 
 ### Automate standard RHCSA tasks using Ansible modules that work with:
 
 1. Software packages and repositories
 
+	* The `yum` module in `ansible-core` can be used to manage packages.
+
 1. Services
+
+	* The `service` module in `ansible-core` can be used to manage services.
 
 1. Firewall rules
 
+	* The `ansible.posix.firewalld` module in the `ansible.posix` collection can be used to manage firewall rules.
+
 1. File systems
+
+	* The `community.general.filesystem` module in the `community.general` collection can be used to manage file systems.
 
 1. Storage devices
 
+	* Various modules in the `community.general` collection can be used to manage block devices.
+
 1. File content
+
+	* The `copy` module in `ansible-core` can be used to copy file contents.
 
 1. Archiving
 
+	* The `community.general.archive` module in the `community.general` collection can be used to create or extend an archive.
+
 1. Task scheduling
+
+	* The `cron` module in `ansible-core` can be used to manage task scheduling.
 
 1. Security
 
+	* The `community.general.sefcontext` module in the `community.general` collection can be used to manage SELinux file contexts.
+
 1. Users and groups
+
+	* The `user` and `group` modules in `ansible-core` can be used to manage users and groups.
 
 ### Manage content
 
 1. Create and use templates to create customized configuration files
+
+	* The `template` module in `ansible-core` can be used with templates to populate files on managed hosts.
 
 1. Use Ansible Vault in playbooks to protect sensitive data
 
@@ -6300,54 +6354,54 @@
               user:
                 name: webdev
                 state: present
-        
+
             - name: Create webdev directory
               file:
                 path: /webdev
                 state: directory
                 mode: '2755'
                 owner: webdev
-        
+
             - name: Create the html webdev directory
               file:
                 path: /var/www/html/webdev
                 state: directory
                 mode: '2755'
                 owner: root
-        
+
             - name: Set correct SELinux file context
               sefcontext:
                 target: '/var/www/html/webdev(/.*)?'
                 setype: httpd_sys_content_t
                 state: present
-        
+
             - name: Set correct SELinux file context
               sefcontext:
                 target: '/webdev(/.*)?'
                 setype: httpd_sys_content_t
                 state: present
-        
+
             - name: Check firewall rules
               firewalld:
                 service: http
                 permanent: true
                 state: enabled
                 immediate: true
-        
+
             - name: Copy html file into webdev directory
               copy:
                 src: /home/ansible/ansible/index.html
                 dest: /webdev/index.html
                 owner: webdev
               notify: Restart httpd
-        
+
         - name: Create the symlink
               file:
                 src: /webdev
                 dest: /var/www/html/webdev
                 state: link
                 force: yes
-        
+
           handlers:
             - name: Restart httpd
               service:
@@ -6564,7 +6618,7 @@
         ansible all -u ansible -m user -a "name=devops" --ask-pass
         ansible all -u ansible -m shell -a "echo password | passwd --stdin devops"
         ansible all -u ansible -m shell -a "echo 'devops ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/devops"
-        
+
         # allow SSH without password
         ssh-copy-id -i /home/devops/.ssh/id_rsa.pub node1.example.com
         ssh-copy-id -i /home/devops/.ssh/id_rsa.pub node2.example.com
@@ -6588,13 +6642,13 @@
                 content: 'Welcome to Dev Server {{  ansible_fqdn  }}'
                 dest: /etc/motd
               when: "'dev' in group_names"
-        
+
             - name: Write to /etc/motd for webservers
               copy:
                 content: 'Welcome to Apache Server {{  ansible_fqdn  }}'
                 dest: /etc/motd
               when: "'webservers' in group_names"
-        
+
             - name: Write to /etc/motd for test
               copy:
                 content: 'Welcome to MySQL Server {{  ansible_fqdn  }}'
@@ -6617,21 +6671,21 @@
                 regexp: '^Banner '
                 line: Banner /etc/issue
                 state: present
-        
+
             - name: Set PermitRootLogin
               lineinfile:
                 path: /etc/ssh/sshd_config.d/50-redhat.conf
                 regexp: '^PermitRootLogin '
                 line: PermitRootLogin no
                 state: present
-        
+
             - name: Set MaxAuthTries
               lineinfile:
                 path: /etc/ssh/sshd_config.d/50-redhat.conf
                 regexp: '^MaxAuthTries '
                 line: MaxAuthTries 6
                 state: present
-        
+
             - name: Restart SSHD
               service:
                 name: sshd
@@ -6792,20 +6846,20 @@
           yum:
             name: httpd
             state: present
-        
+
         - name: Enable http in firewalld
           firewalld:
             service: http
             state: enabled
             permanent: true
             immediate: true
-        
+
         - name: Start httpd
           service:
             name: httpd
             state: started
             enabled: yes
-        
+
         - name: Copy template
           template:
             src: /home/ansible/ansible/index.html.j2
