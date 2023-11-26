@@ -5280,7 +5280,7 @@
 		      ansible.posix.authorized_key:
 		        user: ansible
 		        state: present
-		        key: "{{ lookup('file', /home/ansible/.ssh/id_rsa.pub')  }}"
+		        key: "{{ lookup('file', '/home/ansible/.ssh/id_rsa.pub')  }}"
         ```
 
 	* Note that until you have setup the keys, in `ansible.cfg` you will need to set `ask_pass=true` and `host_key_checking=false` under `[defaults]`, and `become_ask_pass=true` under `[privilege_escalation]`. This will allow you to provide the authentication and sudo passwords as part of the playbook execution.
@@ -6547,7 +6547,7 @@
         echo password | passwd --stdin ansible
         echo "ansible ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ansible
         dnf install ansible-core rhel-system-roles -y
-        '''
+        ```
 
     * On the control node run the following to make vim friendlier for playbook creation:
         ```shell
@@ -7058,158 +7058,100 @@
 		# add a line dev_pass: devops123
         ```
 
-#### Archive
+#### Practise Exam 3
 
-1. Validate a working configuration using ad hoc Ansible commands
-    
-    * An ad hoc command is used to execute one-line commands. They are useful for non-routine tasks such as file transfers, package management, managing services, user and group management, fact gathering, general system information, software deployment from Git, and playbook creation testing.
- 
-    * The syntax of an ad hoc command is shown below:
-        ```shell
-        ansible host -i inventory_file -m module -a "arguments"
+1. Install Essential tools and ensure access to remote hosts
+
+	* Run the following:
+         ```shell
+		sudo -su root
+		ansible localhost -m user -a "name=ansible"
+		echo password | passwd --stdin ansible
+		echo "ansible ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ansible
+		mdkir ansible
+		cd ansible
+		ansible-config init --disabled > ansible_reference.cfg
+		sudo cp /etc/ansible/hosts hosts.ini
+		sudo chown ansible:ansible hosts.ini
+		ansible-galaxy collection install community.general community.crypto ansible.posix
+		python3 -m pip install ansible-navigator --user
         ```
 
-    * Arguments require double quotes and are space delimited, and commands are executed as the user that is running them. The -b option can be used to execute the command as the root user. The -a option may be used without the -m command to run shell commands.
+1. Install Essential tools and ensure access to remote hosts
 
-    * Examples of ad hoc commands are shown below:
-        ```shell
-        # an example for the ping module
-        ansible -i inventory/inv.ini all -m ping
-
-        # an example for the setup module against the mypearson2 host
-        ansible mypearson2 -i inventory/inv.ini all -m setup
-
-        # an example of a shell command against the mypearson2 host
-        ansible mspearson2 -a "ls -l /tmp"
-
-        # an example of a shell command against the labservers group
-        ansible labservers -a "ls -l /tmp"
-
-        # ping localhost
-        ansible localhost -m ping
-
-        # create a file on all remote clients
-        ansible all -m file -a "path=/home/username/adhoc1 state=touch mode=700"
-
-        # delete a file on all remote clients
-        ansible all -m file -a "path=/home/username/adhoc1 state=absent"
-
-        # delete a file to all remote clients
-        ansible all -m copy -a "src=/tmp/adhoc2 dest=/home/username/adhoc2"
-
-        # installing a package
-        ansible all -m yum -a "name=telnet state=present"
-        ansible all -m yum -a "name=httpd-manual state=present"
-
-        # start a service
-        ansible all -m service -a "name=httpd state=started"
-
-        # start a service and enable at boot time
-        ansible all -m service -a "name=httpd state=started enabled=yes"
-
-        # check service status on remote client
-        ansible all -m shell -a "systemctl status httpd"
-
-        # remove package
-        ansible all -m yum -a "name=httpd state=absent"
-        # or
-        ansible all -m shell -a "yum remove httpd"
-
-        # create a user on remote clients
-        ansible all -m user -a "name=jsmith home=/home/jsmith shell=/bin/bash state=present"
-
-        # add a user to a different group
-        ansible all -m user -a "name=jsmith group=group"
-
-        # deleting a user on remote clients
-        ansible all -m user -a "name=jsmith home=/home/jsmith shell=/bin/bash state=absent"
-
-        # gather system information from remote clients
-        ansible all -m setup
-
-        # run a command on a remote host without a shell module
-        ansible client1 -a "/sbin/reboot"
+	* Run the following:
+         ```shell
+		# on the control node
+		sudo -su root
+		mkdir /mnt/rheliso
+		blkid # note UUID
+		echo "UUID='' /mnt/rheliso iso9660 loop 0 0" >> /etc/fstab
+		mount -a
+		vi /etc/yum.repos.d/redhat.repo
+		# add the BaseOS and AppStream repos
+		dnf install kernel-headers kernel-devel -y
+		# install guest additions
+		useradd ansible
+		echo password | passwd --stdin ansible
+		echo "ansible ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ansible
+		sudo -su ansible
+		sudo dnf install ansible-core rhel-system-roles
+		sudo dnf install pip -y
+		python3 -m pip install ansible-navigator --user
+		mdkir ~/ansible
+		cd ~/ansible
+		ansible-config init --disabled > ansible_reference.cfg
+		sudo cp /etc/ansible/hosts hosts.ini
+		sudo chown ansible:ansible hosts.ini
+		ansible-galaxy collection install community.general community.crypto ansible.posix
         ```
 
-### Script administration tasks
+	* Add the managed nodes in `/etc/fstab`.
 
-1. Create simple shell scripts
+	* Update `ansible.cfg` in the working directory:
+         ```shell
+		[defaults]
+		inventory=/home/ansible/ansible/hosts.ini
+		host_key_checking=false
+		ask_pass=true
+		remote_user=ansible
 
-    * The first line of a shell script must include `#!/bin/bash`. Comments can be added by using the # symbol. Execute permissions are required on the script before it can be executed. The script can be executed using the absolute or relative path.
-
-    * A sample shell script is shown below:
-        ```shell
-        #!/bin/bash
-        # hello world script
-        echo "Hello world!"
+		[privilege_escalation]
+		become=false
+		become_method=sudo
+		become_ask_pass=true
+		become_user=root
         ```
 
-    * A sample shell script using a for loop is shown below:
-        ```shell
-        #!/bin/bash
-        # for loop
-        for i in {1..5}
-        do
-            echo "Hello $i times!"
-        done
+	* Login to each managed node and create the ansible user. Create and run the `bootstrap.yml` playbook on the control node:
+         ```yml
+		---
+		- name: Bootstrap automation user
+		  hosts: all
+		  become: true
+		  tasks:
+		    - name: Check automation user
+		      user:
+		        name: ansible
+		        password: "{{  'password' | password_hash('sha512')  }}"
+		        home: /home/ansible
+		        state: present
+
+		    - name: Check key folder
+		      file:
+		        state: directory
+		        mode: 0700
+		        name: /home/ansible/.ssh
+
+		    - name: Check sudo access
+		      copy:
+		        content: "ansible ALL=(ALL) NOPASSWD:ALL"
+		        dest: /etc/sudoers.d/ansible
+		        validate: /usr/sbin/visudo -csf %s
+
+		    - name: Copy public key into authorized_keys
+		      ansible.posix.authorized_key:
+		        user: ansible
+		        state: present
+		        key: "{{  lookup('file', lookup('env', 'HOME') + '/.ssh/id_rsa.pub')  }}"
         ```
-
-1. Create simple shell scripts that run ad hoc Ansible commands
-
-    * A script containing adhoc commands is shown below:
-        ```shell
-        #!/bin/bash
-        
-        # Create the user matt
-        ansible mcpearson3c.mylabserver.com -i /home/cloud_user/ansible/inventory/inv.ini -b -m user -a "name=matt"
-
-        # Create the demo directory in matt's home directory
-        ansible mspearson3c.mylabserver.com -i /home/cloud_user/ansible/inventory/inv.ini -b -m file -a "path=/home/matt/demo state=directory owner=matt group=matt mode=0755"
-
-        # Copy testFile to matt's home directory
-        ansible mspearson3c.mylabserver.com -i /home/cloud_user/ansible/inventory/inv.ini -b -m copy -a "src=/home/cloud_user/ansible/testFile dest=/home/matt/testFile mode=0644 owner=matt group=matt"
-
-        # Install httpd to the webservers group and start and enable the httpd service
-        ansible webservers -i /home/cloud_user/ansible/inventory/inv.ini -b -m yum -a "name=httpd state=latest"
-        ansible webservers -i /home/cloud_user/ansible/inventory/inv.ini -b -m service -a "name=httpd state=started enabled=yes"
-        ```
-
-    * Ad hoc commands can be a powerful tool for running commands across an inventory and getting the desired results. The following example can be run on a host to retrieve log files from multiple managed nodes:
-        ```shell
-        #!/bin/bash
-
-        for i in webserver1 dbserver1 adminserver1;
-           do ssh ansible@$i "sudo tar -czf messages.tar.gz /var/log/messages";
-        done
-        ansible -m fetch -a "src=/home/ansible/messages.tar.gz dest=/tmp/messages" all
-        ```
-
-    * To mount an ISO and use it as a repo:
-        ```shell
-        mount -t iso9660 -o loop rhel-9.2-x86_64-dvd.iso /mnt/disc
-        # to make it permanent edit /etc/fstab
-        # /mnt/disc/rhel-9.2-x86_64-dvd.iso /mnt/iso iso9660 loop,ro,nofail 0 0
-        mount -a
-        # add the following entries to /etc/yum.repos.d/redhat.repo
-        #
-        # [BaseOS]
-        # name=BaseOS
-        # baseurl=file:///mnt/disc/BaseOS/
-        # enabled=1
-        # gpgcheck=0
-        #
-        # [AppStream]
-        # name=AppStream
-        # baseurl=file:///mnt/disc/AppStream/
-        # enabled=1
-        # gpgcheck=0
-        dnf repolist # confirm repos
-        ```
-
-1. Create roles
-
-1. Download roles from an Ansible Galaxy and use them
-
-1. Create and use templates to create customized configuration files
-
-1. Use Ansible Vault in playbooks to protect sensitive data
