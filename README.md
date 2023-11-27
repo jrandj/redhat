@@ -7098,6 +7098,7 @@
 		sudo dnf install ansible-core rhel-system-roles
 		sudo dnf install pip -y
 		python3 -m pip install ansible-navigator --user
+		echo "autocmd FileType yml setlocal ai sw=2 ts=2 et cu" >> ~/.vimrc
 		mdkir ~/ansible
 		cd ~/ansible
 		ansible-config init --disabled > ansible_reference.cfg
@@ -7154,4 +7155,179 @@
 		        user: ansible
 		        state: present
 		        key: "{{  lookup('file', lookup('env', 'HOME') + '/.ssh/id_rsa.pub')  }}"
+        ```
+
+1. Create an Ansible Inventory
+
+	* Add the following to `/home/ansible/inventory`:
+         ```yml
+		[web]
+		web01
+		web02
+		
+		[development]
+		dev01 
+		
+		[dc1:children]
+		web
+		development
+        ```
+
+1. Configure Ansible Settings
+
+	* Update `ansible.cfg` in the working directory:
+         ```yml
+		[defaults]
+		inventory=/home/ansible/rhce1/inventory
+		host_key_checking=False
+		ask_pass=False
+		remote_user=ansible
+		forks=3
+		timeout=120
+		
+		[privilege_escalation]
+		become=True
+		become_method=sudo
+		become_ask_pass=False
+		become_user=root
+        ```
+
+1. User Management and Group Assignments
+
+	* Run the following:
+         ```shell
+		mkdir vars
+		cd vars
+		ansible-vault create vault.yml # enter 'rocky'
+		# enter user_password: password!
+		cd ..
+		echo rocky > users_vault.txt
+        ```
+
+	* Create the playbook `users.yml` and run using `ansible-playbook users.yml --vault-password-file users_vault.txt`:
+         ```yml
+		---
+		- name: Create users in managed nodes
+		  hosts: dc1
+		  vars_files:
+		    - vars/vault.yml
+		  tasks:
+		    - name: Create the admins groups
+		      group:
+		        name: admins
+		        state: present
+
+		    - name: Create the users group
+		      group:
+		        name: users
+		        state: present
+
+		    - name: Create tony
+		      user:
+		        name: tony
+		        password: "{{  user_password | password_hash('sha512')  }}"
+		        groups: admins
+
+		    - name: Create carmela
+		      user:
+		        name: carmela
+		        password: "{{  user_password | password_hash('sha512')  }}"
+		        groups: admins
+
+		    - name: Create paulie
+		      user:
+		        name: paulie
+		        password: "{{  user_password | password_hash('sha512')  }}"
+		        groups: users
+
+		    - name: Create chris
+		      user:
+		        name: chris
+		        password: "{{  user_password | password_hash('sha512')  }}"
+		        groups: users
+
+		    - name: Give tony sudo access
+		      copy:
+		        content: "tony ALL=(ALL) NOPASSWD:ALL"
+		        dest: /etc/sudoers.d/tony
+        ```
+
+1. Setup a Cron Job for Logging Date
+
+	*  Create and run the playbook `cron.yml`
+         ```yml
+		---
+		- name: Setup cron jobs on managed nodes
+		  hosts: dev01
+		  tasks:
+		    - name: Setup cron job
+		      cron:
+		        name: "Write date to file"
+		        minute: "*/2"
+		        job: "date +'%Y-%m-%d %H:%M:%S' >> /tmp/logme.txt"
+		        state: present
+        ```
+
+1. Extract Host Information from Inventory using Ansible Navigator
+
+	*  Create and run the script `fetch_host_info.sh`
+         ```shell
+		#!/bin/bash
+		ansible-navigator inventory -i inventory -m stdout --host web01
+        ```
+
+1. Configure Time Synchronization Using RHEL System Roles
+
+	*  Run the following:
+         ```shell
+		sudo dnf install rhel-system-roles -y
+        ```
+
+	*  Create and run the playbook `timesync.yml`
+         ```yml
+		---
+		- name: Configure timesync
+		  hosts: all
+		  vars:
+		    timesync_ntp_servers:
+		      - hostname: 2.rhel.pool.ntp.org
+		        iburst: True
+		        pool: True
+		  roles:
+		    - /usr/share/ansible/collections/ansible_collections/redhat/rhel_system_roles/roles/timesync
+        ```
+
+1. Software Installation Using Variables
+
+	*  Create the file `software_vars.yml`
+         ```yml
+		---
+		software_packages:
+		  - vim
+		  - nmap
+        ```
+
+	*  Create and run the playbook `software_install.yml`
+         ```yml
+		---
+		- name: Install software packages
+		  hosts: all
+		  vars_files:
+		    - software_vars.yml
+		  vars:
+		    software_group: "@Virtualization Host"
+		  tasks:
+		    - name: Install packages for web
+		      yum:
+		        name: "{{  item  }}"
+		        state: present
+		      with_items:
+		        - "{{  software_packages  }}"
+		      when: "'web' in group_names"
+
+		    - name: Install packages for dev01
+		      yum:
+		        name: "{{  software_group  }}"
+		        state: present
+		      when: "'development' in group_names"
         ```
