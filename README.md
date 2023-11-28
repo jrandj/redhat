@@ -4815,7 +4815,7 @@
         {% endif %}
         ```
 
-    * The `inventory_hostname` variable contains the host as configured as configured in your inventory, as an alternative to `ansible_hostname` when fact-gathering is disabled. You can also use `inventory_hostname_short` which contains the part up to the first period.
+    * The `inventory_hostname` variable contains the host as configured as configured in your inventory, as an alternative to `ansible_hostname` when fact-gathering is disabled (`gather_facts: no`). You can also use `inventory_hostname_short` which contains the part up to the first period.
 
     * The `ansible_play_hosts` is the list of all hosts still active in the current play.
 
@@ -6464,13 +6464,13 @@
                 content: "Development"
                 dest: /etc/issue
               when: "'dev' in group_names"
-        
+
             - name: Update file for tets
               copy:
                 content: "Test"
                 dest: /etc/issue
               when: "'test' in group_names"
-        
+
             - name: Update file for prod
               copy:
                 content: "Production"
@@ -6736,7 +6736,7 @@
                 password: "{{  user_pass | password_hash('sha512')  }}"
               with_items: "{{  users }}"
               when: "('dev' in group_names) and (item.job == 'developer')"
-        
+
             - name: Create manager users from the userlist
               user:
                 name: "{{  item.username }}"
@@ -6776,13 +6776,13 @@
                     flags: [ lvm ]
                     state: present
                   when: "ansible_facts['devices']['sdb'] is defined"
-            
+
                 - name: Create volume group
                   lvg:
                     vg: vg0
                     pvs: /dev/sdb1
                   when: "ansible_facts['devices']['sdb'] is defined"
-            
+
                 - name: Create logical volume
                   lvol:
                     vg: vg0
@@ -6790,12 +6790,12 @@
                     size: 1500m
                     state: present
                   when: "ansible_facts['devices']['sdb'] is defined and ansible_lvm['vgs']['vg0'] is defined and ansible_lvm['lvs']['lv0'] is not defined and (ansible_lvm['vgs']['vg0']['free_g'] | float) > 1.5"
-            
+
                 - name: Print error message
                   debug:
                     msg: "Not enough space in volume group"
                   when: "ansible_facts['devices']['sdb'] is defined and ansible_lvm['vgs']['vg0'] is defined and (ansible_lvm['vgs']['vg0']['free_g']) | float <= 1.5"
-            
+
                 - name: Create logical volume
                   lvol:
                     vg: vg0
@@ -6803,14 +6803,14 @@
                     size: 800m
                     state: present
                   when: "ansible_facts['devices']['sdb'] is defined and ansible_lvm['vgs']['vg0'] is defined and ansible_lvm['lvs']['lv0'] is not defined and (ansible_lvm['vgs']['vg0']['free_g']) | float > 0.8"
-            
+
                 - name: Create the file system
                   filesystem:
                     dev: /dev/vg0/lv0
                     state: present
                     fstype: xfs
                   when: "ansible_lvm['lvs']['lv0'] is defined"
-            
+
                 - name: Mount file system
                   mount:
                     src: /dev/vg0/lv0
@@ -7164,10 +7164,10 @@
 		[web]
 		web01
 		web02
-		
+
 		[development]
 		dev01 
-		
+
 		[dc1:children]
 		web
 		development
@@ -7184,7 +7184,7 @@
 		remote_user=ansible
 		forks=3
 		timeout=120
-		
+
 		[privilege_escalation]
 		become=True
 		become_method=sudo
@@ -7264,7 +7264,7 @@
 		      cron:
 		        name: "Write date to file"
 		        minute: "*/2"
-		        job: "date +'%Y-%m-%d %H:%M:%S' >> /tmp/logme.txt"
+		        job: "date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S' >> /tmp/logme.txt"
 		        state: present
         ```
 
@@ -7330,4 +7330,265 @@
 		        name: "{{  software_group  }}"
 		        state: present
 		      when: "'development' in group_names"
+        ```
+
+1. Debugging an API Key from an Ansible Vault
+
+	*  Run the following:
+         ```shell
+		ansible-vault create api_key.yml # trustme!123
+        ```
+
+	* Add the following content to `api_key.yml`:
+         ```yml
+		my_api_key: "f3eb0782983d3a417de12b96eb551a90"
+        ```
+
+	*  Run the following:
+         ```shell
+		ansible-vault create api_key.yml # trustme!123
+		echo 'trustme!123' > vault-key.txt
+        ```
+
+	* Create `playbook-secret.yml` and run using `ansible-playbook playbook-secret.yml --vault-password-file vault-key.txt:`
+         ```yml
+		---
+		- name: Fetch API keys
+		  hosts: localhost
+		  vars_files:
+		    - api_key.yml
+		  tasks:
+		    - name: Print API key
+		      debug:
+		        var: my_api_key
+        ```
+
+1. Configure SELinux Settings for dev01
+
+	* Create and run `selinux.yml`:
+         ```yml
+		---
+		- name: Configure SELinux
+		  hosts: dev01
+		  vars:
+		    selinux_policy: targeted
+		    selinux_state: enforcing
+		    selinux_ports:
+		      - {ports: '82', proto: 'tcp', setype: 'http_port_t', state: 'present', local: true}
+		  roles:
+		    - /usr/share/ansible/collections/ansible_collections/redhat/rhel_system_roles/roles/selinux
+		  tasks:
+		    - name: Install http package
+		      yum:
+		        name: httpd
+		        state: present
+
+		    - name: Enable http service
+		      service:
+		        name: httpd
+		        state: started
+		        enabled: yes
+
+		    - name: Enable firewall port
+		      ansible.posix.firewalld:
+		        port: 82/tcp
+		        state: enabled
+		        permanent: yes
+		        immediate: yes
+
+		    - name: Check Apache port
+		      lineinfile:
+		        path: /etc/httpd/conf/httpd.conf
+		        regexp: '^Listen '
+		        insertafter: '^#Listen '
+		        line: Listen 82
+        ```
+
+1. Troubleshoot and Fix the Playbook
+
+	* Create and run `fixme.yml`:
+         ```yml
+		---
+		- name: Troublesome Playbook
+		  hosts: all
+		  become: yes
+		  vars:
+		    install_package: "vsftpd"
+		    service_name: "vsftpd"
+
+		  tasks:
+		  - name: Install a package
+		    yum:
+		      name: "{{ install_package }}"
+		      state: "installed"
+
+		  - name: Start and enable a service
+		    service:
+		      name: "{{ service_name }}"
+		      enabled: yes
+		      state: started
+        ```
+
+1. Ad-Hoc Command Execution via Shell Script
+
+	* Create and run `adhocfile.sh`:
+         ```shell
+		!/bin/bash
+		ansible all -m file -a "path=/tmp/sample.txt state=touch owner=carmela mode=0644"
+		ansible all -m lineinfile -a "path=/tmp/sample.txt line='Hello ansible world'"
+        ```
+
+1. Create Swap Partition Based on Memory
+
+	* Create and run `swap.yml`:
+         ```yml
+		---
+		- name: Create Swap Partition Based on Memory
+		  hosts: all
+		  tasks:
+		    - name: Create partition
+		      community.general.parted:
+		        device: /dev/sdb
+		        number: 1
+		        state: present
+		      when: "ansible_devices['sdb'] is defined and ansible_memtotal_mb < 8000"
+
+		    - name: Display message
+		      debug:
+		        msg: "Available memory is {{  ansible_memfree_mb  }}"
+		      when: "ansible_memtotal_mb < 8000"
+
+		    - name: Create file system
+		      community.general.filesystem:
+		        fstype: swap
+		        dev: /dev/sdb1
+		        state: present
+		      when: "ansible_devices['sdb']['partitions']['sdb1'] is defined"
+
+			- name: Activate the swap space
+			  command: "swapon /dev/sdb1"
+			  when: "ansible_devices['sdb']['partitions']['sdb1'] is defined"
+
+		    - name: Mount file system
+		      ansible.posix.mount:
+		        path: /mnt/swp
+		        src: /dev/sdb1
+		        state: mounted
+		        fstype: swap
+		      when: "ansible_devices['sdb']['partitions']['sdb1'] is defined"
+        ```
+
+1. Check Webpage Status and Debug on Failure
+
+	* Create and run `check_webpage.yml`:
+         ```yml
+	    ---
+	    - name: Check Webpage Status and Debug on Failure
+	      hosts: localhost
+	      become: false
+	      gather_facts: no
+	      tasks:
+	        - name: Block to attempt fetching the webpage status
+	          block:
+	            - name: Attempt to fetch the status of webserver
+	              ansible.builtin.uri:
+	                url: http://169.254.3.5
+	                method: GET
+	                status_code: 200
+	              register: webpage_result
+
+	          rescue:
+	            - name: Display debug message if webpage check fails
+	              ansible.builtin.debug:
+	                msg: "{{ webpage_result }}"
+        ```
+
+1. Configure SSH Security Settings with Ansible Role
+
+	* Create `/home/ansible/rhce1/roles/secure_ssh/tasks/main.yml`:
+         ```yml
+		---
+		- name: Configure X11Forwarding
+		  lineinfile:
+		    path: /etc/ssh/sshd_config
+		    line: X11Forwarding no
+		  notify: Restart SSH
+
+		- name: Configure PermitRootLogin
+		  lineinfile:
+		    path: /etc/ssh/sshd_config
+		    line: PermitRootLogin no
+		  notify: Restart SSH
+
+		- name: Configure MaxAuthTries
+		  lineinfile:
+		    path: /etc/ssh/sshd_config
+		    line: MaxAuthTries 3
+		  notify: Restart SSH
+
+		- name: Configure AllowTcpForwarding
+		  lineinfile:
+		    path: /etc/ssh/sshd_config
+		    line: AllowTcpForwarding no
+		  notify: Restart SSH
+        ```
+
+	* Create `/home/ansible/rhce1/roles/secure_ssh/handlers/main.yml`:
+         ```yml
+		---
+		- name: Restart SSH
+		  service:
+		    name: sshd
+		    state: restarted
+        ```
+
+	* Create and run `secure_ssh_playbookyml`:
+         ```yml
+		---
+		- name: Secure SSH
+		  hosts: all
+		  roles:
+		    - secure_ssh
+        ```
+
+1. Task: Configure Web Server with System Information
+
+	* Create `webserver.j2`:
+         ```yml
+		Servername: {{  ansible_hostname }}
+		IP Aaddress: {{ ansible_default_ipv4['address'] }}
+		Free Memory: {{ ansible_memfree_mb  }}MB
+		OS: {{  ansible_os_family  }}
+		Kernel Version: {{  ansible_kernel  }}
+        ```
+
+	* Create and run `webserver.yml`:
+         ```yml
+		---
+		- name: Configure Web Server with System Information
+		  hosts: web01
+		  tasks:
+		    - name: Install httpd
+		      yum:
+		        name: httpd
+		        state: present
+
+		    - name: Enable httpd
+		      service:
+		        name: httpd
+		        state: started
+		        enabled: yes
+
+		    - name: Enable firewall
+		      ansible.posix.firewalld:
+		        service: http
+		        state: enabled
+		        immediate: true
+		        permanent: true
+			  tags: setfirewall
+
+		    - name: Populate template
+		      template:
+		        src: webserver.j2
+		        dest: /var/www/html/index.html
         ```
