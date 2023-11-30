@@ -4717,13 +4717,13 @@
     * Modules are essentially tools for tasks. They usually take parameters and return JSON. Modules can be run from the command line or within a playbook. Ansible ships with a significant number of modules by default, and custom modules can also be written.
 
     * Each specific task in Ansible is written through a Module. Multiple Modules are written in sequential order. Multiple Modules for related Tasks are called a Play. All Plays together make a Playbook.
-
+Dragon’s Dogma: Dark Arise
     * To run modules through a YAML file:
         ```shell
         ansible-playbook example.yml
         ```
 
-    * The `--syntax-check` command can be used to check the syntax before running a playbook.
+    * The `--syntax-check` parameter can be used to check the syntax before running a playbook. The `-C` parameter can be used to dry-run a playbook. 
 
     * To run a module independently:
         ```shell
@@ -4768,6 +4768,8 @@
                 path: /tmp/{{ fileName }}.txt
         ```
 
+	* When referencing a variable and the `{` character is the first character in the line, the reference must be enclosed in quotes.
+
 1. Facts
 
     * Facts provide certain information about a given target host. They are automatically discovered by Ansible when it reaches out to a host. Facts can be disabled and can be cached for use in playbook executions.
@@ -4792,7 +4794,7 @@
 
     * In addition to Facts, Ansible contains many special (or magic) variables that are automatically available.
 
-    * The `hostvars` variable contains host details for any host in the play, at any point in the playbook. To access access a fact from another node, you can use the syntax `{{  hostvars['test.example.com']['ansible_facts']['distribution']  }}`.
+    * The `hostvars` variable contains host details for any host in the play, at any point in the playbook. To access a fact from another node, you can use the syntax `{{  hostvars['test.example.com']['ansible_facts']['distribution']  }}`.
 
     * The `groups` variable lists all of the groups and hosts in the inventory. You can use this to enumerate the hosts within a group:
         ```jinja2
@@ -4849,6 +4851,8 @@
               debug:
                 msg: "{{  hostvars  }}"
         ```
+
+	* Custom facts
 
 1. Loops
 
@@ -4929,7 +4933,7 @@
 
 1. Handling task failure
 
-	* By default, Ansible stops executing tasks on a host when a task fails on that host. You can use the `ignore_errors` option to continue despite the failure. This directive only works when the task can run and returns a value of 'failed'.
+	* By default, Ansible stops executing tasks on a host when a task fails on that host. You can use the `ignore_errors` option to continue despite the failure. This directive only works when the task can run and returns a value of 'failed'. For example, the condition `when: response.failed` is used to trigger if the registered variable `response` has returned a failure.
 	
 	* Ansible lets you define what "failure" means in each task using the `failed_when` conditional. This is commonly used on registered variables:
 		```yaml
@@ -5093,7 +5097,7 @@
             - basicinstall
         ```
 
-    * Many roles are available in the Ansible Galaxy. To install a role run `ansible-galaxy install $role`. These roles will be installed into the users home directory in the users home directory in `.ansible/roles`. The role can then be copied into the standard Ansible location.
+    * By default, Ansible downloads roles to the first writable directory in the default list of paths `~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles`. This installs roles in the home directory of the user running ansible-galaxy. You can override this behaviour by setting `ANSIBLE_ROLES_PATH`, using the `--roles-path` option for the `ansible-galaxy` command, or defining `roles_path` in an `ansible.cfg` file.
 
 1. Use provided documentation to look up specific information about Ansible modules and commands
 
@@ -5110,11 +5114,23 @@
 
 1. Install roles and use them in playbooks
 
-	* The default location for roles is in `/etc/ansible/roles` which is configurable as `roles_path` in ansible.cfg. Ansible also looks for roles in collections, in the `roles` directory relative to the playbook file, and in the directory where the playbook file is located.
+	* The default location for roles is in `/etc/ansible/roles` which is configurable as `roles_path` in `ansible.cfg`. Ansible also looks for roles in collections, in the `roles` directory relative to the playbook file, and in the directory where the playbook file is located.
 
 	* To install a role run:
         ```shell
         ansible-galaxy install author.role
+        ```
+
+	* To install a role from an FTP locations $URL, first run `wget $URL`. Then create a `requirements.yml` file with each collection specified using one of these methods:
+        ```yml
+		- name: http-role-gz
+		  src: https://some.webserver.example.com/files/main.tar.gz
+        ```
+
+	* Run the following:
+        ```shell
+        ansible-galaxy install -r requirements.yml -p .
+		ansible-galaxy install -r requirements.yml -p . # allow documentation commands to work
         ```
 
 1. Install Content Collections and use them in playbooks
@@ -5144,10 +5160,28 @@
 
     * To install the `ansible-posix` collection:
         ```shell
-        ansible galaxy collection install ansible-posix
+        ansible-galaxy collection install ansible-posix
         ```
 
-	* Note that the collection is installed into `~/ansible`. This can be overwritten with `-p /path/to/collection`, but you must update `ansible.cfg` accordingly. The documentation of the installed collection can be referred, but the `ansible-doc` command only searches the system directories for documentation.
+	* To install the `ansible-posix` collection from an FTP locations $URL, first run `wget $URL`. Then create a `requirements.yml` file with each collection specified using one of these methods:
+        ```yml
+		collections:
+		  # directory containing the collection
+		  - source: ./my_namespace/my_collection/
+		    type: dir
+		
+		  # directory containing a namespace, with collections as subdirectories
+		  - source: ./my_namespace/
+		    type: subdirs
+        ```
+
+	* Run the following:
+        ```shell
+        ansible-galaxy collection install -r requirements.yml -p .
+		ansible-galaxy collection install -r requirements.yml -p . # allow documentation commands to work
+        ```
+
+	* Note that the collection is installed into `~./ansible/collections/ansible_collections`. This can be overwritten with `-p /path/to/collection`, but you must update `ansible.cfg` accordingly. The documentation of the installed collection can be referred, but the `ansible-doc` command only searches the system directories for documentation.
 
 	* Create and run a playbook enforce-selinux.yml:
         ```yaml
@@ -5177,7 +5211,7 @@
 
     * An inventory is a list of hosts that Ansible manages. Inventory files may contain hosts, patterns, groups, and variables. Multiple inventory files may be specified using a directory. Inventory files may be specified in INI or YAML format.
 
-    * The default location is `/etc/ansible/hosts`. The location can be set in ansible.cfg or specified in the CLI using:
+    * The default location is `/etc/ansible/hosts`. The location can be set in `ansible.cfg` or specified in the CLI using:
         ```shell
         ansible -i <filename>
         ```
@@ -5200,8 +5234,7 @@
         ```shell
         cd ansible
         vi ansible.cfg
-		mkdir roles
-
+=
         ### contents of file
         [defaults]
         interpreter_python = auto
@@ -5309,7 +5342,7 @@
 
 1. Know how to run playbooks with Automation content navigator
 
-	* Anible content navigator is a commond line, content-creator-focused tool with a text-based user interface. You can use it to launch and watch jobs and playbooks, share playbook and job run artifacts in JSON, browse and introspect automation execution environments, and more.
+	* Ansible content navigator is a command line, content-creator-focused tool with a text-based user interface. You can use it to launch and watch jobs and playbooks, share playbook and job run artifacts in JSON, browse and introspect automation execution environments, and more.
 
 	* Install Ansible Navigator:
         ```shell
@@ -5333,7 +5366,7 @@
 
 	* After running `ansible-navigator` you are presented with an interactive interface. You can type `:run <playbook> -i <inventory>` to run a playbook. You can also run a playbook using `ansible-navigator run -m stdout $playbook`. This provides backwards compatability with the standard `ansible-playbook` command.
 
-	* Note that there is no ansible-doc for ansible-navigator, but you can use `ansible-navigator --help`.
+	* Note that there is no `ansible-doc` for `ansible-navigator`, but you can use `ansible-navigator --help`.
 
 1. Use Automation content navigator to find new modules in available Ansible Content Collections and use them
 
@@ -5555,7 +5588,7 @@
                 mode: 0755
         ```
 
-    * A sample playbook to download a file:
+    * A sample playbook mount a filesystem:
         ```yaml
         ---
         - name: Create and mount new storage
@@ -5905,7 +5938,7 @@
 
     * On the control node run the following to make vim friendlier for playbook creation:
         ```shell
-        echo "autocmd FileType yaml setlocal ai ts=2 sw=2 et cuc nu" >> ~/.vimrc
+        echo "autocmd FileType yml setlocal ai ts=2 sw=2 et cuc nu" >> ~/.vimrc
         ```
 
 1. Task 1
@@ -6395,12 +6428,12 @@
                 owner: webdev
               notify: Restart httpd
 
-        - name: Create the symlink
-              file:
-                src: /webdev
-                dest: /var/www/html/webdev
-                state: link
-                force: yes
+	        - name: Create the symlink
+	              file:
+	                src: /webdev
+	                dest: /var/www/html/webdev
+	                state: link
+	                force: yes
 
           handlers:
             - name: Restart httpd
@@ -6547,16 +6580,16 @@
         echo password | passwd --stdin ansible
         echo "ansible ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ansible
         dnf install ansible-core rhel-system-roles -y
-        ```
+		```
 
     * On the control node run the following to make vim friendlier for playbook creation:
         ```shell
-        echo "autocmd FileType yaml setlocal ai ts=2 sw=2 et cuc nu" >> ~/.vimrc
+        echo "autocmd FileType yml setlocal ai ts=2 sw=2 et cuc nu" >> ~/.vimrc
         ```
 
     * Clone the control node machine five times for managed nodes 1-5. Attach a 2GB SATA drive to nodes 1-3, and a 1GB SATA drive to node 4. Note that cloning means the above steps are also done on each managed node, but if the servers existed already, we would have had to do this manually.
 
-    * On each managed node get the IP address using `ifconfig`. On the control node, switch to the toot user and add hostnames for the managed nodes:
+    * On each managed node get the IP address using `ifconfig`. On the control node, switch to the root user and add hostnames for the managed nodes:
         ```shell
         vi /etc/hosts
         # add the following lines
@@ -6627,7 +6660,7 @@
         ssh-copy-id -i /home/devops/.ssh/id_rsa.pub node5.example.com
         ```
 
-    * Note that this requires an existing user `ansible` to authenticate to the managed nodes. The ask pass parameter is used initially as the devops user is not created in the remote systems, and there are no keys setup for the devops user yet.
+    * Note that this requires an existing user `ansible` to authenticate to the managed nodes. The ask pass parameter is used initially as the devops user is not created in the remote systems, and there are no keys setup for the ansible user yet.
 
 1. Task 3
 
@@ -6763,62 +6796,62 @@
         ```
 
     * Revert the networking to Bridged Adapter. Add an additional 1GB and 2GB drive to nodes 4 and 5 respectively. Create and run the playbook `/home/ansible/ansible/logvol.yml`:
-             ```yaml
-            ---    
-            - name: Setup volumes
-              hosts: all
-              become: true
-              tasks:
-                - name: Create partition
-                  parted:
-                    device: /dev/sdb
-                    number: 1
-                    flags: [ lvm ]
-                    state: present
-                  when: "ansible_facts['devices']['sdb'] is defined"
-
-                - name: Create volume group
-                  lvg:
-                    vg: vg0
-                    pvs: /dev/sdb1
-                  when: "ansible_facts['devices']['sdb'] is defined"
-
-                - name: Create logical volume
-                  lvol:
-                    vg: vg0
-                    lv: lv0
-                    size: 1500m
-                    state: present
-                  when: "ansible_facts['devices']['sdb'] is defined and ansible_lvm['vgs']['vg0'] is defined and ansible_lvm['lvs']['lv0'] is not defined and (ansible_lvm['vgs']['vg0']['free_g'] | float) > 1.5"
-
-                - name: Print error message
-                  debug:
-                    msg: "Not enough space in volume group"
-                  when: "ansible_facts['devices']['sdb'] is defined and ansible_lvm['vgs']['vg0'] is defined and (ansible_lvm['vgs']['vg0']['free_g']) | float <= 1.5"
-
-                - name: Create logical volume
-                  lvol:
-                    vg: vg0
-                    lv: lv0
-                    size: 800m
-                    state: present
-                  when: "ansible_facts['devices']['sdb'] is defined and ansible_lvm['vgs']['vg0'] is defined and ansible_lvm['lvs']['lv0'] is not defined and (ansible_lvm['vgs']['vg0']['free_g']) | float > 0.8"
-
-                - name: Create the file system
-                  filesystem:
-                    dev: /dev/vg0/lv0
-                    state: present
-                    fstype: xfs
-                  when: "ansible_lvm['lvs']['lv0'] is defined"
-
-                - name: Mount file system
-                  mount:
-                    src: /dev/vg0/lv0
-                    path: /mnt/data
-                    state: mounted
-                    fstype: xfs
-                  when: "ansible_lvm['lvs']['lv0'] is defined"
-            ```
+	     ```yaml
+	    ---    
+	    - name: Setup volumes
+	      hosts: all
+	      become: true
+	      tasks:
+	        - name: Create partition
+	          parted:
+	            device: /dev/sdb
+	            number: 1
+	            flags: [ lvm ]
+	            state: present
+	          when: "ansible_facts['devices']['sdb'] is defined"
+	
+	        - name: Create volume group
+	          lvg:
+	            vg: vg0
+	            pvs: /dev/sdb1
+	          when: "ansible_facts['devices']['sdb'] is defined"
+	
+	        - name: Create logical volume
+	          lvol:
+	            vg: vg0
+	            lv: lv0
+	            size: 1500m
+	            state: present
+	          when: "ansible_facts['devices']['sdb'] is defined and ansible_lvm['vgs']['vg0'] is defined and ansible_lvm['lvs']['lv0'] is not defined and (ansible_lvm['vgs']['vg0']['free_g'] | float) > 1.5"
+	
+	        - name: Print error message
+	          debug:
+	            msg: "Not enough space in volume group"
+	          when: "ansible_facts['devices']['sdb'] is defined and ansible_lvm['vgs']['vg0'] is defined and (ansible_lvm['vgs']['vg0']['free_g']) | float <= 1.5"
+	
+	        - name: Create logical volume
+	          lvol:
+	            vg: vg0
+	            lv: lv0
+	            size: 800m
+	            state: present
+	          when: "ansible_facts['devices']['sdb'] is defined and ansible_lvm['vgs']['vg0'] is defined and ansible_lvm['lvs']['lv0'] is not defined and (ansible_lvm['vgs']['vg0']['free_g']) | float > 0.8"
+	
+	        - name: Create the file system
+	          filesystem:
+	            dev: /dev/vg0/lv0
+	            state: present
+	            fstype: xfs
+	          when: "ansible_lvm['lvs']['lv0'] is defined"
+	
+	        - name: Mount file system
+	          mount:
+	            src: /dev/vg0/lv0
+	            path: /mnt/data
+	            state: mounted
+	            fstype: xfs
+	          when: "ansible_lvm['lvs']['lv0'] is defined"
+	    ```
 
     * Note that for some reason you can't access the lvm properties using `ansible_facts['ansible_lvm']`.
 
@@ -6940,7 +6973,6 @@
 
 	* Create a file `/home/ansible/ansible/hosts.j2`:
          ```jinja2
-        ---
 		{%for host in groups['all']%}
 		{{  hostvars[host]['ansible_default_ipv4']['address']  }} {{  hostvars[host]['ansible_fqdn']  }} {{  hostvars[host]['ansible_hostname']  }}
 		{%endfor%}
@@ -6974,8 +7006,7 @@
 1. Task 15
 
 	* Create a file `/home/ansible/ansible/specs.empty`:
-         ```yaml
-		---                     
+         ```yaml           
 		HOST=
 		MEMORY=
 		BIOS=
@@ -7064,6 +7095,7 @@
 
 	* Run the following:
          ```shell
+		# on the control node
 		sudo -su root
 		ansible localhost -m user -a "name=ansible"
 		echo password | passwd --stdin ansible
@@ -7433,7 +7465,7 @@
 
 	* Create and run `adhocfile.sh`:
          ```shell
-		!/bin/bash
+		#!/bin/bash
 		ansible all -m file -a "path=/tmp/sample.txt state=touch owner=carmela mode=0644"
 		ansible all -m lineinfile -a "path=/tmp/sample.txt line='Hello ansible world'"
         ```
