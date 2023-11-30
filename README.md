@@ -5178,7 +5178,7 @@ Dragon’s Dogma: Dark Arise
 	* Run the following:
         ```shell
         ansible-galaxy collection install -r requirements.yml -p .
-		ansible-galaxy collection install -r requirements.yml -p . # allow documentation commands to work
+		ansible-galaxy collection install -r requirements.yml # allow documentation commands to work
         ```
 
 	* Note that the collection is installed into `~./ansible/collections/ansible_collections`. This can be overwritten with `-p /path/to/collection`, but you must update `ansible.cfg` accordingly. The documentation of the installed collection can be referred, but the `ansible-doc` command only searches the system directories for documentation.
@@ -5234,7 +5234,6 @@ Dragon’s Dogma: Dark Arise
         ```shell
         cd ansible
         vi ansible.cfg
-=
         ### contents of file
         [defaults]
         interpreter_python = auto
@@ -6429,11 +6428,11 @@ Dragon’s Dogma: Dark Arise
               notify: Restart httpd
 
 	        - name: Create the symlink
-	              file:
-	                src: /webdev
-	                dest: /var/www/html/webdev
-	                state: link
-	                force: yes
+              file:
+                src: /webdev
+                dest: /var/www/html/webdev
+                state: link
+                force: yes
 
           handlers:
             - name: Restart httpd
